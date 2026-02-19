@@ -28,26 +28,23 @@ export function exportSessionJSON({ paper, actionLog, studentNotes, evaluation, 
     downloadBlob(JSON.stringify(payload, null, 2), `chemlab-session-${datestamp()}.json`, "application/json");
 }
 
-// ─── Export: action log CSV ───────────────────────────────────────────────────
+// ─── Pure builders (exported for testing) ────────────────────────────────────
 
-export function exportActionLogCSV(actionLog) {
+export function buildCSV(actionLog) {
     const esc = v => `"${String(v ?? "").replace(/"/g, '""').replace(/\n/g, " ")}"`;
     const header = ["Time", "Action", "Vessel", "Chemical", "Amount", "Details"].map(esc).join(",");
     const rows   = actionLog.map(e =>
         [e.timestamp, e.action, e.vessel, e.chemical, e.amount, e.details].map(esc).join(",")
     );
-    downloadBlob([header, ...rows].join("\n"), `chemlab-log-${datestamp()}.csv`, "text/csv");
+    return [header, ...rows].join("\n");
 }
 
-// ─── Export: student notes .txt ───────────────────────────────────────────────
-
-export function exportNotesTxt(notes, paperTitle) {
+export function buildNotesTxt(notes, paperTitle) {
     const bar = "═".repeat(50);
-    const content = [
+    return [
         "Cambridge Chemistry Lab Simulator",
         bar,
         paperTitle ?? "Cambridge 9701/33 Advanced Practical Skills",
-        `Exported: ${new Date().toLocaleString()}`,
         bar,
         "",
         "STUDENT ANSWER BOOKLET",
@@ -55,7 +52,18 @@ export function exportNotesTxt(notes, paperTitle) {
         "",
         notes,
     ].join("\n");
-    downloadBlob(content, `chemlab-answers-${datestamp()}.txt`, "text/plain");
+}
+
+// ─── Export: action log CSV ───────────────────────────────────────────────────
+
+export function exportActionLogCSV(actionLog) {
+    downloadBlob(buildCSV(actionLog), `chemlab-log-${datestamp()}.csv`, "text/csv");
+}
+
+// ─── Export: student notes .txt ───────────────────────────────────────────────
+
+export function exportNotesTxt(notes, paperTitle) {
+    downloadBlob(buildNotesTxt(notes, paperTitle), `chemlab-answers-${datestamp()}.txt`, "text/plain");
 }
 
 // ─── Print report ─────────────────────────────────────────────────────────────
