@@ -207,12 +207,14 @@ export function useChemLab() {
             setClockRunning(false);
             obs = `⏱ Stop-clock stopped at ${clockTime}s. ` + (vessel.reactionTime ? `Expected reaction time ~${vessel.reactionTime}s.` : "");
         } else if (action === "measure_temp") {
-            obs = `🌡 Temperature of contents: ${vessel.temp}°C`;
+            // Round to nearest 0.5 °C to simulate thermometer precision
+            const rounded = Math.round(vessel.temp * 2) / 2;
+            obs = `🌡 Temperature: ${rounded.toFixed(1)} °C  [Thermometer precision: ±0.25 °C — record to 0.5 °C]`;
         } else if (action === "weigh") {
             const totalMass = vessel.contents
                 .filter(c => CHEMICALS[c.chemical]?.type === "solid")
                 .reduce((s, c) => s + (c.mass || 0), 0);
-            obs = `⚖️ Mass of solid contents: ${totalMass.toFixed(2)}g`;
+            obs = `⚖️ Mass of solid contents: ${totalMass.toFixed(2)} g  [Balance precision: ±0.005 g — record to 2 d.p.]`;
         } else if (action === "test_gas_splint") {
             const hasGas = vessel.observations.some(o => o.includes("H₂") || o.includes("pops"));
             obs = hasGas ? "🕯️ Gas pops with lighted splint → Hydrogen confirmed!" : "🕯️ Gas does not pop with splint.";

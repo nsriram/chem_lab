@@ -110,6 +110,16 @@ function scoreRateClock(log, notes, q) {
         hasGraph ? 2 : 0
     ));
 
+    // Precision: volumes to 2 d.p. in notes
+    const burettePrecision = /\b\d{1,2}\.\d[05]\s*cm/.test(notes);
+    criteria.push(crit(
+        burettePrecision ? "pass" : "warn",
+        burettePrecision
+            ? "✅ Volume recorded to 0.05 cm³ precision (e.g. 25.00 cm³)"
+            : "⚠️ Precision: volumes should be recorded to 0.05 cm³ (e.g. 25.00 or 12.50 cm³)",
+        burettePrecision ? 2 : 0
+    ));
+
     return criteria;
 }
 
@@ -150,6 +160,16 @@ function scoreTitration(log, notes, q) {
         notesMean ? "pass" : "warn",
         notesMean ? "✅ Mean titre calculated in answer booklet" : "⚠️ Mean titre not shown in answer booklet",
         notesMean ? 2 : 0
+    ));
+
+    // Precision: burette readings to 0.05 cm³
+    const burettePrecision = /\b\d{1,2}\.\d[05]\s*cm/.test(notes);
+    criteria.push(crit(
+        burettePrecision ? "pass" : "warn",
+        burettePrecision
+            ? "✅ Burette readings to 0.05 cm³ precision (e.g. 23.45 or 23.50 cm³)"
+            : "⚠️ Precision: burette readings must end in 0 or 5 (e.g. 12.45, 12.50 cm³)",
+        burettePrecision ? 1 : 0
     ));
 
     // Moles / concentration calculation
@@ -207,6 +227,16 @@ function scoreCrystallisation(log, notes, q) {
         notesMr ? "pass" : "warn",
         notesMr ? "✅ Mr / formula worked out in answer booklet" : "⚠️ Formula/Mr not determined in answer booklet",
         notesMr ? 1 : 0
+    ));
+
+    // Precision: balance readings to 0.01 g
+    const massPrecision = /\d+\.\d{2}\s*g/.test(notes);
+    criteria.push(crit(
+        massPrecision ? "pass" : "warn",
+        massPrecision
+            ? "✅ Mass readings recorded to 0.01 g (2 d.p.) in answer booklet"
+            : "⚠️ Precision: all balance readings must be to 0.01 g (e.g. 5.23 g, not 5.2 g)",
+        massPrecision ? 1 : 0
     ));
 
     return criteria;
@@ -318,6 +348,21 @@ function scoreQ2(log, notes, q) {
         notesDH ? "✅ ΔH / enthalpy value calculated in answer booklet"
                 : "⚠️ No ΔH calculation in answer booklet",
         notesDH ? 2 : 0
+    ));
+
+    // Precision: temperature to 0.5 °C and mass to 0.01 g
+    const tempPrecision  = /\d+\.[05]\s*°?C/.test(notes);
+    const massPrecision  = /\d+\.\d{2}\s*g/.test(notes);
+    criteria.push(crit(
+        tempPrecision && massPrecision ? "pass" : tempPrecision || massPrecision ? "partial" : "warn",
+        tempPrecision && massPrecision
+            ? "✅ Temperature to 0.5 °C and mass to 0.01 g in answer booklet"
+            : !tempPrecision && !massPrecision
+            ? "⚠️ Precision: record temperature to 0.5 °C (e.g. 23.5 °C) and mass to 0.01 g (e.g. 1.23 g)"
+            : tempPrecision
+            ? "⚠️ Temperature precision good — also record mass to 0.01 g"
+            : "⚠️ Mass precision good — also record temperature to 0.5 °C",
+        tempPrecision && massPrecision ? 2 : tempPrecision || massPrecision ? 1 : 0
     ));
 
     return criteria;
