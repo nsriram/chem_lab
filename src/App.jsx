@@ -528,6 +528,118 @@ function evaluateLog(actionLog) {
 }
 
 // ============================================================
+// GRAPH PLOT COMPONENT (SVG)
+// ============================================================
+function GraphPlot({graph}) {
+    const W = 540, H = 360;
+    const ml = 62, mr = 24, mt = 36, mb = 58;
+    const pw = W - ml - mr, ph = H - mt - mb;
+    const pts = graph.points || [];
+
+    if (pts.length === 0) {
+        return (
+            <svg width={W} height={H} style={{background: "rgba(0,0,0,0.2)", borderRadius: 8, display: "block"}}>
+                <text x={W / 2} y={H / 2} textAnchor="middle" fill="#3a6a9a" fontSize={14} fontFamily="serif">
+                    No data points yet
+                </text>
+            </svg>
+        );
+    }
+
+    const xs = pts.map(p => p.x), ys = pts.map(p => p.y);
+    const rawXMin = Math.min(...xs), rawXMax = Math.max(...xs);
+    const rawYMin = Math.min(...ys), rawYMax = Math.max(...ys);
+    const xPad = (rawXMax - rawXMin || 1) * 0.12;
+    const yPad = (rawYMax - rawYMin || 1) * 0.12;
+    const xMin = rawXMin - xPad, xMax = rawXMax + xPad;
+    const yMin = rawYMin - yPad, yMax = rawYMax + yPad;
+
+    const sx = x => ml + ((x - xMin) / (xMax - xMin)) * pw;
+    const sy = y => mt + ph - ((y - yMin) / (yMax - yMin)) * ph;
+
+    // Linear regression
+    let slope = 0, intercept = 0;
+    if (pts.length >= 2 && graph.showBestFit) {
+        const n = pts.length;
+        const mx = xs.reduce((a, v) => a + v, 0) / n;
+        const my = ys.reduce((a, v) => a + v, 0) / n;
+        const num = pts.reduce((a, p) => a + (p.x - mx) * (p.y - my), 0);
+        const den = pts.reduce((a, p) => a + (p.x - mx) ** 2, 0);
+        slope = den !== 0 ? num / den : 0;
+        intercept = my - slope * mx;
+    }
+
+    const nTicks = 5;
+    const xTicks = Array.from({length: nTicks + 1}, (_, i) => xMin + i * (xMax - xMin) / nTicks);
+    const yTicks = Array.from({length: nTicks + 1}, (_, i) => yMin + i * (yMax - yMin) / nTicks);
+
+    const fmt = v => {
+        if (Math.abs(v) >= 1000 || (Math.abs(v) < 0.01 && v !== 0)) return v.toExponential(2);
+        return parseFloat(v.toFixed(3)).toString();
+    };
+
+    return (
+        <svg width={W} height={H} style={{background: "rgba(0,0,0,0.2)", borderRadius: 8, display: "block"}}>
+            {/* Grid lines */}
+            {xTicks.map((x, i) => <line key={`gx${i}`} x1={sx(x)} y1={mt} x2={sx(x)} y2={mt + ph} stroke="#1a3a5a" strokeWidth={0.5}/>)}
+            {yTicks.map((y, i) => <line key={`gy${i}`} x1={ml} y1={sy(y)} x2={ml + pw} y2={sy(y)} stroke="#1a3a5a" strokeWidth={0.5}/>)}
+
+            {/* Axes */}
+            <line x1={ml} y1={mt} x2={ml} y2={mt + ph} stroke="#4a9adf" strokeWidth={2}/>
+            <line x1={ml} y1={mt + ph} x2={ml + pw} y2={mt + ph} stroke="#4a9adf" strokeWidth={2}/>
+
+            {/* Best-fit line */}
+            {pts.length >= 2 && graph.showBestFit && (
+                <line x1={sx(xMin)} y1={sy(slope * xMin + intercept)}
+                      x2={sx(xMax)} y2={sy(slope * xMax + intercept)}
+                      stroke="#4adf9a" strokeWidth={1.5} strokeDasharray="6,3" opacity={0.85}/>
+            )}
+
+            {/* Data points */}
+            {pts.map((p, i) => (
+                <g key={i}>
+                    <circle cx={sx(p.x)} cy={sy(p.y)} r={5} fill="#4a9adf" stroke="#c8e8ff" strokeWidth={1.5}/>
+                    {p.label && (
+                        <text x={sx(p.x) + 8} y={sy(p.y) - 6} fill="#8ab4d4" fontSize={10} fontFamily="monospace">{p.label}</text>
+                    )}
+                </g>
+            ))}
+
+            {/* X ticks + labels */}
+            {xTicks.map((x, i) => (
+                <g key={`xt${i}`}>
+                    <line x1={sx(x)} y1={mt + ph} x2={sx(x)} y2={mt + ph + 5} stroke="#4a9adf"/>
+                    <text x={sx(x)} y={mt + ph + 17} textAnchor="middle" fill="#6a9abf" fontSize={10} fontFamily="monospace">{fmt(x)}</text>
+                </g>
+            ))}
+
+            {/* Y ticks + labels */}
+            {yTicks.map((y, i) => (
+                <g key={`yt${i}`}>
+                    <line x1={ml - 5} y1={sy(y)} x2={ml} y2={sy(y)} stroke="#4a9adf"/>
+                    <text x={ml - 8} y={sy(y) + 4} textAnchor="end" fill="#6a9abf" fontSize={10} fontFamily="monospace">{fmt(y)}</text>
+                </g>
+            ))}
+
+            {/* Axis labels */}
+            <text x={ml + pw / 2} y={H - 8} textAnchor="middle" fill="#8ab4d4" fontSize={12} fontFamily="serif">{graph.xLabel}</text>
+            <text x={14} y={mt + ph / 2} textAnchor="middle" fill="#8ab4d4" fontSize={12} fontFamily="serif"
+                  transform={`rotate(-90, 14, ${mt + ph / 2})`}>{graph.yLabel}</text>
+
+            {/* Title */}
+            <text x={ml + pw / 2} y={22} textAnchor="middle" fill="#c8e8ff" fontSize={13} fontFamily="serif" fontWeight="bold">{graph.title}</text>
+
+            {/* Regression equation */}
+            {pts.length >= 2 && graph.showBestFit && (
+                <text x={ml + pw - 4} y={mt + 16} textAnchor="end" fill="#4adf9a" fontSize={10} fontFamily="monospace">
+                    y = {slope.toFixed(4)}x + {intercept.toFixed(4)}
+                </text>
+            )}
+        </svg>
+    );
+}
+
+// ============================================================
 // MAIN APP COMPONENT
 // ============================================================
 export default function ChemLabApp() {
@@ -552,6 +664,10 @@ export default function ChemLabApp() {
     const [expandedQ, setExpandedQ] = useState("Q1");
     const [transferDestId, setTransferDestId] = useState(null);
     const [transferAmount, setTransferAmount] = useState(10);
+    // Data tab state
+    const [tables, setTables] = useState([]);
+    const [graphs, setGraphs] = useState([]);
+    const [activeDataTab, setActiveDataTab] = useState("tables");
     const clockRef = useRef(null);
 
 // Stop-clock logic
@@ -955,7 +1071,7 @@ export default function ChemLabApp() {
 
             {/* Tab Bar */}
             <div style={{display: "flex", gap: 2, padding: "12px 24px 0", borderBottom: "1px solid #1a3a5a"}}>
-                {[["paper", "📋 Question Paper"], ["lab", "🧪 Laboratory"], ["evaluate", "📊 Evaluate"]].map(([id, label]) => (
+                {[["paper", "📋 Question Paper"], ["lab", "🧪 Laboratory"], ["data", "📈 Data & Graphs"], ["evaluate", "📊 Evaluate"]].map(([id, label]) => (
                     <button key={id} className={`tab-btn ${activeTab === id ? 'active' : ''}`}
                             onClick={() => setActiveTab(id)}>{label}</button>
                 ))}
@@ -1547,6 +1663,225 @@ export default function ChemLabApp() {
                             </button>
                         </div>
                     </div>
+                </div>
+            )}
+
+            {/* ================== DATA & GRAPHS TAB ================== */}
+            {activeTab === "data" && (
+                <div style={{padding: 24, maxWidth: 1100, margin: "0 auto"}}>
+                    {/* Sub-tab bar */}
+                    <div style={{display: "flex", gap: 8, marginBottom: 24}}>
+                        {[["tables", "📋 Tables"], ["graphs", "📉 Graphs"]].map(([id, label]) => (
+                            <button key={id}
+                                className={`tab-btn ${activeDataTab === id ? "active" : ""}`}
+                                onClick={() => setActiveDataTab(id)}
+                            >{label}</button>
+                        ))}
+                    </div>
+
+                    {/* ---- TABLES ---- */}
+                    {activeDataTab === "tables" && (
+                        <div>
+                            <div style={{display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16}}>
+                                <div style={{fontFamily: "'Playfair Display', serif", fontSize: 17, color: "#c8e8ff"}}>
+                                    Results Tables
+                                </div>
+                                <button className="action-btn success" onClick={() => {
+                                    setTables(ts => [...ts, {
+                                        id: Date.now(),
+                                        title: `Table ${ts.length + 1}`,
+                                        headers: ["Variable 1", "Variable 2", "Variable 3"],
+                                        rows: [["", "", ""], ["", "", ""]],
+                                    }]);
+                                }}>+ New Table</button>
+                            </div>
+
+                            {tables.length === 0 && (
+                                <div style={{textAlign: "center", padding: 60, color: "#3a6a9a", border: "2px dashed #1a3a5a", borderRadius: 12}}>
+                                    <div style={{fontSize: 32, marginBottom: 8}}>📋</div>
+                                    <div style={{fontFamily: "'Playfair Display', serif"}}>No tables yet — click "+ New Table" to start recording</div>
+                                </div>
+                            )}
+
+                            {tables.map((tbl, ti) => (
+                                <div key={tbl.id} style={{background: "rgba(0,0,0,0.25)", border: "1px solid #2a4a6a", borderRadius: 10, padding: 18, marginBottom: 20}}>
+                                    {/* Table title */}
+                                    <div style={{display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12}}>
+                                        <input
+                                            value={tbl.title}
+                                            onChange={e => setTables(ts => ts.map((t, i) => i === ti ? {...t, title: e.target.value} : t))}
+                                            style={{fontFamily: "'Playfair Display', serif", fontSize: 15, color: "#c8e8ff", background: "transparent", border: "none", borderBottom: "1px solid #2a5a8a", width: 300}}
+                                        />
+                                        <div style={{display: "flex", gap: 8}}>
+                                            <button className="action-btn" style={{fontSize: 11}} onClick={() =>
+                                                setTables(ts => ts.map((t, i) => i === ti ? {...t, headers: [...t.headers, `Col ${t.headers.length + 1}`], rows: t.rows.map(r => [...r, ""])} : t))
+                                            }>+ Column</button>
+                                            <button className="action-btn" style={{fontSize: 11}} onClick={() =>
+                                                setTables(ts => ts.map((t, i) => i === ti ? {...t, rows: [...t.rows, t.headers.map(() => "")]} : t))
+                                            }>+ Row</button>
+                                            <button className="action-btn danger" style={{fontSize: 11}} onClick={() =>
+                                                setTables(ts => ts.filter((_, i) => i !== ti))
+                                            }>🗑 Delete</button>
+                                        </div>
+                                    </div>
+
+                                    {/* Table grid */}
+                                    <div style={{overflowX: "auto"}}>
+                                        <table style={{borderCollapse: "collapse", width: "100%", fontFamily: "'JetBrains Mono', monospace", fontSize: 12}}>
+                                            <thead>
+                                                <tr>
+                                                    {tbl.headers.map((h, hi) => (
+                                                        <th key={hi} style={{border: "1px solid #2a5a8a", padding: 0}}>
+                                                            <input
+                                                                value={h}
+                                                                onChange={e => setTables(ts => ts.map((t, i) => i === ti ? {...t, headers: t.headers.map((hh, j) => j === hi ? e.target.value : hh)} : t))}
+                                                                style={{width: "100%", background: "rgba(26,74,122,0.4)", color: "#c8e8ff", border: "none", padding: "6px 8px", fontWeight: "bold", fontFamily: "'JetBrains Mono', monospace", fontSize: 12, boxSizing: "border-box"}}
+                                                            />
+                                                        </th>
+                                                    ))}
+                                                    <th style={{border: "1px solid #2a5a8a", width: 28, background: "rgba(0,0,0,0.2)"}}></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {tbl.rows.map((row, ri) => (
+                                                    <tr key={ri}>
+                                                        {row.map((cell, ci) => (
+                                                            <td key={ci} style={{border: "1px solid #1a3a5a", padding: 0}}>
+                                                                <input
+                                                                    value={cell}
+                                                                    onChange={e => setTables(ts => ts.map((t, i) => i === ti ? {...t, rows: t.rows.map((r, rj) => rj === ri ? r.map((c, cj) => cj === ci ? e.target.value : c) : r)} : t))}
+                                                                    style={{width: "100%", background: "transparent", color: "#a8c8e0", border: "none", padding: "5px 8px", fontFamily: "'JetBrains Mono', monospace", fontSize: 12, boxSizing: "border-box"}}
+                                                                />
+                                                            </td>
+                                                        ))}
+                                                        <td style={{border: "1px solid #1a3a5a", textAlign: "center"}}>
+                                                            <button onClick={() => setTables(ts => ts.map((t, i) => i === ti ? {...t, rows: t.rows.filter((_, rj) => rj !== ri)} : t))}
+                                                                style={{background: "none", border: "none", color: "#df6060", cursor: "pointer", fontSize: 13}}>×</button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* ---- GRAPHS ---- */}
+                    {activeDataTab === "graphs" && (
+                        <div>
+                            <div style={{display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16}}>
+                                <div style={{fontFamily: "'Playfair Display', serif", fontSize: 17, color: "#c8e8ff"}}>
+                                    Graphs
+                                </div>
+                                <button className="action-btn success" onClick={() => {
+                                    setGraphs(gs => [...gs, {
+                                        id: Date.now(),
+                                        title: `Graph ${gs.length + 1}`,
+                                        xLabel: "x-axis",
+                                        yLabel: "y-axis",
+                                        points: [],
+                                        showBestFit: true,
+                                        newX: "",
+                                        newY: "",
+                                        newPointLabel: "",
+                                    }]);
+                                }}>+ New Graph</button>
+                            </div>
+
+                            {graphs.length === 0 && (
+                                <div style={{textAlign: "center", padding: 60, color: "#3a6a9a", border: "2px dashed #1a3a5a", borderRadius: 12}}>
+                                    <div style={{fontSize: 32, marginBottom: 8}}>📉</div>
+                                    <div style={{fontFamily: "'Playfair Display', serif"}}>No graphs yet — click "+ New Graph" to start plotting</div>
+                                </div>
+                            )}
+
+                            {graphs.map((g, gi) => (
+                                <div key={g.id} style={{background: "rgba(0,0,0,0.25)", border: "1px solid #2a4a6a", borderRadius: 10, padding: 18, marginBottom: 24}}>
+                                    {/* Graph meta */}
+                                    <div style={{display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 14, alignItems: "center"}}>
+                                        <input value={g.title}
+                                            onChange={e => setGraphs(gs => gs.map((gg, i) => i === gi ? {...gg, title: e.target.value} : gg))}
+                                            style={{fontFamily: "'Playfair Display', serif", fontSize: 15, color: "#c8e8ff", background: "transparent", border: "none", borderBottom: "1px solid #2a5a8a", width: 220}}
+                                            placeholder="Graph title"
+                                        />
+                                        <input value={g.xLabel}
+                                            onChange={e => setGraphs(gs => gs.map((gg, i) => i === gi ? {...gg, xLabel: e.target.value} : gg))}
+                                            style={{fontSize: 12, width: 160}} placeholder="x-axis label"
+                                        />
+                                        <input value={g.yLabel}
+                                            onChange={e => setGraphs(gs => gs.map((gg, i) => i === gi ? {...gg, yLabel: e.target.value} : gg))}
+                                            style={{fontSize: 12, width: 160}} placeholder="y-axis label"
+                                        />
+                                        <label style={{fontSize: 12, color: "#8ab4d4", display: "flex", alignItems: "center", gap: 4}}>
+                                            <input type="checkbox" checked={g.showBestFit}
+                                                onChange={e => setGraphs(gs => gs.map((gg, i) => i === gi ? {...gg, showBestFit: e.target.checked} : gg))}
+                                            /> Best-fit line
+                                        </label>
+                                        <button className="action-btn danger" style={{fontSize: 11, marginLeft: "auto"}}
+                                            onClick={() => setGraphs(gs => gs.filter((_, i) => i !== gi))}>🗑 Delete</button>
+                                    </div>
+
+                                    {/* SVG plot */}
+                                    <GraphPlot graph={g} />
+
+                                    {/* Add point form */}
+                                    <div style={{display: "flex", gap: 8, marginTop: 14, alignItems: "center", flexWrap: "wrap"}}>
+                                        <span style={{fontSize: 12, color: "#6a9abf"}}>Add point:</span>
+                                        <input type="number" placeholder="x" value={g.newX}
+                                            onChange={e => setGraphs(gs => gs.map((gg, i) => i === gi ? {...gg, newX: e.target.value} : gg))}
+                                            style={{width: 80, fontSize: 12}} step="any"
+                                        />
+                                        <input type="number" placeholder="y" value={g.newY}
+                                            onChange={e => setGraphs(gs => gs.map((gg, i) => i === gi ? {...gg, newY: e.target.value} : gg))}
+                                            style={{width: 80, fontSize: 12}} step="any"
+                                        />
+                                        <input placeholder="label (optional)" value={g.newPointLabel}
+                                            onChange={e => setGraphs(gs => gs.map((gg, i) => i === gi ? {...gg, newPointLabel: e.target.value} : gg))}
+                                            style={{width: 140, fontSize: 12}}
+                                        />
+                                        <button className="action-btn" style={{fontSize: 12}} onClick={() => {
+                                            const x = parseFloat(g.newX), y = parseFloat(g.newY);
+                                            if (isNaN(x) || isNaN(y)) return;
+                                            setGraphs(gs => gs.map((gg, i) => i === gi
+                                                ? {...gg, points: [...gg.points, {x, y, label: gg.newPointLabel}], newX: "", newY: "", newPointLabel: ""}
+                                                : gg));
+                                        }}>+ Add</button>
+                                    </div>
+
+                                    {/* Points table */}
+                                    {g.points.length > 0 && (
+                                        <div style={{marginTop: 12, overflowX: "auto"}}>
+                                            <table style={{borderCollapse: "collapse", fontSize: 12, fontFamily: "'JetBrains Mono', monospace"}}>
+                                                <thead>
+                                                    <tr>
+                                                        {["#", g.xLabel || "x", g.yLabel || "y", "Label", ""].map((h, i) => (
+                                                            <th key={i} style={{border: "1px solid #2a5a8a", padding: "4px 10px", background: "rgba(26,74,122,0.4)", color: "#c8e8ff", textAlign: "left"}}>{h}</th>
+                                                        ))}
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {g.points.map((pt, pi) => (
+                                                        <tr key={pi}>
+                                                            <td style={{border: "1px solid #1a3a5a", padding: "3px 10px", color: "#6a9abf"}}>{pi + 1}</td>
+                                                            <td style={{border: "1px solid #1a3a5a", padding: "3px 10px", color: "#a8c8e0"}}>{pt.x}</td>
+                                                            <td style={{border: "1px solid #1a3a5a", padding: "3px 10px", color: "#a8c8e0"}}>{pt.y}</td>
+                                                            <td style={{border: "1px solid #1a3a5a", padding: "3px 10px", color: "#8a9abf"}}>{pt.label || "—"}</td>
+                                                            <td style={{border: "1px solid #1a3a5a", padding: "3px 8px", textAlign: "center"}}>
+                                                                <button onClick={() => setGraphs(gs => gs.map((gg, i) => i === gi ? {...gg, points: gg.points.filter((_, pj) => pj !== pi)} : gg))}
+                                                                    style={{background: "none", border: "none", color: "#df6060", cursor: "pointer", fontSize: 13}}>×</button>
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             )}
 
