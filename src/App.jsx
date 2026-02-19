@@ -69,7 +69,7 @@ const EQUIPMENT = {
 function simulateReaction(vessel, action, params = {}) {
     const contents = vessel.contents || [];
     const chemicals = contents.map(c => c.chemical);
-    const result = {observation: null, colorChange: null, precipitate: null, gas: null, newColor: vessel.color};
+    const result = {observation: null, colorChange: null, precipitate: null, gas: null, newColor: vessel.color, hasPrecipitate: false};
 
 // Thiosulfate + HCl -> cloudiness
     if (chemicals.includes("Na2S2O3") && chemicals.includes("HCl")) {
@@ -84,6 +84,7 @@ function simulateReaction(vessel, action, params = {}) {
                 reactionTime: time,
                 newColor: "#f5f0dc",
                 precipitate: "S(s) – pale yellow solid",
+                hasPrecipitate: true,
                 gas: "SO₂ (faint)",
                 colorChange: "clear → cloudy/opaque yellow-white"
             };
@@ -104,6 +105,7 @@ function simulateReaction(vessel, action, params = {}) {
             observation: `Vigorous reaction. Solution turns from blue to colourless/pale. Red-brown copper metal deposits. Temperature rises to ~${maxTemp}°C (ΔT ≈ ${deltaT}°C).`,
             newColor: "#c8a882",
             precipitate: "Cu(s) – red-brown solid",
+            hasPrecipitate: true,
             tempChange: deltaT,
             colorChange: "blue → colourless + red-brown solid"
         };
@@ -134,7 +136,8 @@ function simulateReaction(vessel, action, params = {}) {
         return {
             ...result,
             observation: "No precipitate observed immediately. On standing with H⁺, off-white/pale yellow precipitate forms slowly.",
-            precipitate: "off-white/pale yellow ppt slowly"
+            precipitate: "off-white/pale yellow ppt slowly",
+            hasPrecipitate: true
         };
     }
     if (chemicals.includes("BaCl2") && (chemicals.includes("H2SO4") || chemicals.includes("CuSO4"))) {
@@ -142,7 +145,8 @@ function simulateReaction(vessel, action, params = {}) {
             ...result,
             observation: "White precipitate forms immediately. Insoluble in excess dilute HCl. BaSO₄ confirmed.",
             newColor: "#f8f8f8",
-            precipitate: "BaSO₄ – white ppt, insoluble in dilute HCl"
+            precipitate: "BaSO₄ – white ppt, insoluble in dilute HCl",
+            hasPrecipitate: true
         };
     }
     if (chemicals.includes("BaCl2") && chemicals.includes("Na2SO3")) {
@@ -150,7 +154,8 @@ function simulateReaction(vessel, action, params = {}) {
             ...result,
             observation: "White precipitate forms. Soluble in excess dilute strong acid (BaSO₃ dissolves in HCl).",
             newColor: "#f5f5f5",
-            precipitate: "BaSO₃ – white ppt, soluble in dilute HCl"
+            precipitate: "BaSO₃ – white ppt, soluble in dilute HCl",
+            hasPrecipitate: true
         };
     }
 
@@ -170,7 +175,8 @@ function simulateReaction(vessel, action, params = {}) {
             ...result,
             observation: "Pale blue precipitate forms. Insoluble in excess NaOH. Cu(OH)₂(s).",
             newColor: "#b8d4e8",
-            precipitate: "Cu(OH)₂ – pale blue ppt, insoluble in excess"
+            precipitate: "Cu(OH)₂ – pale blue ppt, insoluble in excess",
+            hasPrecipitate: true
         };
     }
 
@@ -624,6 +630,8 @@ export default function ChemLabApp() {
                 ...v,
                 contents: newContents,
                 color: rxn.newColor || v.color,
+                hasPrecipitate: v.hasPrecipitate || rxn.hasPrecipitate,
+                precipitateLabel: rxn.precipitate || v.precipitateLabel,
                 observations: rxn.observation ? [...v.observations, rxn.observation] : v.observations,
                 temp: rxn.tempChange ? v.temp + rxn.tempChange : v.temp,
                 reactionTime: rxn.reactionTime || v.reactionTime,
@@ -660,8 +668,36 @@ export default function ChemLabApp() {
             const rxn = simulateReaction(vessel, "stir");
             obs = rxn.observation || obs;
         } else if (action === "filter") {
-            const rxn = simulateReaction(vessel, "filter");
-            obs = rxn.observation || "Filtered.";
+            const solidContents = vessel.contents.filter(c => CHEMICALS[c.chemical]?.type === "solid");
+            const liquidContents = vessel.contents.filter(c => CHEMICALS[c.chemical]?.type !== "solid");
+            const hasSolid = solidContents.length > 0 || vessel.hasPrecipitate;
+
+            if (hasSolid) {
+                const residueLabel = vessel.precipitateLabel
+                    ? `Residue: ${vessel.precipitateLabel}`
+                    : "Solid residue on filter paper";
+                const filtrateVessel = {
+                    id: Date.now() + 1,
+                    type: "beaker_100",
+                    label: `Beaker (100 cm³) [Filtrate from ${vessel.label}]`,
+                    icon: "🫙",
+                    contents: liquidContents,
+                    color: "#e8f4f8",
+                    observations: [`Filtrate collected from ${vessel.label}`],
+                    temp: vessel.temp,
+                    hasPrecipitate: false,
+                };
+                setVessels(vs => [
+                    ...vs.map(v => v.id === selectedVessel
+                        ? {...v, contents: solidContents, hasPrecipitate: false, color: "#e8e8e8",
+                            observations: [...v.observations, residueLabel]}
+                        : v),
+                    filtrateVessel,
+                ]);
+                obs = `Filter complete. ${residueLabel}. Filtrate collected in new beaker.`;
+            } else {
+                obs = "Solution filtered through filter paper. No solid residue observed.";
+            }
         } else if (action === "start_clock") {
             setClockRunning(true);
             obs = "⏱ Stop-clock started.";
@@ -685,10 +721,13 @@ export default function ChemLabApp() {
         }
 
         setLastObservation(`[${vessel.label}] ${action.replace(/_/g, ' ')}: ${obs}`);
-        setVessels(vs => vs.map(v => v.id === selectedVessel && obs
-            ? {...v, observations: [...v.observations, obs]}
-            : v
-        ));
+        // filter already called setVessels internally; all other actions need it
+        if (action !== "filter" && action !== "heat") {
+            setVessels(vs => vs.map(v => v.id === selectedVessel && obs
+                ? {...v, observations: [...v.observations, obs]}
+                : v
+            ));
+        }
         pushLog({action, vessel: vessel.label, observation: obs, details: obs});
     };
 
