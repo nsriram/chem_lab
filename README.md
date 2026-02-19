@@ -1,5 +1,7 @@
 # Cambridge Chemistry Lab Simulator
 
+[![CI](https://github.com/nsriram/chem_lab/actions/workflows/ci.yml/badge.svg)](https://github.com/nsriram/chem_lab/actions/workflows/ci.yml)
+
 An interactive browser-based practical chemistry simulator for Cambridge A-Level 9701/33 (Advanced Practical Skills). Students can perform virtual experiments, record observations, answer questions, and receive automated mark-scheme feedback — all without any physical equipment.
 
 **Live demo:** https://cambridge-chem-lab.onrender.com/
