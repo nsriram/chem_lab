@@ -1,0 +1,324 @@
+import { useState, useEffect, useRef, useCallback } from "react";
+import { CHEMICALS } from "../data/chemicals";
+import { EQUIPMENT } from "../data/equipment";
+import { simulateReaction } from "../engine/reactions";
+import { evaluateLog } from "../engine/evaluation";
+
+export function useChemLab() {
+    const [activeTab, setActiveTab] = useState("paper");
+    const [vessels, setVessels] = useState([]);
+    const [selectedVessel, setSelectedVessel] = useState(null);
+    const [actionLog, setActionLog] = useState([]);
+    const [logHistory, setLogHistory] = useState([[]]);
+    const [historyIndex, setHistoryIndex] = useState(0);
+    const [lastObservation, setLastObservation] = useState("");
+    const [studentNotes, setStudentNotes] = useState("");
+    const [evaluation, setEvaluation] = useState(null);
+    const [selectedChemical, setSelectedChemical] = useState("");
+    const [addVolume, setAddVolume] = useState(10);
+    const [addMass, setAddMass] = useState(1);
+    const [clockTime, setClockTime] = useState(0);
+    const [clockRunning, setClockRunning] = useState(false);
+    const [bureteReading, setBuretteReading] = useState(0);
+    const [expandedQ, setExpandedQ] = useState("Q1");
+    const [transferDestId, setTransferDestId] = useState(null);
+    const [transferAmount, setTransferAmount] = useState(10);
+    const [tables, setTables] = useState([]);
+    const [graphs, setGraphs] = useState([]);
+    const [activeDataTab, setActiveDataTab] = useState("tables");
+    const clockRef = useRef(null);
+
+    useEffect(() => {
+        if (clockRunning) {
+            clockRef.current = setInterval(() => setClockTime(t => t + 1), 1000);
+        } else {
+            clearInterval(clockRef.current);
+        }
+        return () => clearInterval(clockRef.current);
+    }, [clockRunning]);
+
+    const pushLog = useCallback((entry) => {
+        const newLog = [...actionLog, { ...entry, timestamp: new Date().toLocaleTimeString() }];
+        setActionLog(newLog);
+        const newHistory = logHistory.slice(0, historyIndex + 1);
+        newHistory.push(newLog);
+        setLogHistory(newHistory);
+        setHistoryIndex(newHistory.length - 1);
+    }, [actionLog, logHistory, historyIndex]);
+
+    const undo = () => {
+        if (historyIndex > 0) {
+            setHistoryIndex(i => i - 1);
+            setActionLog(logHistory[historyIndex - 1]);
+        }
+    };
+
+    const redo = () => {
+        if (historyIndex < logHistory.length - 1) {
+            setHistoryIndex(i => i + 1);
+            setActionLog(logHistory[historyIndex + 1]);
+        }
+    };
+
+    const createVessel = (equipmentId) => {
+        const eq = EQUIPMENT[equipmentId];
+        const newVessel = {
+            id: Date.now(),
+            type: equipmentId,
+            label: eq.label,
+            icon: eq.icon,
+            contents: [],
+            color: "#f0f8ff",
+            observations: [],
+            temp: 22,
+        };
+        setVessels(v => [...v, newVessel]);
+        pushLog({ action: "equipment_selected", equipment: eq.label, details: `Added ${eq.label} to bench` });
+    };
+
+    const addChemicalToVessel = () => {
+        if (!selectedVessel || !selectedChemical) return;
+        const chem = CHEMICALS[selectedChemical];
+        if (!chem) return;
+
+        const amount = chem.type === "solid" ? { mass: addMass } : { volume: addVolume };
+        const amountStr = chem.type === "solid" ? `${addMass}g` : `${addVolume} cm³`;
+
+        setVessels(vs => vs.map(v => {
+            if (v.id !== selectedVessel) return v;
+            const existing = v.contents.find(c => c.chemical === selectedChemical);
+            let newContents;
+            if (existing) {
+                newContents = v.contents.map(c => c.chemical === selectedChemical
+                    ? { ...c, volume: (c.volume || 0) + (amount.volume || 0), mass: (c.mass || 0) + (amount.mass || 0) }
+                    : c
+                );
+            } else {
+                newContents = [...v.contents, { chemical: selectedChemical, label: chem.label, ...amount }];
+            }
+            const tempVessel = { ...v, contents: newContents };
+            const rxn = simulateReaction(tempVessel, "add");
+            if (rxn.observation) setLastObservation(`[${v.label}] Added ${amountStr} ${chem.label}: ${rxn.observation}`);
+            return {
+                ...v,
+                contents: newContents,
+                color: rxn.newColor || v.color,
+                hasPrecipitate: v.hasPrecipitate || rxn.hasPrecipitate,
+                precipitateLabel: rxn.precipitate || v.precipitateLabel,
+                observations: rxn.observation ? [...v.observations, rxn.observation] : v.observations,
+                temp: rxn.tempChange ? v.temp + rxn.tempChange : v.temp,
+                reactionTime: rxn.reactionTime || v.reactionTime,
+            };
+        }));
+
+        pushLog({
+            action: "add_chemical",
+            chemical: selectedChemical,
+            amount: amountStr,
+            vessel: vessels.find(v => v.id === selectedVessel)?.label,
+            details: `Added ${amountStr} of ${chem.label}`,
+        });
+    };
+
+    const performAction = (action) => {
+        if (!selectedVessel) {
+            setLastObservation("⚠️ Please select a vessel first!");
+            return;
+        }
+        const vessel = vessels.find(v => v.id === selectedVessel);
+        if (!vessel) return;
+
+        let obs = "";
+        if (action === "heat") {
+            const rxn = simulateReaction(vessel, "heat");
+            obs = rxn.observation;
+            setVessels(vs => vs.map(v => v.id === selectedVessel
+                ? { ...v, temp: Math.min(v.temp + 15, 100), observations: [...v.observations, obs] }
+                : v
+            ));
+        } else if (action === "stir") {
+            const rxn = simulateReaction(vessel, "stir");
+            obs = rxn.observation || "Stirred vigorously. Contents well mixed.";
+        } else if (action === "filter") {
+            const solidContents = vessel.contents.filter(c => CHEMICALS[c.chemical]?.type === "solid");
+            const liquidContents = vessel.contents.filter(c => CHEMICALS[c.chemical]?.type !== "solid");
+            const hasSolid = solidContents.length > 0 || vessel.hasPrecipitate;
+
+            if (hasSolid) {
+                const residueLabel = vessel.precipitateLabel
+                    ? `Residue: ${vessel.precipitateLabel}`
+                    : "Solid residue on filter paper";
+                const filtrateVessel = {
+                    id: Date.now() + 1,
+                    type: "beaker_100",
+                    label: `Beaker (100 cm³) [Filtrate from ${vessel.label}]`,
+                    icon: "🫙",
+                    contents: liquidContents,
+                    color: "#e8f4f8",
+                    observations: [`Filtrate collected from ${vessel.label}`],
+                    temp: vessel.temp,
+                    hasPrecipitate: false,
+                };
+                setVessels(vs => [
+                    ...vs.map(v => v.id === selectedVessel
+                        ? { ...v, contents: solidContents, hasPrecipitate: false, color: "#e8e8e8", observations: [...v.observations, residueLabel] }
+                        : v),
+                    filtrateVessel,
+                ]);
+                obs = `Filter complete. ${residueLabel}. Filtrate collected in new beaker.`;
+            } else {
+                obs = "Solution filtered through filter paper. No solid residue observed.";
+            }
+        } else if (action === "start_clock") {
+            setClockRunning(true);
+            obs = "⏱ Stop-clock started.";
+        } else if (action === "stop_clock") {
+            setClockRunning(false);
+            obs = `⏱ Stop-clock stopped at ${clockTime}s. ` + (vessel.reactionTime ? `Expected reaction time ~${vessel.reactionTime}s.` : "");
+        } else if (action === "measure_temp") {
+            obs = `🌡 Temperature of contents: ${vessel.temp}°C`;
+        } else if (action === "weigh") {
+            const totalMass = vessel.contents
+                .filter(c => CHEMICALS[c.chemical]?.type === "solid")
+                .reduce((s, c) => s + (c.mass || 0), 0);
+            obs = `⚖️ Mass of solid contents: ${totalMass.toFixed(2)}g`;
+        } else if (action === "test_gas_splint") {
+            const hasGas = vessel.observations.some(o => o.includes("H₂") || o.includes("pops"));
+            obs = hasGas ? "🕯️ Gas pops with lighted splint → Hydrogen confirmed!" : "🕯️ Gas does not pop with splint.";
+        } else if (action === "test_gas_glowing") {
+            const hasO2 = vessel.observations.some(o => o.includes("O₂") || o.includes("relights"));
+            obs = hasO2 ? "🕯️ Glowing splint relights → Oxygen confirmed!" : "🕯️ Glowing splint does not relight.";
+        } else if (action === "test_litmus") {
+            const hasNH3 = vessel.observations.some(o => o.includes("NH₃") || o.includes("ammonia"));
+            obs = hasNH3 ? "📄 Damp red litmus turns blue → Ammonia confirmed!" : "📄 Litmus does not change colour.";
+        }
+
+        setLastObservation(`[${vessel.label}] ${action.replace(/_/g, ' ')}: ${obs}`);
+        if (action !== "filter" && action !== "heat") {
+            setVessels(vs => vs.map(v => v.id === selectedVessel && obs
+                ? { ...v, observations: [...v.observations, obs] }
+                : v
+            ));
+        }
+        pushLog({ action, vessel: vessel.label, observation: obs, details: obs });
+    };
+
+    const transferContents = () => {
+        const sourceVessel = vessels.find(v => v.id === selectedVessel);
+        const destVessel = vessels.find(v => v.id === transferDestId);
+        if (!sourceVessel || !destVessel) return;
+
+        const totalVolume = sourceVessel.contents.reduce((s, c) => s + (c.volume || 0), 0);
+        const fraction = totalVolume > 0 ? Math.min(transferAmount / totalVolume, 1) : 1;
+
+        setVessels(vs => vs.map(v => {
+            if (v.id === selectedVessel) {
+                const newContents = sourceVessel.contents
+                    .map(c => ({
+                        ...c,
+                        volume: c.volume != null ? +(c.volume * (1 - fraction)).toFixed(2) : undefined,
+                        mass: c.mass != null ? +(c.mass * (1 - fraction)).toFixed(3) : undefined,
+                    }))
+                    .filter(c => (c.volume ?? 0) > 0.005 || (c.mass ?? 0) > 0.001);
+                return { ...v, contents: newContents };
+            }
+            if (v.id === transferDestId) {
+                const transferred = sourceVessel.contents.map(c => ({
+                    ...c,
+                    volume: c.volume != null ? +(c.volume * fraction).toFixed(2) : undefined,
+                    mass: c.mass != null ? +(c.mass * fraction).toFixed(3) : undefined,
+                }));
+                let merged = [...v.contents];
+                transferred.forEach(tc => {
+                    const existing = merged.find(c => c.chemical === tc.chemical);
+                    if (existing) {
+                        merged = merged.map(c => c.chemical === tc.chemical
+                            ? {
+                                ...c,
+                                volume: c.volume != null ? +((c.volume || 0) + (tc.volume || 0)).toFixed(2) : undefined,
+                                mass: c.mass != null ? +((c.mass || 0) + (tc.mass || 0)).toFixed(3) : undefined,
+                            }
+                            : c);
+                    } else {
+                        merged.push(tc);
+                    }
+                });
+                const tempVessel = { ...v, contents: merged };
+                const rxn = simulateReaction(tempVessel, "add");
+                const obs = `Transfer from ${sourceVessel.label}: ${rxn.observation}`;
+                if (rxn.observation) setLastObservation(`[${v.label}] ${obs}`);
+                return {
+                    ...v,
+                    contents: merged,
+                    color: rxn.newColor || v.color,
+                    observations: rxn.observation ? [...v.observations, obs] : v.observations,
+                    temp: rxn.tempChange ? v.temp + rxn.tempChange : v.temp,
+                };
+            }
+            return v;
+        }));
+
+        pushLog({
+            action: "transfer",
+            vessel: sourceVessel.label,
+            details: `Transferred ${transferAmount} cm³ from ${sourceVessel.label} → ${destVessel.label}`,
+        });
+    };
+
+    const runEvaluation = () => {
+        const result = evaluateLog(actionLog);
+        setEvaluation(result);
+        setActiveTab("evaluate");
+    };
+
+    const clearBench = () => {
+        setVessels([]);
+        setSelectedVessel(null);
+        setLastObservation("");
+    };
+
+    const startFresh = () => {
+        setActionLog([]);
+        setLogHistory([[]]);
+        setHistoryIndex(0);
+        setVessels([]);
+        setSelectedVessel(null);
+        setStudentNotes("");
+        setEvaluation(null);
+        setActiveTab("paper");
+    };
+
+    return {
+        activeTab, setActiveTab,
+        vessels, setVessels,
+        selectedVessel, setSelectedVessel,
+        lastObservation,
+        selectedChemical, setSelectedChemical,
+        addVolume, setAddVolume,
+        addMass, setAddMass,
+        transferDestId, setTransferDestId,
+        transferAmount, setTransferAmount,
+        clockTime, setClockTime,
+        clockRunning,
+        bureteReading, setBuretteReading,
+        expandedQ, setExpandedQ,
+        studentNotes, setStudentNotes,
+        tables, setTables,
+        graphs, setGraphs,
+        activeDataTab, setActiveDataTab,
+        evaluation, setEvaluation,
+        actionLog,
+        historyIndex,
+        logHistory,
+        pushLog,
+        undo,
+        redo,
+        createVessel,
+        addChemicalToVessel,
+        performAction,
+        transferContents,
+        runEvaluation,
+        clearBench,
+        startFresh,
+    };
+}
