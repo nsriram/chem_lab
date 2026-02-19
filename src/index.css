@@ -1,68 +1,175 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+/* ── Reset & base ─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
 
-  color-scheme: light dark;
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  font-family: 'Crimson Text', Georgia, serif;
+  background: #0a1628;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
+/* ── Scrollbar ───────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 6px; }
+::-webkit-scrollbar-track { background: #0a1628; }
+::-webkit-scrollbar-thumb { background: #2a5a8a; border-radius: 3px; }
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+/* ── Form controls ───────────────────────────────────────── */
+select,
+input[type=number],
+input[type=text],
+input[type=checkbox],
+textarea {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid #2a5a8a;
+  color: #c8dce8;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-family: 'Crimson Text', serif;
+  font-size: 14px;
 }
+select:focus,
+input:focus,
+textarea:focus { outline: none; border-color: #4a9adf; }
+option { background: #0a1628; }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
+/* ── Tab buttons ─────────────────────────────────────────── */
+.tab-btn {
+  background: transparent;
+  border: 1px solid #2a5a8a;
+  color: #8ab4d4;
+  padding: 8px 20px;
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: all 0.2s;
+  font-family: 'Crimson Text', serif;
+  font-size: 15px;
+  letter-spacing: 0.5px;
 }
-button:hover {
-  border-color: #646cff;
+.tab-btn:hover  { background: #1a3a5a; color: #c8e0f4; }
+.tab-btn.active { background: #1a4a7a; color: #e8f4ff; border-color: #4a9adf; }
+
+/* ── Vessel cards ────────────────────────────────────────── */
+.vessel-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid #2a4a6a;
+  border-radius: 8px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 8px;
 }
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+.vessel-card:hover    { border-color: #4a9adf; background: rgba(74, 154, 223, 0.1); }
+.vessel-card.selected { border-color: #4af; background: rgba(68, 170, 255, 0.15); box-shadow: 0 0 12px rgba(68, 170, 255, 0.3); }
+
+/* ── Chemical / equipment buttons ───────────────────────── */
+.chem-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid #2a4a6a;
+  color: #c8dce8;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-size: 12px;
+  border-radius: 4px;
+  text-align: left;
+  width: 100%;
+  font-family: 'Crimson Text', serif;
+}
+.chem-btn:hover    { background: rgba(74, 154, 223, 0.2); border-color: #4a9adf; }
+.chem-btn.selected { background: rgba(74, 154, 223, 0.3); border-color: #7ac; }
+
+/* ── Action buttons ──────────────────────────────────────── */
+.action-btn {
+  background: linear-gradient(135deg, #1a3a5a, #1a4a6a);
+  border: 1px solid #3a6a9a;
+  color: #c8e4f8;
+  padding: 8px 14px;
+  cursor: pointer;
+  border-radius: 6px;
+  font-size: 13px;
+  transition: all 0.2s;
+  font-family: 'Crimson Text', serif;
+}
+.action-btn:hover  { background: linear-gradient(135deg, #2a4a6a, #2a5a7a); transform: translateY(-1px); }
+.action-btn:active { transform: translateY(0); }
+.action-btn.danger  { background: linear-gradient(135deg, #5a1a1a, #7a2a2a); border-color: #9a3a3a; }
+.action-btn.success { background: linear-gradient(135deg, #1a5a2a, #1a6a3a); border-color: #2a9a4a; }
+
+/* ── Observation box ─────────────────────────────────────── */
+.obs-box {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid #2a5a3a;
+  border-radius: 6px;
+  padding: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: #a8d8b8;
+  line-height: 1.6;
+  white-space: pre-wrap;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+/* ── Action log entries ──────────────────────────────────── */
+.log-entry {
+  border-bottom: 1px solid rgba(42, 90, 138, 0.3);
+  padding: 6px 0;
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.log-entry:last-child { border-bottom: none; }
+
+/* ── Question cards ──────────────────────────────────────── */
+.q-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid #2a4a6a;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+.q-header {
+  background: linear-gradient(90deg, rgba(26, 58, 90, 0.8), transparent);
+  padding: 14px 18px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.q-body { padding: 18px; }
+
+/* ── Score bar ───────────────────────────────────────────── */
+.score-bar {
+  height: 20px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.score-fill {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 1s ease;
+  background: linear-gradient(90deg, #2a8a4a, #4adf7a);
+}
+
+/* ── Vessel visuals ──────────────────────────────────────── */
+.vessel-visual {
+  width: 60px;
+  height: 80px;
+  margin: 0 auto 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  position: relative;
+}
+.vessel-liquid {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 20px;
+  border-radius: 0 0 8px 8px;
+  transition: background 0.5s;
 }
