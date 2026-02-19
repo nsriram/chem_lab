@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: cambridge-chem-lab
+    runtime: docker
+    plan: free
+    healthCheckPath: /
+    # Render sets $PORT automatically; the container reads it via envsubst
