@@ -4,30 +4,59 @@ import { EQUIPMENT } from "../data/equipment";
 import { simulateReaction } from "../engine/reactions";
 import { evaluateLog } from "../engine/evaluation";
 
+const STORAGE_KEY = "chemlab_v1";
+
+function loadSaved() {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : {};
+    } catch {
+        return {};
+    }
+}
+
 export function useChemLab() {
-    const [activeTab, setActiveTab] = useState("paper");
-    const [vessels, setVessels] = useState([]);
+    const saved = useRef(loadSaved());
+    const s = saved.current;
+
+    const [activeTab, setActiveTab] = useState(() => s.activeTab ?? "paper");
+    const [vessels, setVessels] = useState(() => s.vessels ?? []);
     const [selectedVessel, setSelectedVessel] = useState(null);
-    const [actionLog, setActionLog] = useState([]);
-    const [logHistory, setLogHistory] = useState([[]]);
-    const [historyIndex, setHistoryIndex] = useState(0);
+    const [actionLog, setActionLog] = useState(() => s.actionLog ?? []);
+    const [logHistory, setLogHistory] = useState(() => s.logHistory ?? [[]]);
+    const [historyIndex, setHistoryIndex] = useState(() => s.historyIndex ?? 0);
     const [lastObservation, setLastObservation] = useState("");
-    const [studentNotes, setStudentNotes] = useState("");
-    const [evaluation, setEvaluation] = useState(null);
+    const [studentNotes, setStudentNotes] = useState(() => s.studentNotes ?? "");
+    const [evaluation, setEvaluation] = useState(() => s.evaluation ?? null);
     const [selectedChemical, setSelectedChemical] = useState("");
     const [addVolume, setAddVolume] = useState(10);
     const [addMass, setAddMass] = useState(1);
-    const [clockTime, setClockTime] = useState(0);
+    const [clockTime, setClockTime] = useState(() => s.clockTime ?? 0);
     const [clockRunning, setClockRunning] = useState(false);
     const [bureteReading, setBuretteReading] = useState(0);
-    const [expandedQ, setExpandedQ] = useState("Q1");
-    const [activePaperId, setActivePaperId] = useState(0);
+    const [expandedQ, setExpandedQ] = useState(() => s.expandedQ ?? "Q1");
+    const [activePaperId, setActivePaperId] = useState(() => s.activePaperId ?? 0);
     const [transferDestId, setTransferDestId] = useState(null);
     const [transferAmount, setTransferAmount] = useState(10);
-    const [tables, setTables] = useState([]);
-    const [graphs, setGraphs] = useState([]);
-    const [activeDataTab, setActiveDataTab] = useState("tables");
+    const [tables, setTables] = useState(() => s.tables ?? []);
+    const [graphs, setGraphs] = useState(() => s.graphs ?? []);
+    const [activeDataTab, setActiveDataTab] = useState(() => s.activeDataTab ?? "tables");
     const clockRef = useRef(null);
+
+    // Persist state to localStorage whenever it changes
+    useEffect(() => {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                activeTab, activePaperId, expandedQ,
+                vessels, actionLog, logHistory, historyIndex,
+                studentNotes, evaluation, clockTime,
+                tables, graphs, activeDataTab,
+            }));
+        } catch {
+            // Storage quota exceeded — ignore
+        }
+    }, [activeTab, activePaperId, expandedQ, vessels, actionLog, logHistory,
+        historyIndex, studentNotes, evaluation, clockTime, tables, graphs, activeDataTab]);
 
     useEffect(() => {
         if (clockRunning) {
@@ -279,6 +308,7 @@ export function useChemLab() {
     };
 
     const startFresh = () => {
+        try { localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
         setActionLog([]);
         setLogHistory([[]]);
         setHistoryIndex(0);
@@ -286,6 +316,9 @@ export function useChemLab() {
         setSelectedVessel(null);
         setStudentNotes("");
         setEvaluation(null);
+        setClockTime(0);
+        setTables([]);
+        setGraphs([]);
         setActiveTab("paper");
     };
 
