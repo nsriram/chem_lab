@@ -29,32 +29,31 @@ export default function EvaluateTab({ evaluation, actionLog, studentNotes, runEv
                         </div>
                         <div style={{ marginTop: 8, fontSize: 13, color: "#8ab4d4" }}>
                             {Math.round((evaluation.total / evaluation.maxMarks) * 100)}%
-                            · {evaluation.total >= 28 ? "Distinction" : evaluation.total >= 20 ? "Merit" : "Needs improvement"}
+                            · {evaluation.total >= evaluation.maxMarks * 0.7
+                                ? "Distinction" : evaluation.total >= evaluation.maxMarks * 0.5
+                                ? "Merit" : "Needs improvement"}
                         </div>
                     </div>
 
-                    {/* Section Breakdown */}
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 24 }}>
-                        {[
-                            ["Q1 – Rate of Reaction", evaluation.Q1, 14],
-                            ["Q2 – Enthalpy", evaluation.Q2, 10],
-                            ["Q3 – Qualitative", evaluation.Q3, 13],
-                        ].map(([label, score, max]) => (
-                            <div key={label} style={{ background: "rgba(0,0,0,0.3)", borderRadius: 8, padding: 16, border: "1px solid #2a4a6a", textAlign: "center" }}>
-                                <div style={{ fontSize: 13, color: "#8ab4d4", marginBottom: 8 }}>{label}</div>
+                    {/* Per-Question Breakdown */}
+                    <div style={{ display: "grid", gridTemplateColumns: `repeat(${evaluation.sections?.length ?? 3}, 1fr)`, gap: 16, marginBottom: 24 }}>
+                        {(evaluation.sections ?? []).map(sec => (
+                            <div key={sec.label} style={{ background: "rgba(0,0,0,0.3)", borderRadius: 8, padding: 16, border: "1px solid #2a4a6a", textAlign: "center" }}>
+                                <div style={{ fontSize: 12, color: "#8ab4d4", marginBottom: 8, lineHeight: 1.4 }}>{sec.label}</div>
                                 <div style={{
                                     fontFamily: "'JetBrains Mono', monospace",
                                     fontSize: 28,
-                                    color: score >= max * 0.7 ? "#4adf7a" : score >= max * 0.5 ? "#df9a4a" : "#df4a4a",
+                                    color: sec.score >= sec.max * 0.7 ? "#4adf7a"
+                                         : sec.score >= sec.max * 0.5 ? "#df9a4a" : "#df4a4a",
                                 }}>
-                                    {score}/{max}
+                                    {sec.score}/{sec.max}
                                 </div>
                                 <div className="score-bar" style={{ marginTop: 8 }}>
                                     <div className="score-fill" style={{
-                                        width: `${(score / max) * 100}%`,
-                                        background: score >= max * 0.7
+                                        width: `${(sec.score / sec.max) * 100}%`,
+                                        background: sec.score >= sec.max * 0.7
                                             ? "linear-gradient(90deg,#2a8a4a,#4adf7a)"
-                                            : score >= max * 0.5
+                                            : sec.score >= sec.max * 0.5
                                                 ? "linear-gradient(90deg,#8a6a1a,#dfaa4a)"
                                                 : "linear-gradient(90deg,#8a1a1a,#df4a4a)",
                                     }} />
@@ -63,31 +62,43 @@ export default function EvaluateTab({ evaluation, actionLog, studentNotes, runEv
                         ))}
                     </div>
 
-                    {/* Feedback */}
-                    <div style={{ background: "rgba(0,0,0,0.2)", borderRadius: 10, padding: 20, border: "1px solid #2a4a6a", marginBottom: 20 }}>
-                        <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 16, color: "#c8e8ff", marginBottom: 14 }}>
-                            📋 Detailed Feedback
-                        </div>
-                        {evaluation.feedback.map((f, i) => (
-                            <div key={i} style={{
-                                padding: "6px 10px",
-                                marginBottom: 4,
-                                borderRadius: 4,
-                                background: f.startsWith("✅") ? "rgba(0,80,0,0.15)" : f.startsWith("⚠️") ? "rgba(80,60,0,0.15)" : "rgba(80,0,0,0.15)",
-                                fontSize: 13,
-                                color: f.startsWith("✅") ? "#8ad8a8" : f.startsWith("⚠️") ? "#d4b86a" : "#d48a8a",
-                            }}>
-                                {f}
+                    {/* Detailed criteria per section */}
+                    {(evaluation.sections ?? []).map(sec => (
+                        <div key={sec.label} style={{ background: "rgba(0,0,0,0.2)", borderRadius: 10, padding: 20, border: "1px solid #2a4a6a", marginBottom: 16 }}>
+                            <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 15, color: "#c8e8ff", marginBottom: 12, display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                                <span>{sec.label}</span>
+                                <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 13, color: "#6a9abf" }}>
+                                    {sec.score}/{sec.max} marks
+                                </span>
                             </div>
-                        ))}
-                    </div>
+                            {sec.criteria.map((c, i) => (
+                                <div key={i} style={{
+                                    padding: "6px 10px", marginBottom: 4, borderRadius: 4, fontSize: 13,
+                                    background: c.status === "pass"    ? "rgba(0,80,0,0.15)"
+                                              : c.status === "partial" ? "rgba(80,60,0,0.15)"
+                                              : c.status === "warn"    ? "rgba(60,50,0,0.15)"
+                                              : "rgba(80,0,0,0.15)",
+                                    color:     c.status === "pass"    ? "#8ad8a8"
+                                             : c.status === "partial" ? "#d4c46a"
+                                             : c.status === "warn"    ? "#c8a84a"
+                                             : "#d48a8a",
+                                    display: "flex", justifyContent: "space-between", gap: 8,
+                                }}>
+                                    <span>{c.text}</span>
+                                    <span style={{ fontFamily: "'JetBrains Mono', monospace", whiteSpace: "nowrap", opacity: 0.75 }}>
+                                        +{c.marks}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    ))}
 
                     {/* Action Log */}
-                    <div style={{ background: "rgba(0,0,0,0.2)", borderRadius: 10, padding: 20, border: "1px solid #2a4a6a" }}>
+                    <div style={{ background: "rgba(0,0,0,0.2)", borderRadius: 10, padding: 20, border: "1px solid #2a4a6a", marginBottom: 16 }}>
                         <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 16, color: "#c8e8ff", marginBottom: 14 }}>
                             🗒 Complete Action Log ({actionLog.length} actions)
                         </div>
-                        <div style={{ maxHeight: 300, overflow: "auto" }}>
+                        <div style={{ maxHeight: 260, overflow: "auto" }}>
                             {actionLog.length === 0 ? (
                                 <div style={{ color: "#3a6a9a", fontSize: 13 }}>
                                     No actions recorded yet. Go to the Laboratory tab to start experimenting.
@@ -107,7 +118,7 @@ export default function EvaluateTab({ evaluation, actionLog, studentNotes, runEv
 
                     {/* Student Notes Review */}
                     {studentNotes && (
-                        <div style={{ marginTop: 20, background: "rgba(0,0,0,0.2)", borderRadius: 10, padding: 20, border: "1px solid #2a4a6a" }}>
+                        <div style={{ background: "rgba(0,0,0,0.2)", borderRadius: 10, padding: 20, border: "1px solid #2a4a6a", marginBottom: 16 }}>
                             <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 16, color: "#c8e8ff", marginBottom: 14 }}>
                                 📝 Your Written Answers
                             </div>

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { CHEMICALS } from "../data/chemicals";
 import { EQUIPMENT } from "../data/equipment";
+import { QUESTION_PAPERS } from "../data/questionPaper";
 import { simulateReaction } from "../engine/reactions";
 import { evaluateLog } from "../engine/evaluation";
 
@@ -296,7 +297,8 @@ export function useChemLab() {
     };
 
     const runEvaluation = () => {
-        const result = evaluateLog(actionLog);
+        const paper = QUESTION_PAPERS[activePaperId] ?? QUESTION_PAPERS[0];
+        const result = evaluateLog(actionLog, studentNotes, paper);
         setEvaluation(result);
         setActiveTab("evaluate");
     };
