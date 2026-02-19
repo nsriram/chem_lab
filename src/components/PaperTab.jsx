@@ -77,21 +77,6 @@ export default function PaperTab({ activePaperId, setActivePaperId, expandedQ, s
                                             💡 Hint: {part.hint}
                                         </div>
                                     )}
-                                    {part.answerKey && (
-                                        <details style={{ marginTop: 8 }}>
-                                            <summary style={{ fontSize: 12, color: "#4a9adf", cursor: "pointer" }}>
-                                                📖 Show mark scheme answer
-                                            </summary>
-                                            <div style={{ marginTop: 6, padding: "8px 12px", background: "rgba(0,80,0,0.15)", borderRadius: 4, fontSize: 13, color: "#8ad8a8", border: "1px solid #2a5a3a" }}>
-                                                {part.answerKey}
-                                            </div>
-                                        </details>
-                                    )}
-                                    {part.calculationGuide && (
-                                        <div style={{ marginTop: 6, padding: "6px 10px", background: "rgba(0,0,80,0.2)", borderRadius: 4, fontSize: 12, color: "#8ab4d8", fontFamily: "'JetBrains Mono', monospace" }}>
-                                            Formula: {part.calculationGuide}
-                                        </div>
-                                    )}
                                 </div>
                             ))}
                         </div>
