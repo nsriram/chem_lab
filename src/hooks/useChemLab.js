@@ -326,8 +326,11 @@ export function useChemLab() {
         setActiveTab("paper");
     };
 
+    const activePaper = QUESTION_PAPERS[activePaperId] ?? QUESTION_PAPERS[0];
+
     return {
         activeTab, setActiveTab,
+        activePaper,
         vessels, setVessels,
         selectedVessel, setSelectedVessel,
         lastObservation,

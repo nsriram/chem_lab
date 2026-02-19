@@ -3,6 +3,7 @@ import PaperTab from "./components/PaperTab";
 import LabTab from "./components/LabTab";
 import DataTab from "./components/DataTab";
 import EvaluateTab from "./components/EvaluateTab";
+import { exportSessionJSON } from "./utils/export";
 
 export default function ChemLabApp() {
     const lab = useChemLab();
@@ -48,6 +49,17 @@ export default function ChemLabApp() {
                     </button>
                     <button className="action-btn" style={{ fontSize: 11 }} onClick={lab.redo} disabled={lab.historyIndex >= lab.logHistory.length - 1}>
                         ↪ Redo
+                    </button>
+                    <button className="action-btn" style={{ fontSize: 11 }}
+                        onClick={() => exportSessionJSON({
+                            paper: lab.activePaper,
+                            actionLog: lab.actionLog,
+                            studentNotes: lab.studentNotes,
+                            evaluation: lab.evaluation,
+                            tables: lab.tables,
+                            graphs: lab.graphs,
+                        })}>
+                        💾 Save
                     </button>
                 </div>
             </div>
@@ -127,6 +139,9 @@ export default function ChemLabApp() {
                     evaluation={lab.evaluation}
                     actionLog={lab.actionLog}
                     studentNotes={lab.studentNotes}
+                    paper={lab.activePaper}
+                    tables={lab.tables}
+                    graphs={lab.graphs}
                     runEvaluation={lab.runEvaluation}
                     onBack={() => { lab.setEvaluation(null); lab.setActiveTab("paper"); }}
                     onStartFresh={lab.startFresh}
