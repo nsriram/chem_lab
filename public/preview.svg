@@ -1,0 +1,334 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" width="900" height="560">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e293b"/>
+      <stop offset="100%" style="stop-color:#0f172a"/>
+    </linearGradient>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1e3a8a"/>
+      <stop offset="100%" style="stop-color:#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="liquidBlue" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#60a5fa;stop-opacity:0.55"/>
+      <stop offset="100%" style="stop-color:#1d4ed8;stop-opacity:0.85"/>
+    </linearGradient>
+    <linearGradient id="liquidYellow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#fef9c3;stop-opacity:0.75"/>
+      <stop offset="100%" style="stop-color:#fde047;stop-opacity:0.9"/>
+    </linearGradient>
+    <linearGradient id="liquidClear" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#e0f2fe;stop-opacity:0.35"/>
+      <stop offset="100%" style="stop-color:#7dd3fc;stop-opacity:0.55"/>
+    </linearGradient>
+  </defs>
+
+  <!-- ── Background ────────────────────────────────────────────────── -->
+  <rect width="900" height="560" fill="url(#bgGrad)" rx="12"/>
+
+  <!-- ── Browser chrome ─────────────────────────────────────────────── -->
+  <rect width="900" height="28" fill="#0f172a" rx="12"/>
+  <rect y="16" width="900" height="12" fill="#0f172a"/>
+  <circle cx="18" cy="14" r="5" fill="#ef4444"/>
+  <circle cx="34" cy="14" r="5" fill="#f59e0b"/>
+  <circle cx="50" cy="14" r="5" fill="#22c55e"/>
+  <rect x="80" y="5" width="620" height="18" fill="#1e293b" rx="9"/>
+  <text x="390" y="18" fill="#64748b" font-size="9" text-anchor="middle" font-family="monospace">cambridge-chem-lab.onrender.com</text>
+
+  <!-- ── App Header ─────────────────────────────────────────────────── -->
+  <rect x="0" y="28" width="900" height="48" fill="url(#headerGrad)"/>
+  <text x="16" y="48" fill="#93c5fd" font-size="8.5" font-weight="bold" letter-spacing="1.2" font-family="Arial, sans-serif">CAMBRIDGE AS LEVEL · 9701 / 33</text>
+  <text x="16" y="67" fill="#ffffff" font-size="15" font-weight="bold" font-family="Georgia, serif">&#x2697;  Chemistry Lab Simulator</text>
+
+  <!-- Nav tabs -->
+  <rect x="530" y="36" width="72" height="28" fill="#2563eb" rx="4"/>
+  <text x="566" y="54" fill="#ffffff" font-size="11" text-anchor="middle" font-weight="600" font-family="Arial, sans-serif">&#x1F9EA; Lab</text>
+
+  <rect x="610" y="36" width="72" height="28" fill="none" stroke="#334155" stroke-width="1" rx="4"/>
+  <text x="646" y="54" fill="#64748b" font-size="11" text-anchor="middle" font-family="Arial, sans-serif">&#x1F4CB; Paper</text>
+
+  <rect x="690" y="36" width="72" height="28" fill="none" stroke="#334155" stroke-width="1" rx="4"/>
+  <text x="726" y="54" fill="#64748b" font-size="11" text-anchor="middle" font-family="Arial, sans-serif">&#x1F4CA; Data</text>
+
+  <rect x="770" y="36" width="88" height="28" fill="none" stroke="#334155" stroke-width="1" rx="4"/>
+  <text x="814" y="54" fill="#64748b" font-size="11" text-anchor="middle" font-family="Arial, sans-serif">&#x2705; Evaluate</text>
+
+  <!-- ================================================================ -->
+  <!--  LEFT PANEL — Chemicals &amp; Equipment                           -->
+  <!-- ================================================================ -->
+  <rect x="8" y="84" width="168" height="458" fill="#1e293b" rx="6" stroke="#334155" stroke-width="1"/>
+  <text x="92" y="102" fill="#e2e8f0" font-size="11" text-anchor="middle" font-weight="600" font-family="Arial, sans-serif">Chemicals</text>
+
+  <!-- HCl -->
+  <rect x="14" y="108" width="156" height="28" fill="#1c0f0f" rx="4" stroke="#44403c" stroke-width="1"/>
+  <rect x="14" y="108" width="4" height="28" fill="#ef4444" rx="2"/>
+  <text x="26" y="120" fill="#fca5a5" font-size="9" font-weight="600" font-family="Arial, sans-serif">HCl</text>
+  <text x="26" y="130" fill="#57534e" font-size="8" font-family="Arial, sans-serif">Hydrochloric acid · 1.0 mol/L</text>
+  <text x="162" y="126" fill="#334155" font-size="12" text-anchor="end" font-family="Arial, sans-serif">+</text>
+
+  <!-- Na2S2O3 -->
+  <rect x="14" y="140" width="156" height="28" fill="#0f172a" rx="4" stroke="#334155" stroke-width="1"/>
+  <rect x="14" y="140" width="4" height="28" fill="#3b82f6" rx="2"/>
+  <text x="26" y="152" fill="#93c5fd" font-size="9" font-weight="600" font-family="Arial, sans-serif">Na&#x2082;S&#x2082;O&#x2083;</text>
+  <text x="26" y="162" fill="#475569" font-size="8" font-family="Arial, sans-serif">Sodium thiosulfate · 0.10 mol/L</text>
+  <text x="162" y="156" fill="#334155" font-size="12" text-anchor="end" font-family="Arial, sans-serif">+</text>
+
+  <!-- NaOH -->
+  <rect x="14" y="172" width="156" height="28" fill="#0a1f0a" rx="4" stroke="#334155" stroke-width="1"/>
+  <rect x="14" y="172" width="4" height="28" fill="#22c55e" rx="2"/>
+  <text x="26" y="184" fill="#86efac" font-size="9" font-weight="600" font-family="Arial, sans-serif">NaOH</text>
+  <text x="26" y="194" fill="#475569" font-size="8" font-family="Arial, sans-serif">Sodium hydroxide · 2.0 mol/L</text>
+
+  <!-- BaCl2 -->
+  <rect x="14" y="204" width="156" height="28" fill="#170f2a" rx="4" stroke="#334155" stroke-width="1"/>
+  <rect x="14" y="204" width="4" height="28" fill="#a855f7" rx="2"/>
+  <text x="26" y="216" fill="#c4b5fd" font-size="9" font-weight="600" font-family="Arial, sans-serif">BaCl&#x2082;</text>
+  <text x="26" y="226" fill="#475569" font-size="8" font-family="Arial, sans-serif">Barium chloride · 0.1 mol/L</text>
+
+  <!-- CuSO4 -->
+  <rect x="14" y="236" width="156" height="28" fill="#0a1826" rx="4" stroke="#334155" stroke-width="1"/>
+  <rect x="14" y="236" width="4" height="28" fill="#0ea5e9" rx="2"/>
+  <text x="26" y="248" fill="#7dd3fc" font-size="9" font-weight="600" font-family="Arial, sans-serif">CuSO&#x2084;</text>
+  <text x="26" y="258" fill="#475569" font-size="8" font-family="Arial, sans-serif">Copper(II) sulfate · 0.5 mol/L</text>
+
+  <!-- Mg powder -->
+  <rect x="14" y="268" width="156" height="28" fill="#1a1a0f" rx="4" stroke="#334155" stroke-width="1"/>
+  <rect x="14" y="268" width="4" height="28" fill="#eab308" rx="2"/>
+  <text x="26" y="280" fill="#fde047" font-size="9" font-weight="600" font-family="Arial, sans-serif">Mg powder</text>
+  <text x="26" y="290" fill="#475569" font-size="8" font-family="Arial, sans-serif">Magnesium · solid</text>
+
+  <!-- Divider -->
+  <line x1="14" y1="304" x2="170" y2="304" stroke="#334155" stroke-width="1"/>
+  <text x="92" y="317" fill="#94a3b8" font-size="10" text-anchor="middle" font-weight="600" font-family="Arial, sans-serif">Equipment</text>
+
+  <!-- Equipment grid -->
+  <!-- Conical flask -->
+  <rect x="14" y="323" width="72" height="52" fill="#0f172a" rx="4" stroke="#334155" stroke-width="1"/>
+  <polygon points="50,334 40,365 60,365" fill="none" stroke="#7dd3fc" stroke-width="1.5"/>
+  <rect x="46" y="327" width="8" height="8" fill="none" stroke="#7dd3fc" stroke-width="1.5"/>
+  <rect x="47" y="328" width="6" height="4" fill="#7dd3fc" opacity="0.3"/>
+  <text x="50" y="380" fill="#64748b" font-size="8" text-anchor="middle" font-family="Arial, sans-serif">Flask</text>
+
+  <!-- Beaker -->
+  <rect x="102" y="323" width="72" height="52" fill="#0f172a" rx="4" stroke="#334155" stroke-width="1"/>
+  <rect x="118" y="334" width="32" height="25" fill="none" stroke="#7dd3fc" stroke-width="1.5" rx="0 0 3 3"/>
+  <line x1="127" y1="334" x2="124" y2="329" stroke="#7dd3fc" stroke-width="1.5"/>
+  <rect x="118" y="349" width="32" height="10" fill="#3b82f6" opacity="0.3" rx="0 0 3 3"/>
+  <text x="134" y="380" fill="#64748b" font-size="8" text-anchor="middle" font-family="Arial, sans-serif">Beaker</text>
+
+  <!-- Burette -->
+  <rect x="14" y="388" width="72" height="52" fill="#0f172a" rx="4" stroke="#334155" stroke-width="1"/>
+  <rect x="47" y="394" width="6" height="32" fill="none" stroke="#7dd3fc" stroke-width="1.5"/>
+  <rect x="47" y="394" width="6" height="18" fill="#3b82f6" opacity="0.3"/>
+  <ellipse cx="50" cy="428" rx="5" ry="2" fill="#7dd3fc"/>
+  <line x1="50" y1="428" x2="50" y2="432" stroke="#7dd3fc" stroke-width="1.5"/>
+  <text x="50" y="446" fill="#64748b" font-size="8" text-anchor="middle" font-family="Arial, sans-serif">Burette</text>
+
+  <!-- Thermometer -->
+  <rect x="102" y="388" width="72" height="52" fill="#0f172a" rx="4" stroke="#334155" stroke-width="1"/>
+  <rect x="134" y="395" width="5" height="24" fill="none" stroke="#94a3b8" stroke-width="1.5" rx="2.5"/>
+  <rect x="135" y="407" width="3" height="12" fill="#ef4444"/>
+  <circle cx="136" cy="421" r="5" fill="#ef4444" stroke="#94a3b8" stroke-width="1"/>
+  <text x="138" y="446" fill="#64748b" font-size="8" text-anchor="middle" font-family="Arial, sans-serif">Therm.</text>
+
+  <!-- ================================================================ -->
+  <!--  CENTER PANEL — Lab Bench                                         -->
+  <!-- ================================================================ -->
+  <rect x="184" y="84" width="380" height="458" fill="#0a1120" rx="6" stroke="#334155" stroke-width="1"/>
+  <text x="374" y="102" fill="#e2e8f0" font-size="11" text-anchor="middle" font-weight="600" font-family="Arial, sans-serif">Lab Bench</text>
+
+  <!-- Bench surface line -->
+  <rect x="192" y="358" width="364" height="7" fill="#1e293b" rx="2"/>
+  <rect x="192" y="363" width="364" height="2" fill="#334155"/>
+
+  <!-- ── Vessel 1: Conical Flask (CuSO4 — blue) ── -->
+  <polygon points="264,255 232,353 296,353" fill="url(#liquidBlue)" stroke="#60a5fa" stroke-width="2"/>
+  <rect x="255" y="222" width="18" height="34" fill="none" stroke="#60a5fa" stroke-width="2"/>
+  <rect x="254" y="218" width="20" height="6" fill="#334155" rx="2"/>
+  <rect x="257" y="235" width="14" height="20" fill="#3b82f6" opacity="0.4"/>
+  <rect x="242" y="293" width="44" height="14" fill="#1e3a5f" rx="2"/>
+  <text x="264" y="303" fill="#93c5fd" font-size="8" text-anchor="middle" font-family="Arial, sans-serif">CuSO&#x2084;</text>
+  <text x="264" y="372" fill="#475569" font-size="9" text-anchor="middle" font-family="Arial, sans-serif">Flask A</text>
+
+  <!-- ── Vessel 2: Beaker (thiosulfate — cloudy yellow) ── -->
+  <rect x="326" y="274" width="68" height="79" fill="url(#liquidYellow)" stroke="#fbbf24" stroke-width="2" rx="0 0 4 4"/>
+  <rect x="324" y="270" width="72" height="7" fill="none" stroke="#fbbf24" stroke-width="2"/>
+  <polygon points="394,272 401,268 401,276" fill="#fbbf24"/>
+  <!-- Cloudiness / precipitate -->
+  <ellipse cx="360" cy="344" rx="26" ry="7" fill="#fef3c7" opacity="0.85"/>
+  <ellipse cx="350" cy="338" rx="14" ry="4" fill="#fefce8" opacity="0.7"/>
+  <ellipse cx="370" cy="336" rx="10" ry="3" fill="#fefce8" opacity="0.6"/>
+  <rect x="334" y="298" width="52" height="14" fill="#78350f" rx="2"/>
+  <text x="360" y="308" fill="#fde68a" font-size="8" text-anchor="middle" font-family="Arial, sans-serif">Na&#x2082;S&#x2082;O&#x2083;</text>
+  <!-- Reaction indicator badge -->
+  <rect x="326" y="258" width="68" height="14" fill="#92400e" rx="2"/>
+  <text x="360" y="268" fill="#fef08a" font-size="8" text-anchor="middle" font-family="Arial, sans-serif">&#x26A0; Cloudy · S&#x2193;</text>
+  <text x="360" y="372" fill="#475569" font-size="9" text-anchor="middle" font-family="Arial, sans-serif">Beaker B</text>
+
+  <!-- ── Vessel 3: Graduated cylinder (water/clear) ── -->
+  <rect x="430" y="279" width="30" height="74" fill="url(#liquidClear)" stroke="#7dd3fc" stroke-width="1.5" rx="0 0 4 4"/>
+  <rect x="428" y="274" width="34" height="8" fill="none" stroke="#7dd3fc" stroke-width="1.5" rx="3 3 0 0"/>
+  <!-- Graduation marks -->
+  <line x1="452" y1="294" x2="458" y2="294" stroke="#334155" stroke-width="1"/>
+  <line x1="452" y1="309" x2="458" y2="309" stroke="#334155" stroke-width="1"/>
+  <line x1="452" y1="324" x2="458" y2="324" stroke="#334155" stroke-width="1"/>
+  <line x1="452" y1="339" x2="458" y2="339" stroke="#334155" stroke-width="1"/>
+  <text x="462" y="298" fill="#475569" font-size="7" font-family="monospace">25</text>
+  <text x="462" y="313" fill="#475569" font-size="7" font-family="monospace">20</text>
+  <text x="462" y="328" fill="#475569" font-size="7" font-family="monospace">15</text>
+  <text x="462" y="343" fill="#475569" font-size="7" font-family="monospace">10</text>
+  <text x="445" y="372" fill="#475569" font-size="9" text-anchor="middle" font-family="Arial, sans-serif">Grad. Cyl.</text>
+
+  <!-- ── Action Buttons ── -->
+  <rect x="192" y="376" width="364" height="42" fill="#1e293b" rx="4" stroke="#334155" stroke-width="1"/>
+  <rect x="200" y="384" width="62" height="26" fill="#7f1d1d" rx="4"/>
+  <text x="231" y="400" fill="#fca5a5" font-size="10" text-anchor="middle" font-family="Arial, sans-serif">&#x1F525; Heat</text>
+  <rect x="270" y="384" width="62" height="26" fill="#172554" rx="4"/>
+  <text x="301" y="400" fill="#93c5fd" font-size="10" text-anchor="middle" font-family="Arial, sans-serif">&#x1F300; Stir</text>
+  <rect x="340" y="384" width="62" height="26" fill="#14532d" rx="4"/>
+  <text x="371" y="400" fill="#86efac" font-size="10" text-anchor="middle" font-family="Arial, sans-serif">&#x2795; Add</text>
+  <rect x="410" y="384" width="62" height="26" fill="#312e81" rx="4"/>
+  <text x="441" y="400" fill="#c4b5fd" font-size="10" text-anchor="middle" font-family="Arial, sans-serif">&#x25BD; Filter</text>
+  <rect x="480" y="384" width="68" height="26" fill="#1e293b" rx="4" stroke="#334155" stroke-width="1"/>
+  <text x="514" y="400" fill="#94a3b8" font-size="10" text-anchor="middle" font-family="Arial, sans-serif">&#x1F321; Temp</text>
+
+  <!-- ── Action Log ── -->
+  <rect x="192" y="424" width="364" height="110" fill="#1e293b" rx="4" stroke="#334155" stroke-width="1"/>
+  <rect x="192" y="424" width="364" height="20" fill="#162032" rx="4 4 0 0"/>
+  <text x="200" y="438" fill="#94a3b8" font-size="9" font-weight="600" font-family="Arial, sans-serif">Action Log</text>
+  <text x="548" y="438" fill="#475569" font-size="8" text-anchor="end" font-family="monospace">18 actions</text>
+  <line x1="192" y1="444" x2="556" y2="444" stroke="#334155" stroke-width="1"/>
+
+  <!-- Log rows -->
+  <text x="200" y="457" fill="#475569" font-size="7.5" font-family="monospace">09:14:02</text>
+  <text x="248" y="457" fill="#86efac" font-size="7.5" font-family="monospace">add_chemical</text>
+  <text x="342" y="457" fill="#94a3b8" font-size="7.5" font-family="Arial, sans-serif">Na&#x2082;S&#x2082;O&#x2083; 25.00 mL &#x2192; Beaker B</text>
+
+  <text x="200" y="470" fill="#475569" font-size="7.5" font-family="monospace">09:14:18</text>
+  <text x="248" y="470" fill="#86efac" font-size="7.5" font-family="monospace">add_chemical</text>
+  <text x="342" y="470" fill="#94a3b8" font-size="7.5" font-family="Arial, sans-serif">HCl 5.00 mL &#x2192; Beaker B</text>
+
+  <text x="200" y="483" fill="#475569" font-size="7.5" font-family="monospace">09:14:18</text>
+  <text x="248" y="483" fill="#fbbf24" font-size="7.5" font-family="monospace">reaction</text>
+  <text x="342" y="483" fill="#fde68a" font-size="7.5" font-family="Arial, sans-serif">Cloudy · S(s) ppt · faint SO&#x2082;</text>
+
+  <text x="200" y="496" fill="#475569" font-size="7.5" font-family="monospace">09:14:30</text>
+  <text x="248" y="496" fill="#7dd3fc" font-size="7.5" font-family="monospace">start_clock</text>
+  <text x="342" y="496" fill="#94a3b8" font-size="7.5" font-family="Arial, sans-serif">Timer started · t = 0</text>
+
+  <text x="200" y="509" fill="#475569" font-size="7.5" font-family="monospace">09:14:52</text>
+  <text x="248" y="509" fill="#f87171" font-size="7.5" font-family="monospace">stop_clock</text>
+  <text x="342" y="509" fill="#94a3b8" font-size="7.5" font-family="Arial, sans-serif">Reaction time: 22 s · cross obscured</text>
+
+  <text x="200" y="522" fill="#475569" font-size="7.5" font-family="monospace">09:15:04</text>
+  <text x="248" y="522" fill="#86efac" font-size="7.5" font-family="monospace">add_chemical</text>
+  <text x="342" y="522" fill="#94a3b8" font-size="7.5" font-family="Arial, sans-serif">Na&#x2082;S&#x2082;O&#x2083; 20.00 mL · H&#x2082;O 5.00 mL</text>
+
+  <!-- ================================================================ -->
+  <!--  RIGHT PANEL — Question Paper + Score                             -->
+  <!-- ================================================================ -->
+  <rect x="572" y="84" width="320" height="458" fill="#1e293b" rx="6" stroke="#334155" stroke-width="1"/>
+
+  <!-- Paper header -->
+  <rect x="572" y="84" width="320" height="38" fill="#1e3a8a" rx="6 6 0 0"/>
+  <text x="732" y="101" fill="#bfdbfe" font-size="8.5" text-anchor="middle" font-weight="600" font-family="Arial, sans-serif">QUESTION PAPER 1 · 2024 Feb/Mar</text>
+  <text x="732" y="115" fill="#93c5fd" font-size="10" text-anchor="middle" font-weight="700" font-family="Georgia, serif">Q1 — Rate of Reaction (Clock)</text>
+
+  <!-- Question text -->
+  <rect x="580" y="126" width="304" height="88" fill="#0a1120" rx="4"/>
+  <text x="588" y="140" fill="#64748b" font-size="8" font-weight="600" font-family="Arial, sans-serif">QUESTION 1(a)(i)</text>
+  <text x="588" y="153" fill="#cbd5e1" font-size="8" font-family="Arial, sans-serif">You are provided with Na&#x2082;S&#x2082;O&#x2083; and HCl. Record</text>
+  <text x="588" y="164" fill="#cbd5e1" font-size="8" font-family="Arial, sans-serif">the time for the cross to become obscured at</text>
+  <text x="588" y="175" fill="#cbd5e1" font-size="8" font-family="Arial, sans-serif">each concentration of thiosulfate.</text>
+  <text x="588" y="190" fill="#475569" font-size="8" font-family="Arial, sans-serif">Na&#x2082;S&#x2082;O&#x2083; + 2HCl &#x2192; 2NaCl + H&#x2082;O + SO&#x2082; + S</text>
+  <rect x="858" y="127" width="22" height="14" fill="#1e3a8a" rx="2"/>
+  <text x="869" y="138" fill="#93c5fd" font-size="8" text-anchor="middle" font-family="Arial, sans-serif">[3]</text>
+
+  <!-- Results table -->
+  <rect x="580" y="220" width="304" height="118" fill="#0a1120" rx="4"/>
+  <text x="588" y="234" fill="#64748b" font-size="8" font-weight="600" font-family="Arial, sans-serif">TABLE OF RESULTS</text>
+
+  <rect x="588" y="238" width="288" height="16" fill="#162032" rx="2"/>
+  <text x="636" y="249" fill="#7dd3fc" font-size="7.5" text-anchor="middle" font-family="Arial, sans-serif">Vol. Na&#x2082;S&#x2082;O&#x2083; / cm&#xB3;</text>
+  <text x="716" y="249" fill="#7dd3fc" font-size="7.5" text-anchor="middle" font-family="Arial, sans-serif">Vol. H&#x2082;O / cm&#xB3;</text>
+  <text x="820" y="249" fill="#7dd3fc" font-size="7.5" text-anchor="middle" font-family="Arial, sans-serif">Time / s</text>
+  <line x1="680" y1="238" x2="680" y2="334" stroke="#334155" stroke-width="1"/>
+  <line x1="756" y1="238" x2="756" y2="334" stroke="#334155" stroke-width="1"/>
+
+  <text x="636" y="264" fill="#e2e8f0" font-size="8" text-anchor="middle" font-family="monospace">50.00</text>
+  <text x="716" y="264" fill="#e2e8f0" font-size="8" text-anchor="middle" font-family="monospace">0.00</text>
+  <text x="820" y="264" fill="#4ade80" font-size="8" text-anchor="middle" font-family="monospace">22</text>
+
+  <text x="636" y="278" fill="#e2e8f0" font-size="8" text-anchor="middle" font-family="monospace">40.00</text>
+  <text x="716" y="278" fill="#e2e8f0" font-size="8" text-anchor="middle" font-family="monospace">10.00</text>
+  <text x="820" y="278" fill="#4ade80" font-size="8" text-anchor="middle" font-family="monospace">28</text>
+
+  <text x="636" y="292" fill="#e2e8f0" font-size="8" text-anchor="middle" font-family="monospace">30.00</text>
+  <text x="716" y="292" fill="#e2e8f0" font-size="8" text-anchor="middle" font-family="monospace">20.00</text>
+  <text x="820" y="292" fill="#4ade80" font-size="8" text-anchor="middle" font-family="monospace">37</text>
+
+  <text x="636" y="306" fill="#e2e8f0" font-size="8" text-anchor="middle" font-family="monospace">20.00</text>
+  <text x="716" y="306" fill="#e2e8f0" font-size="8" text-anchor="middle" font-family="monospace">30.00</text>
+  <text x="820" y="306" fill="#4ade80" font-size="8" text-anchor="middle" font-family="monospace">55</text>
+
+  <text x="636" y="320" fill="#e2e8f0" font-size="8" text-anchor="middle" font-family="monospace">10.00</text>
+  <text x="716" y="320" fill="#e2e8f0" font-size="8" text-anchor="middle" font-family="monospace">40.00</text>
+  <text x="820" y="320" fill="#fbbf24" font-size="8" text-anchor="middle" font-family="monospace">112</text>
+
+  <line x1="588" y1="254" x2="876" y2="254" stroke="#1e293b" stroke-width="1"/>
+  <line x1="588" y1="268" x2="876" y2="268" stroke="#1e293b" stroke-width="0.5" stroke-dasharray="3,3"/>
+  <line x1="588" y1="282" x2="876" y2="282" stroke="#1e293b" stroke-width="0.5" stroke-dasharray="3,3"/>
+  <line x1="588" y1="296" x2="876" y2="296" stroke="#1e293b" stroke-width="0.5" stroke-dasharray="3,3"/>
+  <line x1="588" y1="310" x2="876" y2="310" stroke="#1e293b" stroke-width="0.5" stroke-dasharray="3,3"/>
+
+  <!-- Observation box -->
+  <rect x="580" y="344" width="304" height="56" fill="#052e16" rx="4" stroke="#166534" stroke-width="1"/>
+  <text x="588" y="358" fill="#86efac" font-size="8" font-weight="600" font-family="Arial, sans-serif">REACTION OBSERVATION</text>
+  <text x="588" y="371" fill="#d1fae5" font-size="8" font-family="Arial, sans-serif">Solution turns cloudy/opaque after ~22 s.</text>
+  <text x="588" y="382" fill="#d1fae5" font-size="8" font-family="Arial, sans-serif">Pale yellow S(s) precipitate. Faint smell of SO&#x2082;.</text>
+  <text x="588" y="393" fill="#6ee7b7" font-size="7.5" font-family="monospace">clear &#x2192; cloudy/opaque yellow-white</text>
+
+  <!-- Score panel -->
+  <rect x="580" y="406" width="304" height="128" fill="#0a1120" rx="4" stroke="#334155" stroke-width="1"/>
+  <rect x="580" y="406" width="304" height="18" fill="#162032" rx="4 4 0 0"/>
+  <text x="588" y="419" fill="#94a3b8" font-size="9" font-weight="600" font-family="Arial, sans-serif">SCORE PREVIEW</text>
+  <text x="876" y="419" fill="#475569" font-size="8" text-anchor="end" font-family="Arial, sans-serif">Paper 1 of 20</text>
+
+  <!-- Q1 bar -->
+  <text x="588" y="438" fill="#cbd5e1" font-size="8" font-family="Arial, sans-serif">Q1 — Rate of Reaction</text>
+  <rect x="588" y="441" width="214" height="7" fill="#1e293b" rx="3.5"/>
+  <rect x="588" y="441" width="164" height="7" fill="#3b82f6" rx="3.5"/>
+  <text x="808" y="449" fill="#60a5fa" font-size="8" font-family="monospace">13 / 17</text>
+
+  <!-- Q2 bar -->
+  <text x="588" y="462" fill="#cbd5e1" font-size="8" font-family="Arial, sans-serif">Q2 — Energetics</text>
+  <rect x="588" y="465" width="214" height="7" fill="#1e293b" rx="3.5"/>
+  <rect x="588" y="465" width="107" height="7" fill="#f59e0b" rx="3.5"/>
+  <text x="808" y="473" fill="#fbbf24" font-size="8" font-family="monospace">5 / 10</text>
+
+  <!-- Q3 bar -->
+  <text x="588" y="486" fill="#cbd5e1" font-size="8" font-family="Arial, sans-serif">Q3 — Qualitative Analysis</text>
+  <rect x="588" y="489" width="214" height="7" fill="#1e293b" rx="3.5"/>
+  <rect x="588" y="489" width="181" height="7" fill="#22c55e" rx="3.5"/>
+  <text x="808" y="497" fill="#4ade80" font-size="8" font-family="monospace">11 / 13</text>
+
+  <!-- Total + grade -->
+  <line x1="588" y1="506" x2="876" y2="506" stroke="#334155" stroke-width="1"/>
+  <text x="588" y="521" fill="#94a3b8" font-size="9" font-family="Arial, sans-serif">Total Score</text>
+  <text x="752" y="522" fill="#f1f5f9" font-size="13" font-weight="700" text-anchor="end" font-family="monospace">29 / 40</text>
+  <rect x="758" y="510" width="36" height="20" fill="#1e3a8a" rx="4"/>
+  <text x="776" y="525" fill="#bfdbfe" font-size="12" text-anchor="middle" font-weight="700" font-family="Arial, sans-serif">B</text>
+  <text x="802" y="521" fill="#64748b" font-size="8" font-family="Arial, sans-serif">grade</text>
+
+  <!-- Feedback note -->
+  <rect x="580" y="532" width="304" height="2" fill="#334155"/>
+  <text x="588" y="527" fill="#475569" font-size="7.5" font-family="Arial, sans-serif">&#x26A0; Q2: missing mass measurement · no stirring recorded</text>
+
+  <!-- ── Bottom status bar ─────────────────────────────────────────── -->
+  <rect x="0" y="542" width="900" height="18" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+  <circle cx="14" cy="551" r="4" fill="#22c55e"/>
+  <text x="24" y="555" fill="#475569" font-size="8" font-family="Arial, sans-serif">Session active</text>
+  <text x="170" y="555" fill="#475569" font-size="8" font-family="Arial, sans-serif">&#x1F4C4; Paper 1 of 20</text>
+  <text x="310" y="555" fill="#475569" font-size="8" font-family="Arial, sans-serif">&#x2697; 3 vessels · 2 chemicals</text>
+  <text x="490" y="555" fill="#475569" font-size="8" font-family="Arial, sans-serif">&#x1F4BE; Auto-saved · localStorage</text>
+  <text x="888" y="555" fill="#334155" font-size="8" text-anchor="end" font-family="monospace">React 19 + Vite 7</text>
+</svg>
