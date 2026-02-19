@@ -72,6 +72,8 @@ export default function ChemLabApp() {
             {/* Tab Content */}
             {lab.activeTab === "paper" && (
                 <PaperTab
+                    activePaperId={lab.activePaperId}
+                    setActivePaperId={lab.setActivePaperId}
                     expandedQ={lab.expandedQ}
                     setExpandedQ={lab.setExpandedQ}
                     studentNotes={lab.studentNotes}

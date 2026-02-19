@@ -21,6 +21,7 @@ export function useChemLab() {
     const [clockRunning, setClockRunning] = useState(false);
     const [bureteReading, setBuretteReading] = useState(0);
     const [expandedQ, setExpandedQ] = useState("Q1");
+    const [activePaperId, setActivePaperId] = useState(0);
     const [transferDestId, setTransferDestId] = useState(null);
     const [transferAmount, setTransferAmount] = useState(10);
     const [tables, setTables] = useState([]);
@@ -302,6 +303,7 @@ export function useChemLab() {
         clockRunning,
         bureteReading, setBuretteReading,
         expandedQ, setExpandedQ,
+        activePaperId, setActivePaperId,
         studentNotes, setStudentNotes,
         tables, setTables,
         graphs, setGraphs,

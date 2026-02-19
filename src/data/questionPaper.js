@@ -1,0 +1,1152 @@
+// Each paper follows Cambridge 9701/33 structure: Q1 quantitative, Q2 energetics, Q3 qualitative
+
+export const QUESTION_PAPERS = [
+
+// ─── Paper 1 ── February / March 2024 (real) ─────────────────────────────────
+{
+    id: "p1",
+    title: "9701/33 February/March 2024",
+    subtitle: "Paper 3 Advanced Practical Skills 1",
+    time: "2 hours",
+    marks: 40,
+    questions: [
+        {
+            id: "Q1", type: "quantitative",
+            title: "Question 1 – Rate of Reaction (Thiosulfate Clock)",
+            marks: 17,
+            context: `The ionic equation for the reaction between sodium thiosulfate and hydrochloric acid is:
+S₂O₃²⁻(aq) + 2H⁺(aq) → S(s) + SO₂(aq) + H₂O(l)
+
+The solid sulfur formed causes the reaction mixture to become cloudy and opaque.
+You will carry out experiments to investigate the relationship between the concentration of sodium thiosulfate and the rate of reaction.
+
+FA 1 = 0.10 mol dm⁻³ sodium thiosulfate, Na₂S₂O₃
+FA 2 = 2.00 mol dm⁻³ hydrochloric acid, HCl
+Distilled water`,
+            parts: [
+                { id: "Q1a", label: "(a) Method & Results Table", marks: 8,
+                  instruction: "Prepare a results table with columns for: volume of FA 1, volume of distilled water, reaction time, and relative rate (= 1000/time). Carry out Experiments 1–5. Experiment 1: 25.00 cm³ FA 1 + 10.0 cm³ FA 2. Experiment 2: 12.50 cm³ FA 1 + 12.50 cm³ water + 10.0 cm³ FA 2. Experiments 3–5: vary volume of FA 1 (not less than 12.50 cm³), add water to keep FA 1 + water = 25.00 cm³.",
+                  hint: "Fill burette with FA 1; use 25 cm³ measuring cylinder for FA 2. Dry beaker between experiments." },
+                { id: "Q1b", label: "(b) Graph", marks: 4,
+                  instruction: "Plot a graph of relative rate (y-axis) against volume of FA 1 (x-axis). Do not include the origin. Identify any anomalous point. Draw a line of best fit." },
+                { id: "Q1c", label: "(c) Prediction", marks: 2,
+                  instruction: "Use your graph to predict the reaction time if 23.50 cm³ FA 1 is used with distilled water. Show clearly on the grid how you determined the relative rate.",
+                  calculationGuide: "reaction time = 1000 / (relative rate read from graph)" },
+                { id: "Q1d", label: "(d) Effect of not drying the beaker", marks: 1,
+                  instruction: "State the effect on the reaction time of not drying the beaker before each of Experiments 2–5. Explain your answer.",
+                  answerKey: "Time would be longer. Extra water dilutes the concentration of sodium thiosulfate (FA 1), reducing the rate of reaction." },
+                { id: "Q1e", label: "(e)(i) Larger beaker", marks: 1,
+                  instruction: "A student repeats Experiment 1 using a 250 cm³ beaker instead of 100 cm³. State whether this statement is correct and explain: 'The student records a longer time because the 250 cm³ beaker is used.'",
+                  answerKey: "Correct. The depth of solution is less in the wider beaker, so more sulfur must accumulate before the cross is obscured." },
+                { id: "Q1f", label: "(e)(ii) Rate of sulfur production", marks: 1,
+                  instruction: "State whether this is correct and explain: 'A longer time is recorded because the rate of production of sulfur is slower.'",
+                  answerKey: "Not correct. The concentrations (and thus rate of sulfur production) are unchanged. More sulfur is required to obscure the insert in the wider beaker." },
+            ],
+        },
+        {
+            id: "Q2", type: "energetics",
+            title: "Question 2 – Enthalpy Change (CuSO₄ + Mg)",
+            marks: 10,
+            context: `Determine the enthalpy change ΔH for:
+CuSO₄(aq) + Mg(s) → Cu(s) + MgSO₄(aq)
+
+FA 3 = 1.0 mol dm⁻³ copper(II) sulfate, CuSO₄
+FA 4 = magnesium powder, Mg`,
+            parts: [
+                { id: "Q2a", label: "(a) Method", marks: 3,
+                  instruction: "Use a 50 cm³ measuring cylinder to transfer 50.0 cm³ FA 3 into a polystyrene cup supported in a 250 cm³ beaker. Weigh the stoppered container of FA 4. Record initial temperature of FA 3. Add FA 4, stir constantly. Record maximum temperature. Reweigh container. Calculate mass of FA 4 used and temperature change." },
+                { id: "Q2b", label: "(b)(i) Heat energy", marks: 1,
+                  instruction: "Calculate the heat energy produced in the reaction.",
+                  calculationGuide: "q = 50 × 4.18 × ΔT (J)" },
+                { id: "Q2c", label: "(b)(ii) Limiting reagent", marks: 1,
+                  instruction: "Determine which reactant (FA 3 or FA 4) is in excess. Show your working.",
+                  answerKey: "Amount FA 3 (CuSO₄) = 0.050 × 1.0 = 0.050 mol. Amount FA 4 (Mg) = mass/24.3. FA 3 is typically in excess." },
+                { id: "Q2d", label: "(b)(iii) ΔH", marks: 2,
+                  instruction: "Calculate ΔH in kJ mol⁻¹. Sign must be negative (exothermic).",
+                  calculationGuide: "ΔH = −q / (1000 × n(limiting)) kJ mol⁻¹" },
+                { id: "Q2e", label: "(c) Improvement", marks: 3,
+                  instruction: "The slow reaction causes heat loss, making the temperature change inaccurate. Describe how to change the method and process results to improve accuracy. Do not change quantities.",
+                  answerKey: "Record temperature at regular time intervals before and after adding FA 4. Plot temperature vs time. Extrapolate both lines of best fit to the moment of addition to find the true ΔT." },
+            ],
+        },
+        {
+            id: "Q3", type: "qualitative",
+            title: "Question 3 – Qualitative Analysis (Sulfur Anions)",
+            marks: 13,
+            context: `FA 5, FA 6 and FA 7 each contain an anion with sulfur. None of the anions is present in more than one compound.
+
+FA 5 = Na₂S₂O₃ (sodium thiosulfate)
+FA 6 = H₂SO₄ (sulfuric acid)
+FA 7 = Na₂SO₃ (sodium sulfite)
+FA 8 = Cu₂O (copper(I) oxide, solid)`,
+            parts: [
+                { id: "Q3a", label: "(a) Tests on FA 5, FA 6, FA 7", marks: 5,
+                  instruction: "Use 1 cm depth of each solution. Test 1: add a few drops of acidified KMnO₄, leave 2 min. Test 2: add a piece of Mg ribbon. Test 3: add aqueous barium chloride or barium nitrate. Record ALL observations in a table." },
+                { id: "Q3b", label: "(b)(i) Identify anions", marks: 2,
+                  instruction: "Use your observations to identify the anion formula for FA 5, FA 6, and FA 7.",
+                  answerKey: "FA 5: S₂O₃²⁻ | FA 6: SO₄²⁻ | FA 7: SO₃²⁻" },
+                { id: "Q3c", label: "(b)(ii) Cation in FA 6", marks: 2,
+                  instruction: "Suggest the identity of the cation in FA 6 and carry out a further test to confirm. Record test and observations. State the identity of the cation.",
+                  answerKey: "Cation is H⁺. Test: add Na₂CO₃ → effervescence (CO₂ turns limewater milky). Or add litmus indicator → turns red." },
+                { id: "Q3d", label: "(c) Ionic equation", marks: 1,
+                  instruction: "Write an ionic equation with state symbols for one reaction from Test 2 or Test 3.",
+                  answerKey: "Mg(s) + 2H⁺(aq) → Mg²⁺(aq) + H₂(g)  OR  Ba²⁺(aq) + SO₄²⁻(aq) → BaSO₄(s)  OR  Ba²⁺(aq) + SO₃²⁻(aq) → BaSO₃(s)" },
+                { id: "Q3e", label: "(d)(i) FA 8 in FA 6", marks: 1,
+                  instruction: "Gently warm FA 6. Add FA 8. Filter. Describe the residue and filtrate.",
+                  answerKey: "Residue: red-brown/brown solid (Cu). Filtrate: pale blue solution (Cu²⁺ ions formed)." },
+                { id: "Q3f", label: "(d)(ii) Filtrate + KI", marks: 1,
+                  instruction: "Add an equal volume of aqueous KI to the filtrate. Record observations.",
+                  answerKey: "Brown/yellow-brown solution or precipitate (iodine liberated: 2Cu²⁺ + 4I⁻ → 2CuI + I₂)." },
+                { id: "Q3g", label: "(d)(iii) + NaOH", marks: 1,
+                  instruction: "Add aqueous NaOH to the filtrate from (d)(ii). Record observations.",
+                  answerKey: "Pale blue precipitate (Cu(OH)₂) forms, insoluble in excess NaOH." },
+            ],
+        },
+    ],
+},
+
+// ─── Paper 2 ── February / March 2025 (real) ─────────────────────────────────
+{
+    id: "p2",
+    title: "9701/33 February/March 2025",
+    subtitle: "Paper 3 Advanced Practical Skills 1",
+    time: "2 hours",
+    marks: 40,
+    questions: [
+        {
+            id: "Q1", type: "quantitative",
+            title: "Question 1 – Water of Crystallisation (Potassium Alum)",
+            marks: 11,
+            context: `Potassium alum is a hydrated salt containing Al³⁺, K⁺ and SO₄²⁻ ions.
+1 mol of hydrated potassium alum contains 12 mol of water of crystallisation.
+You will determine the formula of potassium alum by heating until anhydrous.
+
+FA 1 = hydrated potassium alum`,
+            parts: [
+                { id: "Q1a", label: "(a) Method & Results", marks: 5,
+                  instruction: "Weigh crucible + lid. Add all FA 1. Weigh crucible + lid + FA 1. Heat gently 2 min (lid on), then strongly 5 min (lid off). Cool at least 5 min. Reweigh. Heat strongly again 2 min. Cool 5 min. Reweigh. Record all masses in a table with headings: (I) crucible+lid, (II) crucible+lid+FA 1, (III) after first heating, (IV) after second heating, (V) mass of FA 1, mass of residue.",
+                  hint: "Constant mass confirms complete dehydration. Two heating cycles required." },
+                { id: "Q1b", label: "(b)(i) Amount of H₂O", marks: 1,
+                  instruction: "Calculate the amount, in mol, of water of crystallisation lost during thermal decomposition of FA 1.",
+                  calculationGuide: "n(H₂O) = (mass FA 1 − mass residue) / 18.0" },
+                { id: "Q1c", label: "(b)(ii) Amount of alum", marks: 1,
+                  instruction: "Use the information given and your answer to (b)(i) to determine the amount, in mol, of potassium alum used.",
+                  calculationGuide: "n(alum) = n(H₂O) / 12" },
+                { id: "Q1d", label: "(b)(iii) Mr of anhydrous alum", marks: 1,
+                  instruction: "Calculate the relative formula mass, Mr, of anhydrous potassium alum.",
+                  calculationGuide: "Mr = mass of residue / n(alum)" },
+                { id: "Q1e", label: "(b)(iv) Formula", marks: 1,
+                  instruction: "Anhydrous potassium alum contains Al³⁺, K⁺ and SO₄²⁻; 1 mol also contains 1 mol Al³⁺. Use your Mr to suggest the formula. Show working.",
+                  answerKey: "AlK(SO₄)₂  [Mr ≈ 258; from 27+39+2×96 = 258]" },
+                { id: "Q1f", label: "(c)(i) Percentage error", marks: 1,
+                  instruction: "The uncertainty in a single balance reading is 0.01 g. Calculate the maximum percentage error in your measurement of the mass of residue.",
+                  calculationGuide: "% error = (2 × 0.01) / mass of residue × 100" },
+                { id: "Q1g", label: "(c)(ii) Decomposition argument", marks: 1,
+                  instruction: "A student obtains a higher Mr than expected and suggests some anhydrous alum decomposes to Al₂O₃ and K₂O during strong heating. Explain why this suggestion is not correct.",
+                  answerKey: "If alum decomposed, mass loss would be greater (both water and oxides lost), so calculated moles of residue would be lower, giving a higher Mr – consistent with observation. But the argument is wrong because Al₂O₃ and K₂O would remain in the crucible, not reduce the residue mass. Hence more mass would be lost, n(water) rises, n(alum) rises, and Mr falls – contradicting the observation." },
+            ],
+        },
+        {
+            id: "Q2", type: "quantitative",
+            title: "Question 2 – Iodometric Titration (Oxidising Agent)",
+            marks: 16,
+            context: `Many oxidising agents can oxidise acidified potassium iodide to iodine.
+I₂(aq) + 2Na₂S₂O₃(aq) → 2NaI(aq) + Na₂S₄O₆(aq)
+
+FA 2 = sodium thiosulfate (22.00 g Na₂S₂O₃·5H₂O per dm³, Mr = 248.2)
+FA 3 = 0.0175 mol dm⁻³ oxidising agent
+FA 4 = 0.50 mol dm⁻³ potassium iodide, KI
+FA 5 = 1.00 mol dm⁻³ sulfuric acid, H₂SO₄
+FA 6 = starch solution`,
+            parts: [
+                { id: "Q2a", label: "(a) Titration method & results", marks: 7,
+                  instruction: "Fill burette with FA 2. Pipette 25.0 cm³ FA 3 into a conical flask. Add 10 cm³ FA 4 (excess, using 10 cm³ measuring cylinder) and 20 cm³ FA 5 (excess, using 25 cm³ measuring cylinder). Titrate with FA 2 until yellow, then add ~10 drops FA 6. Continue to endpoint (blue-black → colourless). Record all burette readings and titres. Carry out as many accurate titrations as needed for consistent results.",
+                  hint: "Rough titre first, then 2–3 accurate titres within 0.10 cm³ of each other." },
+                { id: "Q2b", label: "(b) Mean titre", marks: 1,
+                  instruction: "From your accurate titration results, calculate a suitable mean value. Show clearly how you obtain the mean.",
+                  calculationGuide: "Mean = average of consistent titres (within ±0.10 cm³), rounded to 0.01 cm³" },
+                { id: "Q2c", label: "(c)(i) Significant figures", marks: 1,
+                  instruction: "State the number of significant figures you will use for (c)(ii)–(c)(iv) and justify your choice." },
+                { id: "Q2d", label: "(c)(ii) n(Na₂S₂O₃)", marks: 1,
+                  instruction: "Calculate the amount, in mol, of sodium thiosulfate in the volume of FA 2 used.",
+                  calculationGuide: "n(Na₂S₂O₃) = (22.00/248.2) × (titre/1000)" },
+                { id: "Q2e", label: "(c)(iii) n(I₂)", marks: 1,
+                  instruction: "Calculate the amount, in mol, of iodine that reacts with the amount of sodium thiosulfate in (c)(ii).",
+                  calculationGuide: "n(I₂) = ½ × n(Na₂S₂O₃)" },
+                { id: "Q2f", label: "(c)(iv) n(FA 3)", marks: 1,
+                  instruction: "Calculate the amount, in mol, of FA 3 used to produce the iodine in (c)(iii).",
+                  calculationGuide: "n(FA 3) = 0.0175 × 25.0/1000 = 4.375 × 10⁻⁴ mol" },
+                { id: "Q2g", label: "(c)(v) I₂ per mol FA 3", marks: 1,
+                  instruction: "Calculate the amount, in mol, of iodine produced per mole of FA 3 reacting with KI. Give answer to 1 d.p.",
+                  calculationGuide: "mol I₂ per mol FA 3 = n(I₂) / n(FA 3)" },
+                { id: "Q2h", label: "(c)(vi) Change in oxidation state", marks: 2,
+                  instruction: "The oxidising agent in FA 3 is a compound of transition metal M. The redox reaction produces M²⁺ ions. Use (c)(v) to calculate the change in oxidation state of M. Show working.",
+                  answerKey: "Each mol I₂ produced requires 2e⁻. Change in OS = (c)(v) × 2 electrons per I₂. M changes from (2 + change) to +2." },
+                { id: "Q2i", label: "(d) Accuracy of measuring FA 5", marks: 1,
+                  instruction: "A student suggests the experiment would be more accurate if FA 5 (sulfuric acid) were measured using a pipette. State whether the student is correct and explain.",
+                  answerKey: "The student is incorrect. FA 5 is used in excess, so its exact volume does not affect the result. Using a pipette provides no benefit." },
+            ],
+        },
+        {
+            id: "Q3", type: "qualitative",
+            title: "Question 3 – Qualitative Analysis (Transition Metal & Ions)",
+            marks: 13,
+            context: `FA 3 = acidified KMnO₄ (purple solution)
+FA 7 = solution containing four ions: H⁺, NH₄⁺, Fe³⁺, SO₄²⁻
+
+Use 1 cm depth for each test. Use a boiling tube for Test 1 in part (b); test-tubes elsewhere.`,
+            parts: [
+                { id: "Q3a", label: "(a) Tests on FA 3", marks: 4,
+                  instruction: "Use 1 cm depth FA 3. Test 1: add equal volume NaOH, then equal volume Na₂SO₃, shake, then add H₂SO₄. Test 2: add equal volume H₂SO₄ then a spatula of zinc pieces; leave to stand. Test 3: add equal volume H₂O₂. For Test 3, give the formula of the gas formed.",
+                  answerKey: "Test 1: NaOH – no change (purple). Na₂SO₃ – turns green then brown ppt. H₂SO₄ – turns colourless. Test 2: purple turns colourless; effervescence. Test 3: effervescence; brown solid; gas relights glowing splint (O₂)." },
+                { id: "Q3b", label: "(b)(i) Tests on FA 7", marks: 6,
+                  instruction: "Test 1 (boiling tube): add 0.5 cm NaOH, warm carefully, then add aluminium foil. Test 2: add drops of KI (FA 4), then starch (FA 6). Test 3: add pieces of magnesium. Test 4: add drops BaCl₂, then add HCl. Test 5: add drops AgNO₃, then add NH₃(aq). Record all observations." },
+                { id: "Q3c", label: "(b)(ii) Identify the four ions", marks: 2,
+                  instruction: "Give the formula of each of the four ions in FA 7.",
+                  answerKey: "H⁺, NH₄⁺, Fe³⁺, SO₄²⁻" },
+                { id: "Q3d", label: "(b)(iii) Ionic equation", marks: 1,
+                  instruction: "Give the ionic equation for one reaction in Test 1 or Test 3 of (b)(i). Include state symbols.",
+                  answerKey: "Fe³⁺(aq) + 3OH⁻(aq) → Fe(OH)₃(s)  OR  NH₄⁺(aq) + OH⁻(aq) → NH₃(g) + H₂O(l)  OR  Mg(s) + 2H⁺(aq) → Mg²⁺(aq) + H₂(g)" },
+            ],
+        },
+    ],
+},
+
+// ─── Paper 3 ── Practice A ────────────────────────────────────────────────────
+{
+    id: "p3",
+    title: "Practice Paper A – Acid-Base Titration",
+    subtitle: "Paper 3 Advanced Practical Skills 1 – Practice",
+    time: "2 hours",
+    marks: 40,
+    questions: [
+        {
+            id: "Q1", type: "quantitative",
+            title: "Question 1 – Acid-Base Titration (NaOH + HCl)",
+            marks: 17,
+            context: `You will determine the concentration of a solution of hydrochloric acid by titration against a standard solution of sodium hydroxide.
+
+FA 1 = sodium hydroxide, NaOH (exactly 1.000 mol dm⁻³)
+FA 2 = hydrochloric acid, HCl (concentration unknown)
+Indicator: methyl orange`,
+            parts: [
+                { id: "Q1a", label: "(a) Titration method", marks: 7,
+                  instruction: "Fill the burette with FA 2. Pipette 25.0 cm³ of FA 1 into a conical flask. Add 2–3 drops of methyl orange indicator. Perform a rough titration. Record burette readings. Carry out at least two accurate titrations. Record all readings to 0.05 cm³ in a suitable table.",
+                  hint: "Endpoint: yellow (alkaline) → red/orange (acid). Rinse pipette with FA 1 before use." },
+                { id: "Q1b", label: "(b) Mean titre", marks: 1,
+                  instruction: "Calculate a mean titre from your consistent accurate results. Show working.",
+                  calculationGuide: "Select titres within ±0.10 cm³. Mean to 0.01 cm³." },
+                { id: "Q1c", label: "(c)(i) n(NaOH)", marks: 1,
+                  instruction: "Calculate the amount, in mol, of NaOH in 25.0 cm³ of FA 1.",
+                  calculationGuide: "n(NaOH) = 1.000 × 25.0/1000 = 0.0250 mol" },
+                { id: "Q1d", label: "(c)(ii) n(HCl)", marks: 1,
+                  instruction: "Calculate the amount, in mol, of HCl in the mean titre of FA 2. (NaOH + HCl → NaCl + H₂O, 1:1 ratio)",
+                  calculationGuide: "n(HCl) = n(NaOH) = 0.0250 mol" },
+                { id: "Q1e", label: "(c)(iii) Concentration of FA 2", marks: 1,
+                  instruction: "Calculate the concentration, in mol dm⁻³, of FA 2.",
+                  calculationGuide: "c(HCl) = n(HCl) / (mean titre / 1000)" },
+                { id: "Q1f", label: "(d) Systematic error", marks: 1,
+                  instruction: "State one source of systematic error in this titration and explain how it would affect the calculated concentration of FA 2.",
+                  answerKey: "e.g. Pipette not rinsed with FA 1 → dilution → fewer moles NaOH → apparent lower HCl concentration." },
+                { id: "Q1g", label: "(e) Indicator choice", marks: 1,
+                  instruction: "Suggest why phenolphthalein would be less suitable than methyl orange for this titration.",
+                  answerKey: "Phenolphthalein has endpoint at pH 8–10; methyl orange at pH 3–4.4, closer to equivalence point of strong acid–strong base. Either indicator works in practice, but phenolphthalein endpoint occurs slightly before equivalence." },
+                { id: "Q1h", label: "(f) Accuracy marks", marks: 4,
+                  instruction: "Record all burette readings to 0.05 cm³ precision. Accurate titres should agree within 0.10 cm³." },
+            ],
+        },
+        {
+            id: "Q2", type: "energetics",
+            title: "Question 2 – Enthalpy of Reaction (Mg + HCl)",
+            marks: 10,
+            context: `Determine the enthalpy change ΔH for:
+Mg(s) + 2HCl(aq) → MgCl₂(aq) + H₂(g)
+
+FA 3 = 2.00 mol dm⁻³ hydrochloric acid, HCl
+FA 4 = magnesium ribbon`,
+            parts: [
+                { id: "Q2a", label: "(a) Method", marks: 3,
+                  instruction: "Measure 50.0 cm³ FA 3 into a polystyrene cup. Weigh a piece of magnesium ribbon (FA 4). Record initial temperature of FA 3. Add FA 4. Record maximum temperature. Record temperature until it starts to fall. Calculate ΔT." },
+                { id: "Q2b", label: "(b)(i) Heat energy", marks: 1,
+                  instruction: "Calculate the heat energy produced. Assume specific heat capacity c = 4.18 J g⁻¹ K⁻¹ and mass of solution = 50 g.",
+                  calculationGuide: "q = 50 × 4.18 × ΔT (J)" },
+                { id: "Q2c", label: "(b)(ii) Amount of Mg", marks: 1,
+                  instruction: "Calculate the amount, in mol, of Mg used. (Ar: Mg = 24.3)",
+                  calculationGuide: "n(Mg) = mass / 24.3" },
+                { id: "Q2d", label: "(b)(iii) ΔH", marks: 2,
+                  instruction: "Calculate ΔH in kJ mol⁻¹. Sign must be negative (exothermic).",
+                  calculationGuide: "ΔH = −q / (1000 × n(Mg))" },
+                { id: "Q2e", label: "(c) Heat loss", marks: 3,
+                  instruction: "Explain why heat loss to the surroundings means your value of ΔH is less negative than the true value. Describe how to correct for heat loss using a temperature–time graph.",
+                  answerKey: "Record temperature vs time before and after addition. Extrapolate both lines to time of addition. Use extrapolated ΔT (higher) to correct for heat lost during the experiment." },
+            ],
+        },
+        {
+            id: "Q3", type: "qualitative",
+            title: "Question 3 – Qualitative Analysis (Halide Ions)",
+            marks: 13,
+            context: `FA 5, FA 6 and FA 7 each contain a different halide ion.
+
+FA 5 = contains Cl⁻
+FA 6 = contains Br⁻
+FA 7 = contains I⁻
+FA 8 = iron(III) sulfate solution`,
+            parts: [
+                { id: "Q3a", label: "(a) Tests on FA 5–7 with AgNO₃ and NH₃", marks: 5,
+                  instruction: "To 1 cm depth of each FA, add a few drops of AgNO₃ solution, then add aqueous ammonia in excess. Record all observations in a table." },
+                { id: "Q3b", label: "(b) Identify halide ions", marks: 2,
+                  instruction: "Use your observations to identify the halide ion in FA 5, FA 6 and FA 7.",
+                  answerKey: "FA 5: Cl⁻ (white ppt, soluble in NH₃). FA 6: Br⁻ (cream ppt, partially soluble). FA 7: I⁻ (pale yellow ppt, insoluble in NH₃)." },
+                { id: "Q3c", label: "(c) Tests on FA 8", marks: 4,
+                  instruction: "Use 1 cm depth FA 8. Test 1: add NaOH solution. Test 2: add NH₃(aq). Test 3: add Na₂SO₃ solution. Record all observations." },
+                { id: "Q3d", label: "(d) Identify cation in FA 8", marks: 1,
+                  instruction: "Identify the cation in FA 8 and write its formula.",
+                  answerKey: "Fe³⁺. Red-brown precipitate with both NaOH and NH₃, insoluble in excess. Decolourisation of purple KMnO₄ absent." },
+                { id: "Q3e", label: "(e) Ionic equation", marks: 1,
+                  instruction: "Write an ionic equation with state symbols for the reaction of FA 8 with NaOH.",
+                  answerKey: "Fe³⁺(aq) + 3OH⁻(aq) → Fe(OH)₃(s)" },
+            ],
+        },
+    ],
+},
+
+// ─── Paper 4 ── Practice B ────────────────────────────────────────────────────
+{
+    id: "p4",
+    title: "Practice Paper B – Temperature Effect on Rate",
+    subtitle: "Paper 3 Advanced Practical Skills 1 – Practice",
+    time: "2 hours",
+    marks: 40,
+    questions: [
+        {
+            id: "Q1", type: "quantitative",
+            title: "Question 1 – Effect of Temperature on Rate",
+            marks: 17,
+            context: `You will investigate how temperature affects the rate of reaction between sodium thiosulfate and hydrochloric acid.
+
+FA 1 = 0.10 mol dm⁻³ Na₂S₂O₃
+FA 2 = 2.00 mol dm⁻³ HCl`,
+            parts: [
+                { id: "Q1a", label: "(a) Method & results table", marks: 8,
+                  instruction: "Prepare a table including: temperature (°C), reaction time (s), relative rate (1000/time). Warm 25.0 cm³ FA 1 to each target temperature (20, 30, 40, 50, 60 °C) in a water bath. Add 10.0 cm³ FA 2 (pre-warmed to same temperature). Start clock. Stop when mixture becomes opaque. Record time.",
+                  hint: "Warm FA 2 separately to prevent premature mixing. Record temperature at moment of mixing." },
+                { id: "Q1b", label: "(b) Graph", marks: 4,
+                  instruction: "Plot relative rate (y-axis) against temperature (x-axis). Draw a smooth curve of best fit through your points." },
+                { id: "Q1c", label: "(c) Prediction", marks: 2,
+                  instruction: "Use your graph to predict the relative rate at 35 °C. Hence calculate the reaction time at 35 °C.",
+                  calculationGuide: "time = 1000 / relative rate" },
+                { id: "Q1d", label: "(d) Rate doubling rule", marks: 1,
+                  instruction: "State what happens to the rate of reaction when the temperature increases by 10 °C, and link this to the concept of activation energy.",
+                  answerKey: "Rate approximately doubles for every 10 °C rise. Higher temperature → more particles have energy ≥ Eₐ → more successful collisions." },
+                { id: "Q1e", label: "(e) Control variable", marks: 1,
+                  instruction: "State one variable that must be kept constant during this investigation and explain why.",
+                  answerKey: "e.g. Concentration of FA 1 and FA 2 must remain constant; otherwise changes in rate could be due to concentration rather than temperature." },
+                { id: "Q1f", label: "(f) Anomalous result", marks: 1,
+                  instruction: "Identify a potential source of anomalous results in this experiment and how to minimise it.",
+                  answerKey: "Temperature may not be uniform when FA 2 is added; minimise by pre-warming FA 2 in the same water bath." },
+            ],
+        },
+        {
+            id: "Q2", type: "energetics",
+            title: "Question 2 – Enthalpy of Displacement (Zn + CuSO₄)",
+            marks: 10,
+            context: `Determine the enthalpy change ΔH for:
+Zn(s) + CuSO₄(aq) → Cu(s) + ZnSO₄(aq)
+
+FA 3 = 1.0 mol dm⁻³ CuSO₄
+FA 4 = zinc powder`,
+            parts: [
+                { id: "Q2a", label: "(a) Method", marks: 3,
+                  instruction: "Weigh out approximately 0.65 g zinc powder (FA 4). Measure 50.0 cm³ FA 3 into a polystyrene cup. Record initial temperature. Add FA 4 and stir continuously. Record maximum temperature reached." },
+                { id: "Q2b", label: "(b)(i) q", marks: 1,
+                  instruction: "Calculate heat energy produced, assuming density = 1 g cm⁻³.",
+                  calculationGuide: "q = 50 × 4.18 × ΔT" },
+                { id: "Q2c", label: "(b)(ii) Limiting reagent", marks: 1,
+                  instruction: "Determine which reactant is in excess. (Ar: Zn = 65.4)",
+                  answerKey: "n(CuSO₄) = 0.050 mol. n(Zn) = mass/65.4. Zn is typically limiting." },
+                { id: "Q2d", label: "(b)(iii) ΔH", marks: 2,
+                  instruction: "Calculate ΔH in kJ mol⁻¹.",
+                  calculationGuide: "ΔH = −q / (1000 × n(Zn))" },
+                { id: "Q2e", label: "(c) Compare to Mg + CuSO₄", marks: 3,
+                  instruction: "The enthalpy change for Mg(s) + CuSO₄(aq) is more negative than for Zn(s) + CuSO₄(aq). Explain this in terms of electrode potentials.",
+                  answerKey: "Mg has a more negative standard electrode potential than Zn, so Mg displaces Cu more vigorously. Greater difference in E° → larger ΔH of displacement." },
+            ],
+        },
+        {
+            id: "Q3", type: "qualitative",
+            title: "Question 3 – Qualitative Analysis (Cation Identification)",
+            marks: 13,
+            context: `FA 5, FA 6 and FA 7 each contain a different cation.
+Use the Qualitative analysis notes to identify each cation.
+
+FA 8 = NaOH solution (for further testing)`,
+            parts: [
+                { id: "Q3a", label: "(a) Tests with NaOH and NH₃", marks: 5,
+                  instruction: "Use 1 cm depth of FA 5, FA 6 and FA 7. Test 1: add NaOH dropwise then in excess. Test 2: add NH₃(aq) dropwise then in excess. Record colour of precipitate and solubility in excess for each." },
+                { id: "Q3b", label: "(b) Identify cations", marks: 3,
+                  instruction: "Identify the cation in each of FA 5, FA 6 and FA 7, giving reasons from your observations." },
+                { id: "Q3c", label: "(c) Further confirmatory test", marks: 2,
+                  instruction: "Describe a further confirmatory test for one of the cations identified, including the expected observation.",
+                  answerKey: "e.g. For Cu²⁺: excess NH₃ gives deep blue solution (tetraamminecopper(II) complex). For Fe³⁺: add KSCN → blood-red solution." },
+                { id: "Q3d", label: "(d) Ionic equation", marks: 1,
+                  instruction: "Write an ionic equation (with state symbols) for the reaction of one of the cations with NaOH.",
+                  answerKey: "e.g. Cu²⁺(aq) + 2OH⁻(aq) → Cu(OH)₂(s)  OR  Fe³⁺(aq) + 3OH⁻(aq) → Fe(OH)₃(s)" },
+                { id: "Q3e", label: "(e) Anion test", marks: 2,
+                  instruction: "FA 6 also contains a sulfate anion. Describe how you would confirm the presence of sulfate ions. State the expected observation.",
+                  answerKey: "Add BaCl₂ solution (acidified with dilute HCl). White precipitate of BaSO₄ forms, insoluble in excess dilute HCl." },
+            ],
+        },
+    ],
+},
+
+// ─── Paper 5 ── Practice C ────────────────────────────────────────────────────
+{
+    id: "p5",
+    title: "Practice Paper C – Water of Crystallisation",
+    subtitle: "Paper 3 Advanced Practical Skills 1 – Practice",
+    time: "2 hours",
+    marks: 40,
+    questions: [
+        {
+            id: "Q1", type: "quantitative",
+            title: "Question 1 – Water of Crystallisation (CuSO₄·xH₂O)",
+            marks: 11,
+            context: `Hydrated copper(II) sulfate decomposes on heating, losing its water of crystallisation:
+CuSO₄·xH₂O(s) → CuSO₄(s) + xH₂O(g)
+
+You will determine the value of x.
+FA 1 = hydrated copper(II) sulfate, CuSO₄·xH₂O (blue crystals)`,
+            parts: [
+                { id: "Q1a", label: "(a) Method & Results", marks: 5,
+                  instruction: "Weigh an evaporating dish. Add all FA 1. Weigh dish + FA 1. Heat gently on a gauze for 5 min until colour changes to white. Cool. Reweigh. Heat 2 more min. Cool. Reweigh. Record masses: (I) dish, (II) dish + FA 1, (III) after first heating, (IV) after second heating. Calculate mass of FA 1 and mass of anhydrous CuSO₄.",
+                  hint: "Continue heating and cooling until two successive masses agree to ±0.02 g." },
+                { id: "Q1b", label: "(b)(i) Mass of water", marks: 1,
+                  instruction: "Calculate the mass of water of crystallisation lost.",
+                  calculationGuide: "mass H₂O = mass FA 1 − mass CuSO₄" },
+                { id: "Q1c", label: "(b)(ii) n(H₂O) and n(CuSO₄)", marks: 1,
+                  instruction: "Calculate the amount, in mol, of water lost and of anhydrous CuSO₄ formed. (Mr: H₂O = 18.0; CuSO₄ = 159.6)",
+                  calculationGuide: "n(H₂O) = mass H₂O / 18.0; n(CuSO₄) = mass CuSO₄ / 159.6" },
+                { id: "Q1d", label: "(b)(iii) Value of x", marks: 1,
+                  instruction: "Calculate the value of x in CuSO₄·xH₂O. Give your answer to the nearest integer.",
+                  calculationGuide: "x = n(H₂O) / n(CuSO₄)" },
+                { id: "Q1e", label: "(c)(i) Percentage uncertainty", marks: 1,
+                  instruction: "Calculate the maximum percentage uncertainty in the mass of anhydrous CuSO₄, given a balance uncertainty of 0.01 g.",
+                  calculationGuide: "% uncertainty = (2 × 0.01 / mass CuSO₄) × 100" },
+                { id: "Q1f", label: "(c)(ii) Source of error", marks: 1,
+                  instruction: "Suggest why the value of x obtained may be too high, even if heating is sufficient.",
+                  answerKey: "If CuSO₄ is not fully dehydrated (colour still blue-tinged), the mass of anhydrous CuSO₄ is too high. Alternatively, if the dish absorbs moisture during cooling, mass appears higher." },
+                { id: "Q1g", label: "(c)(iii) Safety", marks: 1,
+                  instruction: "State one safety precaution when heating FA 1 and give the reason.",
+                  answerKey: "Allow crucible to cool fully before handling to avoid burns. Or: heat gently first to avoid spattering." },
+            ],
+        },
+        {
+            id: "Q2", type: "quantitative",
+            title: "Question 2 – Redox Titration (KMnO₄ vs Fe²⁺)",
+            marks: 16,
+            context: `KMnO₄ oxidises Fe²⁺ in acidic solution:
+MnO₄⁻(aq) + 5Fe²⁺(aq) + 8H⁺(aq) → Mn²⁺(aq) + 5Fe³⁺(aq) + 4H₂O(l)
+
+FA 2 = 0.0200 mol dm⁻³ KMnO₄
+FA 3 = FeSO₄ solution (concentration unknown)
+FA 4 = 1.0 mol dm⁻³ H₂SO₄ (to acidify)`,
+            parts: [
+                { id: "Q2a", label: "(a) Titration", marks: 7,
+                  instruction: "Fill burette with FA 2. Pipette 25.0 cm³ FA 3 into conical flask. Add 20 cm³ FA 4. Titrate with FA 2 until a faint permanent pink colour persists. Perform a rough and at least two accurate titrations. Record all burette readings.",
+                  hint: "KMnO₄ acts as its own indicator. Endpoint: first faint pink lasting 30 s." },
+                { id: "Q2b", label: "(b) Mean titre", marks: 1,
+                  instruction: "Calculate a suitable mean from your consistent accurate titres.",
+                  calculationGuide: "Mean of titres within ±0.10 cm³" },
+                { id: "Q2c", label: "(c)(i) n(KMnO₄)", marks: 1,
+                  instruction: "Calculate the amount, in mol, of KMnO₄ in the mean titre.",
+                  calculationGuide: "n(KMnO₄) = 0.0200 × titre/1000" },
+                { id: "Q2d", label: "(c)(ii) n(Fe²⁺)", marks: 1,
+                  instruction: "Calculate the amount, in mol, of Fe²⁺ in 25.0 cm³ of FA 3.",
+                  calculationGuide: "n(Fe²⁺) = 5 × n(KMnO₄)" },
+                { id: "Q2e", label: "(c)(iii) Concentration of FA 3", marks: 1,
+                  instruction: "Calculate the concentration, in mol dm⁻³, of FeSO₄ in FA 3.",
+                  calculationGuide: "c(FeSO₄) = n(Fe²⁺) / 0.0250" },
+                { id: "Q2f", label: "(d) Why acidify?", marks: 1,
+                  instruction: "Explain why dilute H₂SO₄ is added to the conical flask before titrating.",
+                  answerKey: "Acidic conditions are required to prevent precipitation of MnO₂ (brown solid). In acid, Mn is fully reduced to Mn²⁺ (colourless). H₂SO₄ preferred over HCl (HCl would be oxidised by KMnO₄)." },
+                { id: "Q2g", label: "(e) Fe²⁺ in air", marks: 1,
+                  instruction: "Fe²⁺ is readily oxidised to Fe³⁺ by air. State how this would affect the titre value obtained.",
+                  answerKey: "Titre would be smaller (less Fe²⁺ present). The calculated concentration of FeSO₄ would appear lower than the actual value." },
+                { id: "Q2h", label: "(f) SF and sig fig", marks: 3,
+                  instruction: "Give your answer to (c)(iii) to an appropriate number of significant figures. Justify the number chosen." },
+            ],
+        },
+        {
+            id: "Q3", type: "qualitative",
+            title: "Question 3 – Qualitative Analysis (Anion Identification)",
+            marks: 13,
+            context: `FA 5, FA 6, FA 7 each contain a different anion.
+FA 8 = a solid of unknown composition
+
+FA 5 = contains CO₃²⁻
+FA 6 = contains NO₃⁻
+FA 7 = contains Cl⁻`,
+            parts: [
+                { id: "Q3a", label: "(a) Tests on FA 5–7", marks: 5,
+                  instruction: "Test 1: Add dilute HCl to each solution. Test 2: Test any gas produced with limewater. Test 3: Add AgNO₃ solution to each, then add NH₃(aq). Record all observations in a table." },
+                { id: "Q3b", label: "(b) Identify anions", marks: 3,
+                  instruction: "Use observations to identify the anion in each of FA 5, FA 6 and FA 7.",
+                  answerKey: "FA 5: CO₃²⁻ (effervescence with HCl; CO₂ turns limewater milky). FA 6: NO₃⁻ (no reaction with HCl or AgNO₃; confirmed by brown ring test with Fe²⁺/H₂SO₄). FA 7: Cl⁻ (white ppt with AgNO₃, soluble in NH₃)." },
+                { id: "Q3c", label: "(c) Tests on FA 8 (solid)", marks: 4,
+                  instruction: "Test 1: Heat FA 8 in a hard-glass test tube. Test 2: Dissolve in dilute HCl, test solution with NaOH. Test 3: Test solution with AgNO₃ solution. Record all observations." },
+                { id: "Q3d", label: "(d) Identity of FA 8", marks: 1,
+                  instruction: "Suggest the identity of FA 8 from your observations. Justify your answer." },
+            ],
+        },
+    ],
+},
+
+// ─── Paper 6 ── Practice D ────────────────────────────────────────────────────
+{
+    id: "p6",
+    title: "Practice Paper D – Iodometric Titration",
+    subtitle: "Paper 3 Advanced Practical Skills 1 – Practice",
+    time: "2 hours",
+    marks: 40,
+    questions: [
+        {
+            id: "Q1", type: "quantitative",
+            title: "Question 1 – Iodometric Titration (H₂O₂ + KI)",
+            marks: 16,
+            context: `Hydrogen peroxide oxidises iodide ions in acidic solution:
+H₂O₂(aq) + 2KI(aq) + H₂SO₄(aq) → I₂(aq) + K₂SO₄(aq) + 2H₂O(l)
+The iodine produced is titrated with sodium thiosulfate.
+
+FA 1 = Na₂S₂O₃ (22.00 g Na₂S₂O₃·5H₂O per dm³)
+FA 2 = H₂O₂ solution (concentration unknown)
+FA 3 = 0.50 mol dm⁻³ KI
+FA 4 = 1.00 mol dm⁻³ H₂SO₄
+FA 5 = starch solution`,
+            parts: [
+                { id: "Q1a", label: "(a) Titration", marks: 7,
+                  instruction: "Fill burette with FA 1. Pipette 25.0 cm³ FA 2 into conical flask. Add 10 cm³ FA 3 and 10 cm³ FA 4. Titrate FA 1 into the brown/yellow solution until pale yellow, then add 10 drops FA 5. Continue to endpoint (blue → colourless). Record all readings. Carry out rough and two accurate titrations." },
+                { id: "Q1b", label: "(b) Mean titre", marks: 1,
+                  instruction: "Determine a mean titre from consistent accurate readings.", },
+                { id: "Q1c", label: "(c)(i) n(Na₂S₂O₃)", marks: 1,
+                  instruction: "Calculate the amount, in mol, of Na₂S₂O₃ in the mean titre.",
+                  calculationGuide: "n(Na₂S₂O₃) = (22.00/248.2) × titre/1000" },
+                { id: "Q1d", label: "(c)(ii) n(I₂)", marks: 1,
+                  instruction: "Calculate n(I₂) produced.",
+                  calculationGuide: "n(I₂) = ½ n(Na₂S₂O₃)" },
+                { id: "Q1e", label: "(c)(iii) n(H₂O₂)", marks: 1,
+                  instruction: "Calculate the amount, in mol, of H₂O₂ in 25.0 cm³ of FA 2.",
+                  calculationGuide: "n(H₂O₂) = n(I₂) (1:1 ratio)" },
+                { id: "Q1f", label: "(c)(iv) Concentration of H₂O₂", marks: 1,
+                  instruction: "Calculate the concentration, in mol dm⁻³, of FA 2.",
+                  calculationGuide: "c(H₂O₂) = n(H₂O₂) / 0.0250" },
+                { id: "Q1g", label: "(d) Role of starch", marks: 1,
+                  instruction: "Explain why starch is added near the endpoint rather than at the start.",
+                  answerKey: "At high [I₂], starch forms a very strong blue-black complex that is slow to decolour, making it difficult to reach a sharp endpoint. Added near endpoint, the colour change is sharper and more precise." },
+                { id: "Q1h", label: "(e) Accuracy", marks: 3,
+                  instruction: "Record all burette readings. Consistent accurate titres within ±0.10 cm³." },
+            ],
+        },
+        {
+            id: "Q2", type: "energetics",
+            title: "Question 2 – Enthalpy of Neutralisation",
+            marks: 11,
+            context: `Determine the enthalpy change of neutralisation for:
+NaOH(aq) + HCl(aq) → NaCl(aq) + H₂O(l)
+
+FA 6 = 2.00 mol dm⁻³ NaOH
+FA 7 = 2.00 mol dm⁻³ HCl`,
+            parts: [
+                { id: "Q2a", label: "(a) Method", marks: 3,
+                  instruction: "Measure 25.0 cm³ FA 6 into a polystyrene cup. Record initial temperature. Measure 25.0 cm³ FA 7 in a measuring cylinder and record its temperature. Calculate mean initial temperature. Add FA 7 to FA 6, stir, record maximum temperature. Calculate ΔT." },
+                { id: "Q2b", label: "(b)(i) Heat energy", marks: 1,
+                  instruction: "Calculate the heat energy released. Assume total mass = 50 g, c = 4.18 J g⁻¹ K⁻¹.",
+                  calculationGuide: "q = 50 × 4.18 × ΔT (J)" },
+                { id: "Q2c", label: "(b)(ii) n(NaOH) reacted", marks: 1,
+                  instruction: "Calculate the amount, in mol, of NaOH in 25.0 cm³ of FA 6.",
+                  calculationGuide: "n(NaOH) = 2.00 × 25.0/1000 = 0.0500 mol" },
+                { id: "Q2d", label: "(b)(iii) ΔH neutralisation", marks: 2,
+                  instruction: "Calculate ΔH in kJ mol⁻¹ of water formed. Sign must be negative.",
+                  calculationGuide: "ΔH = −q / (1000 × 0.0500)" },
+                { id: "Q2e", label: "(c) Literature value", marks: 2,
+                  instruction: "The literature value for enthalpy of neutralisation is −57.1 kJ mol⁻¹. Explain why your experimental value is likely to be less negative.",
+                  answerKey: "Heat losses to surroundings and to the polystyrene cup mean not all the energy released by neutralisation goes into raising the temperature of the solution. The measured ΔT is smaller than the true value." },
+                { id: "Q2f", label: "(d) Weak acid comparison", marks: 2,
+                  instruction: "Predict whether the enthalpy of neutralisation of a weak acid (e.g. ethanoic acid) with NaOH would be more or less negative than −57.1 kJ mol⁻¹. Explain.",
+                  answerKey: "Less negative. Some energy must be used to dissociate the weak acid (endothermic). The net enthalpy released is therefore smaller." },
+            ],
+        },
+        {
+            id: "Q3", type: "qualitative",
+            title: "Question 3 – Qualitative Analysis (Mixed Ions)",
+            marks: 13,
+            context: `FA 8 contains a mixture of ions. You will identify the cation and anion present.
+No additional tests should be attempted beyond those listed.`,
+            parts: [
+                { id: "Q3a", label: "(a) Tests on FA 8", marks: 6,
+                  instruction: "Test 1: add NaOH(aq) dropwise then in excess. Test 2: add NH₃(aq) dropwise then in excess. Test 3: add BaCl₂ solution then add dilute HCl. Test 4: add AgNO₃ solution then add NH₃(aq). Record all observations in a table." },
+                { id: "Q3b", label: "(b) Identify cation", marks: 2,
+                  instruction: "Use your observations from Test 1 and Test 2 to identify the cation in FA 8." },
+                { id: "Q3c", label: "(c) Identify anion", marks: 2,
+                  instruction: "Use your observations from Tests 3 and 4 to identify the anion in FA 8." },
+                { id: "Q3d", label: "(d) Ionic equation", marks: 1,
+                  instruction: "Write an ionic equation with state symbols for the reaction that confirms the identity of the anion.",
+                  answerKey: "e.g. for SO₄²⁻: Ba²⁺(aq) + SO₄²⁻(aq) → BaSO₄(s)  / for Cl⁻: Ag⁺(aq) + Cl⁻(aq) → AgCl(s)" },
+                { id: "Q3e", label: "(e) Formula of FA 8", marks: 2,
+                  instruction: "Give the formula of the compound in FA 8 and explain any observations that confirm your identification.",
+                  answerKey: "Depends on identified ions. e.g. CuCl₂: pale blue ppt with NaOH (Cu²⁺); white ppt with AgNO₃ soluble in NH₃ (Cl⁻)." },
+            ],
+        },
+    ],
+},
+
+// ─── Paper 7 ── Practice E ────────────────────────────────────────────────────
+{
+    id: "p7",
+    title: "Practice Paper E – Thiosulfate Concentration Series",
+    subtitle: "Paper 3 Advanced Practical Skills 1 – Practice",
+    time: "2 hours",
+    marks: 40,
+    questions: [
+        {
+            id: "Q1", type: "quantitative",
+            title: "Question 1 – Rate vs Concentration (6 Experiments)",
+            marks: 17,
+            context: `Investigate how the volume (and hence concentration) of FA 1 affects the rate of the thiosulfate–acid reaction. Total volume of FA 1 + distilled water = 50.00 cm³ in each experiment. Add 5.0 cm³ FA 2.
+
+FA 1 = 0.10 mol dm⁻³ Na₂S₂O₃
+FA 2 = 2.00 mol dm⁻³ HCl`,
+            parts: [
+                { id: "Q1a", label: "(a) Method & table", marks: 8,
+                  instruction: "Prepare a results table. Carry out 6 experiments with FA 1 volumes: 50.00, 40.00, 30.00, 20.00, 15.00, 10.00 cm³. Make up to 50.00 cm³ with distilled water each time. Add 5.0 cm³ FA 2. Record reaction time and relative rate (1000/t)." },
+                { id: "Q1b", label: "(b) Graph", marks: 4,
+                  instruction: "Plot relative rate vs volume of FA 1. Draw a line of best fit. Do not include origin." },
+                { id: "Q1c", label: "(c) Rate law", marks: 2,
+                  instruction: "From your graph, deduce whether the rate is directly proportional to the concentration of Na₂S₂O₃. Explain your reasoning.",
+                  answerKey: "If graph is linear through origin, rate ∝ [Na₂S₂O₃], i.e. first order with respect to Na₂S₂O₃." },
+                { id: "Q1d", label: "(d) Effect of HCl volume", marks: 1,
+                  instruction: "Predict what would happen to the reaction time if the volume of FA 2 was doubled, keeping FA 1 volume constant. Explain.",
+                  answerKey: "Time would decrease (rate increases). Higher [H⁺] increases the rate of the reaction." },
+                { id: "Q1e", label: "(e) Precision", marks: 2,
+                  instruction: "Describe how you would ensure consistent precision in measuring time across the 6 experiments.",
+                  answerKey: "Use the same method to judge opacity (e.g. same cross/insert, same observer). Start clock immediately on mixing. Only one person should stop the clock." },
+            ],
+        },
+        {
+            id: "Q2", type: "energetics",
+            title: "Question 2 – Enthalpy Change (Cu + displacement series)",
+            marks: 10,
+            context: `Compare enthalpy changes for two displacement reactions:
+(i) Mg(s) + CuSO₄(aq) → Cu(s) + MgSO₄(aq)
+(ii) Zn(s) + CuSO₄(aq) → Cu(s) + ZnSO₄(aq)
+
+FA 3 = 1.0 mol dm⁻³ CuSO₄
+FA 4a = magnesium powder;  FA 4b = zinc powder`,
+            parts: [
+                { id: "Q2a", label: "(a) Method", marks: 3,
+                  instruction: "Carry out both experiments using 50.0 cm³ FA 3 and approximately equimolar quantities of FA 4a and FA 4b. Record initial and maximum temperatures in each case." },
+                { id: "Q2b", label: "(b) ΔH for each reaction", marks: 4,
+                  instruction: "Calculate ΔH (kJ mol⁻¹) for each reaction. Show all working.",
+                  calculationGuide: "ΔH = −q / (1000 × n(metal))" },
+                { id: "Q2c", label: "(c) Comparison", marks: 3,
+                  instruction: "State which reaction releases more energy. Explain this in terms of electrode potentials and reactivity.",
+                  answerKey: "Mg reaction releases more energy. Mg has a more negative standard electrode potential (E° = −2.37 V) than Zn (E° = −0.76 V). The greater the difference in E° with Cu (+0.34 V), the more energy is released." },
+            ],
+        },
+        {
+            id: "Q3", type: "qualitative",
+            title: "Question 3 – Qualitative Analysis (Mixed Cation & Anion)",
+            marks: 13,
+            context: `FA 5, FA 6 and FA 7 are solutions containing various ions.
+FA 5 contains a transition metal cation.
+FA 6 contains an ammonium cation.
+FA 7 contains a group 2 cation.`,
+            parts: [
+                { id: "Q3a", label: "(a) Tests on FA 5–7", marks: 6,
+                  instruction: "Test 1: Add NaOH dropwise then in excess. Test 2: Add NH₃(aq) dropwise then in excess. For FA 6 only: Test 3: warm with NaOH and test gas with damp red litmus. Record all observations." },
+                { id: "Q3b", label: "(b) Identify cations", marks: 3,
+                  instruction: "Identify the cation in each of FA 5, FA 6 and FA 7. Give reasons.",
+                  answerKey: "FA 6: NH₄⁺ (ammonia gas with NaOH turns litmus blue). FA 7: Ca²⁺ or Mg²⁺ (white ppt, insoluble in excess). FA 5: Cu²⁺ (pale blue ppt, soluble in excess NH₃ giving deep blue)." },
+                { id: "Q3c", label: "(c) Ionic equations", marks: 2,
+                  instruction: "Write ionic equations for: (i) precipitation of cation in FA 5 with NaOH. (ii) ammonium ion with NaOH, producing gas.",
+                  answerKey: "(i) Cu²⁺(aq) + 2OH⁻(aq) → Cu(OH)₂(s). (ii) NH₄⁺(aq) + OH⁻(aq) → NH₃(g) + H₂O(l)" },
+                { id: "Q3d", label: "(d) Anion tests on FA 5", marks: 2,
+                  instruction: "Describe tests to confirm whether FA 5 contains Cl⁻, Br⁻ or I⁻ and give expected observations.",
+                  answerKey: "Add AgNO₃; if Cl⁻: white ppt soluble in NH₃. If Br⁻: cream ppt, partially soluble. If I⁻: yellow ppt, insoluble in NH₃." },
+            ],
+        },
+    ],
+},
+
+// ─── Paper 8 ── Practice F ────────────────────────────────────────────────────
+{
+    id: "p8",
+    title: "Practice Paper F – Marble Chips Rate & Enthalpy",
+    subtitle: "Paper 3 Advanced Practical Skills 1 – Practice",
+    time: "2 hours",
+    marks: 40,
+    questions: [
+        {
+            id: "Q1", type: "quantitative",
+            title: "Question 1 – Rate of Reaction (Marble + HCl)",
+            marks: 17,
+            context: `CaCO₃(s) + 2HCl(aq) → CaCl₂(aq) + CO₂(g) + H₂O(l)
+
+You will investigate how the surface area of marble chips affects the rate of gas production.
+FA 1 = 1.00 mol dm⁻³ HCl
+FA 2a = large marble chips; FA 2b = small marble chips; FA 2c = marble powder (same total mass each time)`,
+            parts: [
+                { id: "Q1a", label: "(a) Method & results", marks: 8,
+                  instruction: "Use 50 cm³ FA 1 and 5.0 g of marble in each experiment. Measure CO₂ volume collected over a gas syringe at 30 s intervals for 5 min. Record results in a table: time (s), volume CO₂ (cm³) for each marble form." },
+                { id: "Q1b", label: "(b) Graph", marks: 4,
+                  instruction: "Plot volume CO₂ (y-axis) vs time (x-axis) for all three experiments on the same axes. Label each curve clearly. Draw smooth curves through the points." },
+                { id: "Q1c", label: "(c) Initial rate", marks: 2,
+                  instruction: "Calculate the initial rate of each reaction from the gradient of a tangent drawn at t = 0 on your graph.",
+                  calculationGuide: "Initial rate = gradient of tangent at t = 0 (cm³ s⁻¹)" },
+                { id: "Q1d", label: "(d) Surface area effect", marks: 1,
+                  instruction: "State the relationship between surface area and initial rate of reaction. Explain using collision theory.",
+                  answerKey: "Increasing surface area increases the rate of reaction. More surface area exposed means more particle–particle collisions per unit time, increasing the frequency of successful collisions." },
+                { id: "Q1e", label: "(e) Same final volume", marks: 1,
+                  instruction: "Predict whether the final volume of CO₂ collected will be the same or different for the three experiments. Explain.",
+                  answerKey: "Same. All use the same mass of CaCO₃ and the same amount of HCl (in excess). The total moles of CO₂ produced depends only on the moles of limiting reagent, not surface area." },
+                { id: "Q1f", label: "(f) Further experiment", marks: 1,
+                  instruction: "Suggest a further experiment to investigate one other factor affecting the rate of this reaction. State the variable changed and kept constant.",
+                  answerKey: "Vary [HCl], keeping mass and size of marble, temperature, and volume constant. OR vary temperature, keeping [HCl] and marble constant." },
+            ],
+        },
+        {
+            id: "Q2", type: "energetics",
+            title: "Question 2 – Enthalpy of Dissolution (NH₄NO₃)",
+            marks: 10,
+            context: `Determine the enthalpy of dissolution of ammonium nitrate:
+NH₄NO₃(s) → NH₄⁺(aq) + NO₃⁻(aq)
+
+FA 3 = ammonium nitrate, NH₄NO₃ (solid, Mr = 80.0)`,
+            parts: [
+                { id: "Q2a", label: "(a) Method", marks: 3,
+                  instruction: "Measure 100.0 cm³ of distilled water into a polystyrene cup. Record initial temperature. Weigh approximately 2.00 g FA 3. Add FA 3 to water and stir until dissolved. Record minimum temperature (endothermic)." },
+                { id: "Q2b", label: "(b)(i) Heat energy", marks: 1,
+                  instruction: "Calculate the heat energy absorbed. Assume mass of solution = 102 g, c = 4.18 J g⁻¹ K⁻¹.",
+                  calculationGuide: "q = 102 × 4.18 × |ΔT| (J, positive for endothermic)" },
+                { id: "Q2c", label: "(b)(ii) n(NH₄NO₃)", marks: 1,
+                  instruction: "Calculate the amount, in mol, of NH₄NO₃ dissolved.",
+                  calculationGuide: "n = mass / 80.0" },
+                { id: "Q2d", label: "(b)(iii) ΔH", marks: 2,
+                  instruction: "Calculate ΔH in kJ mol⁻¹. Sign must be positive (endothermic).",
+                  calculationGuide: "ΔH = +q / (1000 × n)" },
+                { id: "Q2e", label: "(c) Application", marks: 3,
+                  instruction: "Ammonium nitrate is used in instant cold packs. Explain why using a polystyrene container rather than a glass beaker gives a more accurate value of ΔH.",
+                  answerKey: "Polystyrene is a good thermal insulator; less heat is absorbed by the container, so more of the heat exchange is measured via the temperature change of the solution. Glass absorbs more heat, reducing the observed temperature change and making ΔH less accurate." },
+            ],
+        },
+        {
+            id: "Q3", type: "qualitative",
+            title: "Question 3 – Qualitative Analysis (Nitrogen Compounds)",
+            marks: 13,
+            context: `FA 4, FA 5 and FA 6 each contain a nitrogen-containing anion: one contains NO₃⁻, one contains NO₂⁻, one contains NH₄⁺ (as a cation).
+FA 7 = acidified KMnO₄
+FA 8 = aqueous NaOH`,
+            parts: [
+                { id: "Q3a", label: "(a) Tests on FA 4–6", marks: 5,
+                  instruction: "Test 1: Add NaOH (FA 8), warm gently; test gas with damp red litmus. Test 2: Add acidified KMnO₄ (FA 7). Test 3: Add aluminium foil to FA 8 + solution in boiling tube; warm. Record all observations." },
+                { id: "Q3b", label: "(b) Identify ions", marks: 3,
+                  instruction: "Identify the nitrogen-containing ion in each of FA 4, FA 5 and FA 6.",
+                  answerKey: "NH₄⁺: litmus turns blue on warming with NaOH. NO₂⁻: decolourises acidified KMnO₄; NH₃ on warming with NaOH + Al foil. NO₃⁻: no immediate reaction; NH₃ only with NaOH + Al foil + warming." },
+                { id: "Q3c", label: "(c) Test to distinguish NO₂⁻ from NO₃⁻", marks: 2,
+                  instruction: "Describe a test that distinguishes NO₂⁻ from NO₃⁻ without using Al foil.",
+                  answerKey: "Add acidified KMnO₄. NO₂⁻ decolourises the purple KMnO₄ (it is oxidised by MnO₄⁻). NO₃⁻ does not decolourise KMnO₄." },
+                { id: "Q3d", label: "(d) Ionic equation", marks: 1,
+                  instruction: "Write an ionic equation for the reaction of NO₂⁻ with acidified KMnO₄.",
+                  answerKey: "2MnO₄⁻(aq) + 5NO₂⁻(aq) + 6H⁺(aq) → 2Mn²⁺(aq) + 5NO₃⁻(aq) + 3H₂O(l)" },
+                { id: "Q3e", label: "(e) Gas test", marks: 2,
+                  instruction: "Describe the test and result for ammonia gas.",
+                  answerKey: "Hold damp red litmus paper in the gas. The paper turns blue, confirming NH₃." },
+            ],
+        },
+    ],
+},
+
+// ─── Papers 9–20: Condensed Practice Papers ──────────────────────────────────
+
+// Paper 9 – Practice G
+{
+    id: "p9",
+    title: "Practice Paper G – Thiosulfate Clock & Gas Gravimetry",
+    subtitle: "Paper 3 Advanced Practical Skills 1 – Practice",
+    time: "2 hours", marks: 40,
+    questions: [
+        {
+            id: "Q1", type: "quantitative",
+            title: "Question 1 – Thiosulfate Clock (Variable [HCl])",
+            marks: 17,
+            context: `Investigate how [HCl] affects the rate of reaction with Na₂S₂O₃. Keep [Na₂S₂O₃] constant at 25.00 cm³ FA 1. Vary FA 2 volume (5–25 cm³); add distilled water to keep total acid + water = 25 cm³.
+
+FA 1 = 0.10 mol dm⁻³ Na₂S₂O₃
+FA 2 = 2.00 mol dm⁻³ HCl`,
+            parts: [
+                { id: "Q1a", label: "(a) Results table & 5 experiments", marks: 8,
+                  instruction: "Record: vol FA 2, vol water, time, relative rate. Perform 5 experiments with FA 2 volumes 5.0, 10.0, 15.0, 20.0, 25.0 cm³." },
+                { id: "Q1b", label: "(b) Graph", marks: 4,
+                  instruction: "Plot relative rate vs vol FA 2. Draw best-fit line." },
+                { id: "Q1c", label: "(c) Predict at vol FA 2 = 12.5 cm³", marks: 2,
+                  instruction: "Use graph to predict relative rate and hence time at 12.5 cm³ FA 2.",
+                  calculationGuide: "time = 1000 / relative rate" },
+                { id: "Q1d", label: "(d) HCl order of reaction", marks: 1,
+                  instruction: "State what order of reaction with respect to H⁺ your graph suggests. Justify.",
+                  answerKey: "First order if graph is linear through origin: rate ∝ [H⁺]." },
+                { id: "Q1e", label: "(e) Control variable", marks: 1,
+                  instruction: "State one variable kept constant and explain its importance.",
+                  answerKey: "Temperature kept constant: temperature affects rate of reaction independently of concentration." },
+                { id: "Q1f", label: "(f) Evaluation", marks: 1,
+                  instruction: "Describe one limitation of using reaction time as a measure of rate.",
+                  answerKey: "The end point (opacity) is subjective; different observers may stop the clock at different points. This introduces random error." },
+            ],
+        },
+        {
+            id: "Q2", type: "quantitative",
+            title: "Question 2 – Gravimetric Analysis (CO₂ from CaCO₃ + HCl)",
+            marks: 10,
+            context: `CaCO₃(s) + 2HCl(aq) → CaCl₂(aq) + H₂(O(l) + CO₂(g)
+
+FA 3 = excess 2.00 mol dm⁻³ HCl
+FA 4 = impure calcium carbonate sample`,
+            parts: [
+                { id: "Q2a", label: "(a) Method", marks: 3,
+                  instruction: "Weigh conical flask + lid + FA 3. Add a known mass (~2 g) of FA 4. React until no further bubbling. Reweigh. Mass loss = mass of CO₂." },
+                { id: "Q2b", label: "(b)(i) n(CO₂)", marks: 1,
+                  instruction: "Calculate the amount, in mol, of CO₂ produced. (Mr CO₂ = 44.0)",
+                  calculationGuide: "n(CO₂) = mass loss / 44.0" },
+                { id: "Q2c", label: "(b)(ii) n(CaCO₃)", marks: 1,
+                  instruction: "Calculate amount of CaCO₃ that reacted. (1:1 ratio)",
+                  calculationGuide: "n(CaCO₃) = n(CO₂)" },
+                { id: "Q2d", label: "(b)(iii) % purity", marks: 2,
+                  instruction: "Calculate the percentage purity of the CaCO₃ sample. (Mr CaCO₃ = 100.1)",
+                  calculationGuide: "% purity = (n(CaCO₃) × 100.1 / mass FA 4) × 100" },
+                { id: "Q2e", label: "(c) Uncertainty", marks: 3,
+                  instruction: "Explain why weighing before and after may underestimate the CO₂ produced. Suggest how to minimise this error.",
+                  answerKey: "CO₂ dissolved in the acid solution is not counted. Use a gas syringe to collect all gas. Alternatively, let reaction finish completely in a closed flask weighed before and after." },
+            ],
+        },
+        {
+            id: "Q3", type: "qualitative",
+            title: "Question 3 – Qualitative Analysis (Sulfate, Sulfite, Thiosulfate)",
+            marks: 13,
+            context: `FA 5, FA 6, FA 7 each contain one of: SO₄²⁻, SO₃²⁻, S₂O₃²⁻.
+Use reagents: BaCl₂, HCl, acidified KMnO₄, Mg ribbon, AgNO₃, NaOH.`,
+            parts: [
+                { id: "Q3a", label: "(a) Systematic tests", marks: 5,
+                  instruction: "Design and carry out 3 tests that allow you to distinguish between SO₄²⁻, SO₃²⁻ and S₂O₃²⁻. Record all observations in a table." },
+                { id: "Q3b", label: "(b) Identify anions", marks: 3,
+                  instruction: "Identify the anion in each of FA 5, FA 6 and FA 7.",
+                  answerKey: "SO₄²⁻: white ppt with BaCl₂, insoluble in HCl; no reaction with KMnO₄. SO₃²⁻: white ppt with BaCl₂, soluble in HCl; decolourises KMnO₄. S₂O₃²⁻: off-white/yellow ppt slowly with H⁺." },
+                { id: "Q3c", label: "(c) Ionic equations for BaCl₂ tests", marks: 2,
+                  instruction: "Write ionic equations for (i) SO₄²⁻ + Ba²⁺ and (ii) SO₃²⁻ + Ba²⁺.",
+                  answerKey: "(i) Ba²⁺(aq) + SO₄²⁻(aq) → BaSO₄(s). (ii) Ba²⁺(aq) + SO₃²⁻(aq) → BaSO₃(s)." },
+                { id: "Q3d", label: "(d) Further test for S₂O₃²⁻", marks: 1,
+                  instruction: "Describe a test to confirm the presence of S₂O₃²⁻ and state the expected observation.",
+                  answerKey: "Add dilute HCl; pale yellow/off-white precipitate of sulfur forms slowly. Characteristic clouding of the solution." },
+                { id: "Q3e", label: "(e) Practical safety", marks: 2,
+                  instruction: "State two safety precautions when working with concentrated HCl in the laboratory.",
+                  answerKey: "Work in a fume cupboard; wear eye protection; avoid inhaling fumes; use gloves." },
+            ],
+        },
+    ],
+},
+
+// Paper 10 – Practice H
+{
+    id: "p10",
+    title: "Practice Paper H – Back-Titration & Enthalpy",
+    subtitle: "Paper 3 Advanced Practical Skills 1 – Practice",
+    time: "2 hours", marks: 40,
+    questions: [
+        {
+            id: "Q1", type: "quantitative",
+            title: "Question 1 – Back-Titration (CaCO₃ content of limestone)",
+            marks: 17,
+            context: `Limestone contains CaCO₃. A known excess of HCl dissolves the CaCO₃; the remaining HCl is titrated with NaOH.
+CaCO₃(s) + 2HCl(aq) → CaCl₂(aq) + CO₂(g) + H₂O(l)
+HCl(aq) + NaOH(aq) → NaCl(aq) + H₂O(l)
+
+FA 1 = 1.000 mol dm⁻³ HCl (exactly 50.0 cm³ used)
+FA 2 = 0.500 mol dm⁻³ NaOH
+FA 3 = limestone sample (impure CaCO₃)
+Indicator: methyl orange`,
+            parts: [
+                { id: "Q1a", label: "(a) Preparation", marks: 2,
+                  instruction: "Weigh approximately 2.50 g FA 3. Add to 50.0 cm³ FA 1 in a beaker. Heat gently until no further effervescence. Cool. Transfer quantitatively to 250 cm³ volumetric flask; make up to mark with distilled water. Stopper and mix." },
+                { id: "Q1b", label: "(b) Titration", marks: 7,
+                  instruction: "Pipette 25.0 cm³ aliquots from the flask into conical flasks. Add methyl orange indicator. Titrate each aliquot with FA 2 (burette). Record all burette readings for rough and accurate titrations." },
+                { id: "Q1c", label: "(c) Mean titre", marks: 1,
+                  instruction: "Calculate mean titre of FA 2.",
+                  calculationGuide: "Average of consistent titres ±0.10 cm³" },
+                { id: "Q1d", label: "(d)(i) n(NaOH)", marks: 1,
+                  instruction: "Calculate n(NaOH) in the mean titre.",
+                  calculationGuide: "n(NaOH) = 0.500 × titre/1000" },
+                { id: "Q1e", label: "(d)(ii) n(HCl) excess in aliquot", marks: 1,
+                  instruction: "Calculate n(HCl) unreacted in the 25.0 cm³ aliquot.",
+                  calculationGuide: "n(HCl) excess = n(NaOH) (1:1)" },
+                { id: "Q1f", label: "(d)(iii) n(HCl) reacted with CaCO₃", marks: 1,
+                  instruction: "Calculate n(HCl) that reacted with CaCO₃ in the 250 cm³ flask.",
+                  calculationGuide: "n(HCl) total = 1.000×0.0500 = 0.0500. n(HCl) excess in whole flask = n(aliquot excess)×10. n(HCl) reacted = total − excess." },
+                { id: "Q1g", label: "(d)(iv) % CaCO₃", marks: 2,
+                  instruction: "Calculate the percentage by mass of CaCO₃ in the limestone sample. (Mr CaCO₃ = 100.1)",
+                  calculationGuide: "n(CaCO₃) = ½n(HCl reacted). mass CaCO₃ = n×100.1. % = mass/sample×100." },
+                { id: "Q1h", label: "(e) Source of error", marks: 2,
+                  instruction: "State one source of error in this experiment and explain how it would affect the calculated % CaCO₃.",
+                  answerKey: "Not all solution transferred to volumetric flask → n(HCl) remaining appears higher → n(CaCO₃) calculated lower → % CaCO₃ appears lower." },
+            ],
+        },
+        {
+            id: "Q2", type: "energetics",
+            title: "Question 2 – Enthalpy of Reaction (Zn + H₂SO₄)",
+            marks: 10,
+            context: `Zn(s) + H₂SO₄(aq) → ZnSO₄(aq) + H₂(g)
+
+FA 4 = 1.00 mol dm⁻³ H₂SO₄
+FA 5 = zinc powder`,
+            parts: [
+                { id: "Q2a", label: "(a) Method", marks: 3,
+                  instruction: "Measure 50.0 cm³ FA 4 into a polystyrene cup. Weigh ~0.65 g FA 5. Record initial temperature. Add FA 5, stir continuously. Record maximum temperature." },
+                { id: "Q2b", label: "(b)(i) q", marks: 1,
+                  instruction: "Calculate heat energy produced.",
+                  calculationGuide: "q = 50 × 4.18 × ΔT" },
+                { id: "Q2c", label: "(b)(ii) Limiting reagent", marks: 1,
+                  instruction: "Determine which reactant is limiting. (Ar Zn = 65.4; n(H₂SO₄) = 0.050 mol)",
+                  answerKey: "n(Zn) = mass/65.4 ≈ 0.010 mol. Zn is limiting." },
+                { id: "Q2d", label: "(b)(iii) ΔH", marks: 2,
+                  instruction: "Calculate ΔH in kJ mol⁻¹.",
+                  calculationGuide: "ΔH = −q / (1000 × n(Zn))" },
+                { id: "Q2e", label: "(c) Hess's Law", marks: 3,
+                  instruction: "The standard enthalpy of formation of ZnSO₄(aq) can be determined via Hess's Law. Describe the additional experiments needed and the calculation cycle.",
+                  answerKey: "Measure ΔH for: (i) Zn+H₂SO₄(aq)→ZnSO₄(aq)+H₂. (ii) H₂+½O₂→H₂O. (iii) Zn+½O₂→ZnO. Apply Hess's Law with given standard enthalpy data." },
+            ],
+        },
+        {
+            id: "Q3", type: "qualitative",
+            title: "Question 3 – Qualitative Analysis (Cations: Fe²⁺, Fe³⁺, Cu²⁺)",
+            marks: 13,
+            context: `FA 6, FA 7 and FA 8 each contain one of the cations: Fe²⁺, Fe³⁺ or Cu²⁺.
+Carry out tests using NaOH, NH₃(aq) and acidified KMnO₄.`,
+            parts: [
+                { id: "Q3a", label: "(a) Tests", marks: 6,
+                  instruction: "Test 1: add NaOH(aq) dropwise then in excess. Test 2: add NH₃(aq) dropwise then in excess. Test 3: add acidified KMnO₄. Record all observations in a table for each FA." },
+                { id: "Q3b", label: "(b) Identify cations", marks: 3,
+                  instruction: "Use observations to identify the cation in FA 6, FA 7 and FA 8.",
+                  answerKey: "Fe²⁺: green ppt (NaOH/NH₃), turns brown in air; decolourises KMnO₄. Fe³⁺: red-brown ppt (both); no reaction with KMnO₄. Cu²⁺: pale blue ppt (NaOH), soluble in excess NH₃ (deep blue)." },
+                { id: "Q3c", label: "(c) Oxidation of Fe²⁺", marks: 2,
+                  instruction: "Write an ionic equation for the oxidation of Fe²⁺ to Fe³⁺ by acidified KMnO₄.",
+                  answerKey: "MnO₄⁻(aq) + 5Fe²⁺(aq) + 8H⁺(aq) → Mn²⁺(aq) + 5Fe³⁺(aq) + 4H₂O(l)" },
+                { id: "Q3d", label: "(d) Confirmatory test for Cu²⁺", marks: 2,
+                  instruction: "Describe a test to confirm Cu²⁺ is present, beyond the NaOH test. State expected observation.",
+                  answerKey: "Add excess NH₃(aq). Pale blue precipitate dissolves to give a deep blue solution (tetraamminecopper(II) complex, [Cu(NH₃)₄]²⁺)." },
+            ],
+        },
+    ],
+},
+
+// Papers 11–20: Additional condensed practice papers
+...[
+    {
+        id: "p11", title: "Practice Paper I – Alum Formula & Ion Tests",
+        subtitle: "Paper 3 Advanced Practical Skills 1 – Practice",
+        time: "2 hours", marks: 40,
+        q1title: "Question 1 – Water of Crystallisation (Iron(II) Sulfate)",
+        q1context: "FeSO₄·7H₂O crystals lose water on heating. Determine x in FeSO₄·xH₂O.\nFA 1 = hydrated iron(II) sulfate crystals (green)",
+        q1marks: 11,
+        q2title: "Question 2 – Acid–Base Titration (Na₂CO₃ + HCl)",
+        q2context: "Na₂CO₃(aq) + 2HCl(aq) → 2NaCl(aq) + CO₂(g) + H₂O(l)\nFA 2 = 0.100 mol dm⁻³ Na₂CO₃; FA 3 = HCl (unknown conc.); indicator: methyl orange",
+        q2marks: 16,
+        q3title: "Question 3 – Qualitative Analysis (NH₄⁺, Fe³⁺, SO₄²⁻, Cl⁻)",
+        q3context: "FA 4 contains NH₄⁺, Fe³⁺, SO₄²⁻ and Cl⁻. Carry out tests to identify all four ions.",
+        q3marks: 13,
+    },
+    {
+        id: "p12", title: "Practice Paper J – Rate vs Temperature & Enthalpy",
+        subtitle: "Paper 3 Advanced Practical Skills 1 – Practice",
+        time: "2 hours", marks: 40,
+        q1title: "Question 1 – Thiosulfate Clock (Temperature Variation, 5 pts)",
+        q1context: "Keep [Na₂S₂O₃] and [HCl] constant. Vary temperature from 15–55 °C in 10 °C steps.\nFA 1 = 0.10 mol dm⁻³ Na₂S₂O₃; FA 2 = 2.00 mol dm⁻³ HCl",
+        q1marks: 17,
+        q2title: "Question 2 – Enthalpy of Neutralisation (Weak Acid)",
+        q2context: "CH₃COOH(aq) + NaOH(aq) → CH₃COONa(aq) + H₂O(l)\nFA 3 = 2.00 mol dm⁻³ ethanoic acid; FA 4 = 2.00 mol dm⁻³ NaOH",
+        q2marks: 10,
+        q3title: "Question 3 – Qualitative Analysis (Halides + Sulfur Anions)",
+        q3context: "FA 5 contains one of Cl⁻, Br⁻, I⁻; FA 6 contains one of SO₄²⁻, SO₃²⁻, S₂O₃²⁻. Identify each using appropriate reagents.",
+        q3marks: 13,
+    },
+    {
+        id: "p13", title: "Practice Paper K – Iodometric Titration (Revisited)",
+        subtitle: "Paper 3 Advanced Practical Skills 1 – Practice",
+        time: "2 hours", marks: 40,
+        q1title: "Question 1 – Iodometric Titration (Determination of KIO₃ purity)",
+        q1context: "KIO₃ oxidises I⁻ in acid: IO₃⁻ + 5I⁻ + 6H⁺ → 3I₂ + 3H₂O. Iodine titrated with Na₂S₂O₃.\nFA 1 = Na₂S₂O₃ (22.00 g dm⁻³); FA 2 = impure KIO₃; FA 3 = 0.50 mol dm⁻³ KI; FA 4 = 1.00 mol dm⁻³ H₂SO₄; FA 5 = starch",
+        q1marks: 16,
+        q2title: "Question 2 – Enthalpy of Displacement (Fe + CuSO₄)",
+        q2context: "Fe(s) + CuSO₄(aq) → Cu(s) + FeSO₄(aq)\nFA 6 = 1.0 mol dm⁻³ CuSO₄; FA 7 = iron powder",
+        q2marks: 11,
+        q3title: "Question 3 – Qualitative Analysis (Transition Metal Ions)",
+        q3context: "FA 8, FA 9, FA 10 each contain one of: Cu²⁺, Fe²⁺, Fe³⁺, Mn²⁺, Cr³⁺.\nCarry out systematic tests to identify the cation in each.",
+        q3marks: 13,
+    },
+    {
+        id: "p14", title: "Practice Paper L – Gravimetric & Enthalpy Combustion",
+        subtitle: "Paper 3 Advanced Practical Skills 1 – Practice",
+        time: "2 hours", marks: 40,
+        q1title: "Question 1 – Gravimetric Analysis (BaSO₄ precipitation)",
+        q1context: "SO₄²⁻(aq) + Ba²⁺(aq) → BaSO₄(s)\nFA 1 = CuSO₄ solution (unknown); FA 2 = excess BaCl₂",
+        q1marks: 11,
+        q2title: "Question 2 – Enthalpy of Combustion (Ethanol)",
+        q2context: "CH₃CH₂OH(l) + 3O₂(g) → 2CO₂(g) + 3H₂O(l)\nFA 3 = ethanol; use a spirit lamp and calorimeter (copper can + 200 cm³ water)",
+        q2marks: 16,
+        q3title: "Question 3 – Qualitative Analysis (Carbonate, Nitrate, Sulfate, Chloride)",
+        q3context: "FA 4, FA 5, FA 6 each contain one or two ions from: CO₃²⁻, NO₃⁻, SO₄²⁻, Cl⁻.\nCarry out systematic tests to identify all ions present.",
+        q3marks: 13,
+    },
+    {
+        id: "p15", title: "Practice Paper M – Comprehensive Rate Investigation",
+        subtitle: "Paper 3 Advanced Practical Skills 1 – Practice",
+        time: "2 hours", marks: 40,
+        q1title: "Question 1 – Thiosulfate Clock (Concentration + Temperature Matrix)",
+        q1context: "First set: vary [Na₂S₂O₃] at 25 °C. Second set: vary temperature at fixed [Na₂S₂O₃].\nFA 1 = 0.10 mol dm⁻³ Na₂S₂O₃; FA 2 = 2.00 mol dm⁻³ HCl",
+        q1marks: 17,
+        q2title: "Question 2 – Enthalpy of Solution (KNO₃)",
+        q2context: "KNO₃(s) → K⁺(aq) + NO₃⁻(aq)  ΔH = +ve\nFA 3 = KNO₃ solid (Mr = 101.1)",
+        q2marks: 10,
+        q3title: "Question 3 – Qualitative Analysis (Group 2 Cations)",
+        q3context: "FA 4, FA 5, FA 6 contain Ca²⁺, Sr²⁺, or Ba²⁺.\nUse NaOH, NH₃(aq), BaCl₂, dilute H₂SO₄, and flame tests to identify each.",
+        q3marks: 13,
+    },
+    {
+        id: "p16", title: "Practice Paper N – KMnO₄ Titration & Qualitative",
+        subtitle: "Paper 3 Advanced Practical Skills 1 – Practice",
+        time: "2 hours", marks: 40,
+        q1title: "Question 1 – KMnO₄ vs Oxalic Acid Titration",
+        q1context: "2KMnO₄(aq) + 5H₂C₂O₄(aq) + 3H₂SO₄(aq) → 2MnSO₄(aq) + K₂SO₄(aq) + 10CO₂(g) + 8H₂O(l)\nFA 1 = 0.0200 mol dm⁻³ KMnO₄; FA 2 = oxalic acid (unknown); FA 3 = 1.0 mol dm⁻³ H₂SO₄\nWarm flask to ~60 °C before titrating (slow reaction at room temperature).",
+        q1marks: 17,
+        q2title: "Question 2 – Enthalpy of Reaction (Mg + H₂SO₄)",
+        q2context: "Mg(s) + H₂SO₄(aq) → MgSO₄(aq) + H₂(g)\nFA 4 = 2.00 mol dm⁻³ H₂SO₄; FA 5 = Mg ribbon",
+        q2marks: 10,
+        q3title: "Question 3 – Qualitative Analysis (Transition Metals + Anions)",
+        q3context: "FA 6 is a solution containing Cu²⁺ and SO₄²⁻. FA 7 contains Fe³⁺ and Cl⁻. FA 8 contains Zn²⁺ and NO₃⁻.\nVerify each solution using appropriate tests.",
+        q3marks: 13,
+    },
+    {
+        id: "p17", title: "Practice Paper O – Na₂CO₃ Titration & Halide QA",
+        subtitle: "Paper 3 Advanced Practical Skills 1 – Practice",
+        time: "2 hours", marks: 40,
+        q1title: "Question 1 – Acid-Base Titration (Na₂CO₃ vs HCl, two-stage)",
+        q1context: "First endpoint (phenolphthalein): Na₂CO₃ + HCl → NaHCO₃ + NaCl\nSecond endpoint (methyl orange): NaHCO₃ + HCl → NaCl + CO₂ + H₂O\nFA 1 = 0.100 mol dm⁻³ Na₂CO₃; FA 2 = HCl (unknown)",
+        q1marks: 17,
+        q2title: "Question 2 – Enthalpy of Displacement (Mg + CuSO₄, extended)",
+        q2context: "Mg(s) + CuSO₄(aq) → Cu(s) + MgSO₄(aq)\nRepeat experiment 3 times with different masses of Mg. Plot ΔT vs mass Mg.\nFA 3 = 1.0 mol dm⁻³ CuSO₄; FA 4 = Mg powder",
+        q2marks: 10,
+        q3title: "Question 3 – Qualitative Analysis (Halide + Sulfur Anion Pairs)",
+        q3context: "FA 5 contains Cl⁻ and SO₄²⁻. FA 6 contains Br⁻ and SO₃²⁻. FA 7 contains I⁻ and S₂O₃²⁻.\nDesign tests to confirm the identity of each anion in each solution.",
+        q3marks: 13,
+    },
+    {
+        id: "p18", title: "Practice Paper P – Alum Revisited & Comprehensive QA",
+        subtitle: "Paper 3 Advanced Practical Skills 1 – Practice",
+        time: "2 hours", marks: 40,
+        q1title: "Question 1 – Water of Crystallisation (Na₂SO₄·10H₂O)",
+        q1context: "Na₂SO₄·10H₂O(s) → Na₂SO₄(s) + 10H₂O(g)\nFA 1 = hydrated sodium sulfate (washing soda crystals, white)",
+        q1marks: 11,
+        q2title: "Question 2 – Iodometric Titration (Cl₂ water standardisation)",
+        q2context: "Cl₂(aq) + 2KI(aq) → 2KCl(aq) + I₂(aq); I₂ titrated with Na₂S₂O₃.\nFA 2 = Na₂S₂O₃ (22.00 g dm⁻³); FA 3 = chlorine water (unknown); FA 4 = 0.50 mol dm⁻³ KI; FA 5 = starch",
+        q2marks: 16,
+        q3title: "Question 3 – Qualitative Analysis (4 unknowns: Al³⁺, Zn²⁺, Mg²⁺, Ca²⁺)",
+        q3context: "FA 6, FA 7, FA 8, FA 9 each contain one of Al³⁺, Zn²⁺, Mg²⁺, Ca²⁺.\nUse systematic tests with NaOH and NH₃(aq) to identify each cation.",
+        q3marks: 13,
+    },
+    {
+        id: "p19", title: "Practice Paper Q – Mixed Quantitative & QA",
+        subtitle: "Paper 3 Advanced Practical Skills 1 – Practice",
+        time: "2 hours", marks: 40,
+        q1title: "Question 1 – Thiosulfate Clock (6-Point Concentration Series)",
+        q1context: "Full investigation: vary Na₂S₂O₃ from 5.00 to 30.00 cm³, keeping total volume = 35 cm³ (distilled water added). Use 5.0 cm³ HCl each time.\nFA 1 = 0.10 mol dm⁻³ Na₂S₂O₃; FA 2 = 2.00 mol dm⁻³ HCl",
+        q1marks: 17,
+        q2title: "Question 2 – Enthalpy (CuSO₄ + Mg, polystyrene calorimeter)",
+        q2context: "Full quantitative investigation of ΔH for Mg + CuSO₄ using improved technique with temperature-time graph.\nFA 3 = 1.0 mol dm⁻³ CuSO₄; FA 4 = Mg powder",
+        q2marks: 10,
+        q3title: "Question 3 – Qualitative Analysis (Unknown solution FA 5 containing ≥ 3 ions)",
+        q3context: "FA 5 contains three ions from: NH₄⁺, Fe²⁺, Cu²⁺, Cl⁻, Br⁻, SO₄²⁻.\nCarry out tests to identify all ions present.",
+        q3marks: 13,
+    },
+    {
+        id: "p20", title: "Practice Paper R – Redox Titration & Comprehensive",
+        subtitle: "Paper 3 Advanced Practical Skills 1 – Practice",
+        time: "2 hours", marks: 40,
+        q1title: "Question 1 – Redox Titration (KMnO₄ vs Fe²⁺, purity of FeSO₄·7H₂O)",
+        q1context: "MnO₄⁻ + 5Fe²⁺ + 8H⁺ → Mn²⁺ + 5Fe³⁺ + 4H₂O\nFA 1 = 0.0200 mol dm⁻³ KMnO₄; FA 2 = impure FeSO₄·7H₂O dissolved in H₂SO₄; Mr FeSO₄·7H₂O = 278.0",
+        q1marks: 17,
+        q2title: "Question 2 – Enthalpy of Neutralisation (NaOH + HNO₃)",
+        q2context: "NaOH(aq) + HNO₃(aq) → NaNO₃(aq) + H₂O(l)\nFA 3 = 2.00 mol dm⁻³ NaOH; FA 4 = 2.00 mol dm⁻³ HNO₃",
+        q2marks: 10,
+        q3title: "Question 3 – Qualitative Analysis (Complete Unknown with 4 ions)",
+        q3context: "FA 5 is an unknown solution. You have access to: NaOH(aq), NH₃(aq), BaCl₂(aq), AgNO₃(aq), NH₃(aq), dilute HCl, acidified KMnO₄.\nCarry out systematic tests to identify all cations and anions present.",
+        q3marks: 13,
+    },
+].map(p => ({
+    id: p.id,
+    title: p.title,
+    subtitle: p.subtitle,
+    time: p.time,
+    marks: p.marks,
+    questions: [
+        {
+            id: "Q1", type: "quantitative",
+            title: p.q1title, marks: p.q1marks,
+            context: p.q1context,
+            parts: [
+                { id: "Q1a", label: "(a) Method & Results table", marks: Math.ceil(p.q1marks * 0.47),
+                  instruction: "Read through the whole method. Prepare a suitable results table. Carry out the experiment as described. Record all raw data with appropriate precision and units.",
+                  hint: "Show precision of apparatus in recorded data (e.g. burette to 0.05 cm³, balance to 0.01 g, thermometer to 0.5 °C)." },
+                { id: "Q1b", label: "(b) Calculations", marks: Math.floor(p.q1marks * 0.30),
+                  instruction: "Show all working. Give answers to an appropriate number of significant figures with correct units.",
+                  calculationGuide: "Check each step: mol = conc × vol/1000; Mr calculations; percentage calculations as required." },
+                { id: "Q1c", label: "(c) Evaluation & error analysis", marks: Math.floor(p.q1marks * 0.23),
+                  instruction: "Calculate the percentage uncertainty in the key measurement. Identify one source of systematic error and explain how it affects the result.",
+                  answerKey: "% uncertainty = (absolute uncertainty / measured value) × 100. Systematic error: consider incomplete reaction, heat loss, indicator error, or apparatus precision." },
+            ],
+        },
+        {
+            id: "Q2", type: "energetics",
+            title: p.q2title, marks: p.q2marks,
+            context: p.q2context,
+            parts: [
+                { id: "Q2a", label: "(a) Method & Results", marks: 3,
+                  instruction: "Carry out the experiment. Record all masses and temperatures with appropriate precision. Show the precision of the apparatus used.",
+                  hint: "Temperature to nearest 0.5 °C; balance to 2 d.p." },
+                { id: "Q2b", label: "(b) Calculations: q and ΔH", marks: 4,
+                  instruction: "Calculate q = mcΔT (J). Identify the limiting reagent. Calculate ΔH in kJ mol⁻¹ with correct sign.",
+                  calculationGuide: "q = mass × 4.18 × ΔT; ΔH = ±q/(1000 × n(limiting reactant))" },
+                { id: "Q2c", label: "(c) Accuracy & improvement", marks: 3,
+                  instruction: "Explain why your value may differ from the true value of ΔH. Describe a method improvement to reduce heat loss error.",
+                  answerKey: "Heat losses to surroundings and calorimeter reduce ΔT below true value. Plot temperature vs time, extrapolate to time of mixing to obtain true ΔT_max." },
+            ],
+        },
+        {
+            id: "Q3", type: "qualitative",
+            title: p.q3title, marks: p.q3marks,
+            context: p.q3context,
+            parts: [
+                { id: "Q3a", label: "(a) Systematic tests", marks: 6,
+                  instruction: "Carry out appropriate tests using the reagents available. Record ALL observations (colour changes, precipitate formation, gas evolution) in a clearly organised table. Where no change is observed, write 'no change'." },
+                { id: "Q3b", label: "(b) Identify ions", marks: 4,
+                  instruction: "Use your observations to identify the ions present in each solution. Give the formula of each ion identified and justify from your observations.",
+                  answerKey: "Refer to Qualitative Analysis notes. Match observations to expected results: precipitate colour + solubility in excess NaOH/NH₃ identifies cations; BaCl₂, AgNO₃ tests identify anions." },
+                { id: "Q3c", label: "(c) Ionic equations", marks: 2,
+                  instruction: "Write ionic equations (with state symbols) for two of the reactions you observed.",
+                  answerKey: "Select two clear observations and write balanced ionic equations with (aq), (s), (g), (l) state symbols." },
+                { id: "Q3d", label: "(d) Further test", marks: 1,
+                  instruction: "Suggest one further test to confirm the identity of one ion. State expected observation.",
+                  answerKey: "Choose any ion identified and suggest a confirmatory test not already carried out. e.g. flame test for Group 1/2 cations; KSCN for Fe³⁺; excess NH₃ for Cu²⁺." },
+            ],
+        },
+    ],
+})),
+
+];
+
+// Backward compatibility: keep QUESTION_PAPER pointing to the 2024 paper
+export const QUESTION_PAPER = QUESTION_PAPERS[0];
