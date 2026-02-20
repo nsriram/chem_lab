@@ -393,6 +393,37 @@ option { background: #0a1628; }
 .chem-card:hover .chem-detail   { color: #5a8aaa; }
 .chem-card.selected .chem-detail { color: #4a9adf; }
 
+/* ── FA Exam Materials card ────────────────────────────────────── */
+.fa-card {
+  border-color: #5a4010 !important;
+  background: linear-gradient(90deg, #2a1e06, #1e1a08) !important;
+}
+.fa-card:hover {
+  border-color: #c8820a !important;
+  background: linear-gradient(90deg, #3a2a0a, #2a200a) !important;
+}
+.fa-card.selected {
+  border-color: #f9a825 !important;
+  background: linear-gradient(90deg, #3a2a08, #2a2008) !important;
+}
+.fa-swatch {
+  width: 5px !important;
+  min-height: 32px !important;
+  background: repeating-linear-gradient(
+    135deg,
+    #c8820a 0px, #c8820a 3px,
+    #2a1e06 3px, #2a1e06 6px
+  ) !important;
+}
+.fa-label {
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em;
+  color: #f9a825 !important;
+  font-family: 'JetBrains Mono', monospace !important;
+}
+.fa-card.selected .fa-label { color: #ffcc44 !important; }
+
 .chem-check {
   width: 20px;
   flex-shrink: 0;

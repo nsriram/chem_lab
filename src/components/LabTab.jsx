@@ -87,6 +87,7 @@ export default function LabTab({
     clockTime, setClockTime,
     bureteReading, setBuretteReading,
     createVessel, addChemicalToVessel, performAction, transferContents, clearBench, pushLog,
+    activePaper,
 }) {
     // ── Animation state ────────────────────────────────────────────────────────
     const [flashVesselId, setFlashVesselId] = useState(null);
@@ -206,6 +207,57 @@ export default function LabTab({
                     </div>
                 ))}
 
+                {/* ── Exam Materials (FA-labelled bottles) ── */}
+                {activePaper?.faMap && (() => {
+                    const faEntries = Object.entries(activePaper.faMap);
+                    return (
+                        <>
+                            <div style={{ borderTop: "1px solid #1a3a5a", margin: "10px 0 6px" }} />
+                            <div className="palette-heading" style={{ color: "#f9a825" }}>
+                                EXAM MATERIALS
+                            </div>
+                            <div style={{ fontSize: 10, color: "#8a7040", padding: "0 8px 6px", fontStyle: "italic" }}>
+                                {activePaper.title}
+                            </div>
+                            <button
+                                className="palette-group-hdr"
+                                onClick={() => toggleSection("exam_fa")}
+                                style={{ "--grp-color": "#f9a825" }}
+                            >
+                                <span className="palette-chevron">
+                                    {openSections.has("exam_fa") ? "▾" : "▸"}
+                                </span>
+                                <span className="palette-group-label" style={{ color: "#f9a825" }}>
+                                    Labelled Bottles
+                                </span>
+                                <span className="palette-count">{faEntries.length}</span>
+                            </button>
+                            {openSections.has("exam_fa") && (
+                                <div className="palette-items">
+                                    {faEntries.map(([faLabel]) => {
+                                        const isSel = selectedChemical === faLabel;
+                                        return (
+                                            <button
+                                                key={faLabel}
+                                                className={`chem-card fa-card${isSel ? " selected" : ""}`}
+                                                onClick={() => setSelectedChemical(isSel ? "" : faLabel)}
+                                                title={faLabel}
+                                            >
+                                                <span className="chem-swatch fa-swatch" />
+                                                <span className="chem-body">
+                                                    <span className="chem-name fa-label">{faLabel}</span>
+                                                    <span className="chem-detail">Unknown — identify by testing</span>
+                                                </span>
+                                                {isSel && <span className="chem-check">✓</span>}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </>
+                    );
+                })()}
+
                 <div style={{ borderTop: "1px solid #1a3a5a", margin: "10px 0 6px" }} />
                 <div className="palette-heading">CHEMICALS</div>
 
@@ -300,7 +352,9 @@ export default function LabTab({
                                     {vessel.contents.map((c, i) => (
                                         <div key={i} style={{ fontSize: 11, color: "#8ab4d4", display: "flex", justifyContent: "space-between", padding: "2px 0", borderBottom: "1px solid rgba(42,90,138,0.2)" }}>
                                             <span style={{ maxWidth: 130, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                                                {splitLabel(CHEMICALS[c.chemical]?.label ?? c.chemical).name}
+                                                {c.label?.startsWith("FA ")
+                                                    ? c.label
+                                                    : splitLabel(CHEMICALS[c.chemical]?.label ?? c.chemical).name}
                                             </span>
                                             <span style={{ color: "#4a9adf", fontFamily: "'JetBrains Mono', monospace", fontSize: 10 }}>
                                                 {c.volume ? `${c.volume}cm³` : c.mass ? `${c.mass}g` : ""}

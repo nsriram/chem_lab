@@ -120,6 +120,7 @@ export default function ChemLabApp() {
                     transferContents={lab.transferContents}
                     clearBench={lab.clearBench}
                     pushLog={lab.pushLog}
+                    activePaper={lab.activePaper}
                 />
             )}
 

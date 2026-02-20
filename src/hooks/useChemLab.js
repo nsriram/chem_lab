@@ -109,27 +109,35 @@ export function useChemLab() {
 
     const addChemicalToVessel = () => {
         if (!selectedVessel || !selectedChemical) return;
-        const chem = CHEMICALS[selectedChemical];
+
+        // Resolve FA label → actual chemical ID using the active paper's faMap
+        const faMap = activePaper?.faMap ?? {};
+        const isFa = String(selectedChemical).startsWith("FA ");
+        const actualChemId = isFa ? (faMap[selectedChemical] ?? selectedChemical) : selectedChemical;
+        const chem = CHEMICALS[actualChemId];
         if (!chem) return;
+
+        // Display label: FA label for exam materials, chemical name for regular chemicals
+        const displayLabel = isFa ? selectedChemical : chem.label;
 
         const amount = chem.type === "solid" ? { mass: addMass } : { volume: addVolume };
         const amountStr = chem.type === "solid" ? `${addMass}g` : `${addVolume} cm³`;
 
         setVessels(vs => vs.map(v => {
             if (v.id !== selectedVessel) return v;
-            const existing = v.contents.find(c => c.chemical === selectedChemical);
+            const existing = v.contents.find(c => c.chemical === actualChemId);
             let newContents;
             if (existing) {
-                newContents = v.contents.map(c => c.chemical === selectedChemical
+                newContents = v.contents.map(c => c.chemical === actualChemId
                     ? { ...c, volume: (c.volume || 0) + (amount.volume || 0), mass: (c.mass || 0) + (amount.mass || 0) }
                     : c
                 );
             } else {
-                newContents = [...v.contents, { chemical: selectedChemical, label: chem.label, ...amount }];
+                newContents = [...v.contents, { chemical: actualChemId, label: displayLabel, ...amount }];
             }
             const tempVessel = { ...v, contents: newContents };
             const rxn = simulateReaction(tempVessel, "add");
-            if (rxn.observation) setLastObservation(`[${v.label}] Added ${amountStr} ${chem.label}: ${rxn.observation}`);
+            if (rxn.observation) setLastObservation(`[${v.label}] Added ${amountStr} ${displayLabel}: ${rxn.observation}`);
             return {
                 ...v,
                 contents: newContents,
@@ -144,10 +152,10 @@ export function useChemLab() {
 
         pushLog({
             action: "add_chemical",
-            chemical: selectedChemical,
+            chemical: actualChemId,
             amount: amountStr,
             vessel: vessels.find(v => v.id === selectedVessel)?.label,
-            details: `Added ${amountStr} of ${chem.label}`,
+            details: `Added ${amountStr} of ${displayLabel}`,
         });
     };
 

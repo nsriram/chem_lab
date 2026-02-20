@@ -172,14 +172,127 @@ export const REACTION_RULES = [
         },
     },
 
+    // ── Fe³⁺ cation tests (FeCl3) ─────────────────────────────────────────────
+    // Must precede naoh-cuso4 and nh3-cuso4 rules.
+    {
+        id: "qualitative/fecl3-naoh",
+        requires: ["FeCl3", "NaOH"],
+        produce() {
+            return {
+                observation: "Rust-brown/red-brown precipitate of iron(III) hydroxide Fe(OH)₃ forms immediately. Insoluble in excess NaOH. Confirms Fe³⁺. Does NOT dissolve in excess (distinction from Al³⁺).",
+                newColor: "#b05a10",
+                precipitate: "Fe(OH)₃(s) – rust-brown ppt, insoluble in excess NaOH",
+                hasPrecipitate: true,
+                colorChange: "orange-brown → rust-brown precipitate (Fe(OH)₃)",
+            };
+        },
+    },
+    {
+        id: "qualitative/fecl3-nh3",
+        requires: ["FeCl3", "NH3_aq"],
+        produce() {
+            return {
+                observation: "Rust-brown precipitate of Fe(OH)₃ forms. Insoluble in excess NH₃(aq) — key distinction from Cu²⁺ (which dissolves in excess NH₃ to form deep blue complex).",
+                newColor: "#b05a10",
+                precipitate: "Fe(OH)₃(s) – rust-brown ppt, insoluble in excess NH₃",
+                hasPrecipitate: true,
+                colorChange: "orange-brown → rust-brown precipitate (Fe(OH)₃)",
+            };
+        },
+    },
+
+    // ── NH4⁺ cation test (NH4Cl) ──────────────────────────────────────────────
+    {
+        id: "qualitative/nh4cl-naoh-heat",
+        requires: ["NH4Cl", "NaOH"],
+        actionFilter: "heat",
+        produce() {
+            return {
+                observation: "On warming with NaOH: pungent smell of ammonia (NH₃). Damp red litmus paper held in vapour turns blue. NH₄⁺ + OH⁻ → NH₃(g) + H₂O. Confirms ammonium ion NH₄⁺.",
+                gas: "NH₃ – pungent gas; turns damp red litmus blue",
+                colorChange: "no visible change in solution (gas evolved)",
+            };
+        },
+    },
+    {
+        id: "qualitative/nh4cl-naoh",
+        requires: ["NH4Cl", "NaOH"],
+        produce() {
+            return {
+                observation: "No precipitate at room temperature. On warming, pungent ammonia gas evolved — turns damp red litmus blue. Confirms NH₄⁺. No colour change to solution.",
+                colorChange: "no visible change (NH₃ gas on warming)",
+            };
+        },
+    },
+
+    // ── Ca²⁺ tests (CaCl2) ────────────────────────────────────────────────────
+    {
+        id: "qualitative/cacl2-naoh",
+        requires: ["CaCl2", "NaOH"],
+        produce() {
+            return {
+                observation: "Slight white precipitate of Ca(OH)₂ (lime) forms — may appear milky rather than a distinct ppt. Ca(OH)₂ is slightly soluble so precipitate dissolves partially. Insoluble in excess NaOH. Confirms Ca²⁺.",
+                newColor: "#f0f0ee",
+                precipitate: "Ca(OH)₂(s) – faint white milky ppt (slightly soluble)",
+                hasPrecipitate: true,
+                colorChange: "colourless → faint milky white (Ca(OH)₂)",
+            };
+        },
+    },
+    {
+        id: "qualitative/cacl2-na2co3",
+        requires: ["CaCl2", "Na2CO3"],
+        produce() {
+            return {
+                observation: "White precipitate of calcium carbonate (CaCO₃) forms immediately. Dissolves with effervescence in dilute hydrochloric acid. Ca²⁺ confirmed.",
+                newColor: "#f0f0f0",
+                precipitate: "CaCO₃(s) – white ppt; dissolves in dilute HCl with CO₂ effervescence",
+                hasPrecipitate: true,
+                colorChange: "colourless → milky white (CaCO₃)",
+            };
+        },
+    },
+
+    // ── Cu₂O + acid ───────────────────────────────────────────────────────────
+    {
+        id: "qualitative/cu2o-h2so4",
+        matches: (chemicals) =>
+            chemicals.includes("Cu2O") &&
+            (chemicals.includes("H2SO4") || chemicals.includes("HCl")),
+        produce() {
+            return {
+                observation: "Cu₂O dissolves in warm acid. Disproportionation: Cu⁺ → Cu⁰ + Cu²⁺. Residue: red-brown copper metal. Filtrate: pale blue solution (CuSO₄/CuCl₂, Cu²⁺ ions). Filter to separate. Filtrate tests positive with NaOH (pale blue Cu(OH)₂ ppt).",
+                newColor: "#b3d9ff",
+                precipitate: "Cu(s) – red-brown metallic residue from disproportionation",
+                hasPrecipitate: true,
+                colorChange: "red solid → red-brown Cu residue + pale blue Cu²⁺ filtrate",
+            };
+        },
+    },
+
+    // ── NO₂⁻ redox ────────────────────────────────────────────────────────────
+    {
+        id: "redox/kmno4-nano2",
+        requires: ["KMnO4_acid", "NaNO2"],
+        produce() {
+            return {
+                observation: "Purple KMnO₄ rapidly decolourised. NO₂⁻ is oxidised to NO₃⁻. MnO₄⁻ reduced to Mn²⁺. Confirms reducing nitrite (NO₂⁻) — not shown by nitrate (NO₃⁻).",
+                newColor: "#f5f5f5",
+                colorChange: "purple → colourless (NO₂⁻ reduces KMnO₄; NO₃⁻ does not)",
+            };
+        },
+    },
+
     // ── Silver nitrate tests ───────────────────────────────────────────────────
     // Must precede BaCl2 rules because BaCl2 contains Cl⁻ (would precipitate AgCl).
     {
         id: "qualitative/agno3-chloride",
-        // Cl⁻ sources: HCl, NaCl, BaCl2
+        // Cl⁻ sources: HCl, NaCl, BaCl2, FeCl3, NH4Cl, CaCl2
         matches: (chemicals) =>
             chemicals.includes("AgNO3") &&
-            (chemicals.includes("HCl") || chemicals.includes("NaCl") || chemicals.includes("BaCl2")),
+            (chemicals.includes("HCl") || chemicals.includes("NaCl") ||
+             chemicals.includes("BaCl2") || chemicals.includes("FeCl3") ||
+             chemicals.includes("NH4Cl") || chemicals.includes("CaCl2")),
         produce() {
             return {
                 observation: "Curdy white precipitate of silver chloride (AgCl) forms immediately. Turns grey-purple on exposure to sunlight. Dissolves readily in dilute and concentrated NH₃(aq). Halide confirmed as Cl⁻.",

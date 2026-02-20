@@ -74,6 +74,74 @@ describe("Paper questions structure", () => {
     });
 });
 
+// ─── faMap coverage ───────────────────────────────────────────────────────────
+
+describe("faMap on every paper", () => {
+    it("every paper exposes a faMap object", () => {
+        for (const paper of QUESTION_PAPERS) {
+            expect(typeof paper.faMap).toBe("object");
+            expect(paper.faMap).not.toBeNull();
+        }
+    });
+
+    it("every faMap key starts with 'FA '", () => {
+        for (const paper of QUESTION_PAPERS) {
+            for (const key of Object.keys(paper.faMap)) {
+                expect(key).toMatch(/^FA \d+$/);
+            }
+        }
+    });
+
+    it("every faMap value is a non-empty string (chemical ID)", () => {
+        for (const paper of QUESTION_PAPERS) {
+            for (const val of Object.values(paper.faMap)) {
+                expect(typeof val).toBe("string");
+                expect(val.length).toBeGreaterThan(0);
+            }
+        }
+    });
+
+    it("paper 1 faMap covers FA 1 through FA 8", () => {
+        const faMap = QUESTION_PAPERS[0].faMap;
+        for (let i = 1; i <= 8; i++) {
+            expect(faMap[`FA ${i}`]).toBeDefined();
+        }
+    });
+
+    it("no Q3 context reveals specific known-unknowns by name", () => {
+        // These strings were previously leaking the identity of FA unknowns.
+        // Known test reagents (e.g. 'FA 3 = acidified KMnO₄') are allowed —
+        // only the true unknowns that students must identify should be hidden.
+        const bannedPhrases = [
+            "FA 5 = Na₂S₂O₃",
+            "FA 6 = H₂SO₄",
+            "FA 7 = Na₂SO₃",
+            "FA 8 = Cu₂O",
+            "FA 7 = solution containing four ions",
+            "FA 5 = contains Cl⁻",
+            "FA 6 = contains Br⁻",
+            "FA 7 = contains I⁻",
+            "FA 8 = iron(III) sulfate",
+            "FA 5 = contains CO₃²⁻",
+            "FA 6 = contains NO₃⁻",
+            "FA 7 = contains Cl⁻",
+            "FA 4 contains NH₄⁺, Fe³⁺, SO₄²⁻ and Cl⁻",
+            "FA 6 is a solution containing Cu²⁺ and SO₄²⁻",
+            "FA 7 contains Fe³⁺ and Cl⁻",
+            "FA 5 contains Cl⁻ and SO₄²⁻",
+            "FA 6 contains Br⁻ and SO₃²⁻",
+            "FA 7 contains I⁻ and S₂O₃²⁻",
+        ];
+        for (const paper of QUESTION_PAPERS) {
+            const q3 = paper.questions.find(q => q.id === "Q3");
+            if (!q3?.context) continue;
+            for (const phrase of bannedPhrases) {
+                expect(q3.context).not.toContain(phrase);
+            }
+        }
+    });
+});
+
 // ─── Backward-compatible default export ───────────────────────────────────────
 
 describe("QUESTION_PAPER (default)", () => {
