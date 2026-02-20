@@ -1,6 +1,8 @@
+import { useState, useEffect, useRef } from "react";
 import { CHEMICALS } from "../data/chemicals";
 import { EQUIPMENT } from "../data/equipment";
 
+// ── Precision reference ────────────────────────────────────────────────────────
 const PRECISION = [
     { icon: "⚖️", name: "Balance",          reading: "0.01 g",     uncertainty: "±0.005 g",   note: "record to 2 d.p." },
     { icon: "🧪", name: "Burette",           reading: "0.05 cm³",   uncertainty: "±0.025 cm³", note: "final digit 0 or 5" },
@@ -10,17 +12,69 @@ const PRECISION = [
     { icon: "💉", name: "Pipette (25 cm³)",  reading: "±0.06 cm³",  uncertainty: "±0.06 cm³",  note: "fixed volume, single graduation" },
 ];
 
+// ── Lab actions ────────────────────────────────────────────────────────────────
 const ACTIONS = [
-    ["heat",            "🔥 Heat"],
-    ["stir",            "🥢 Stir"],
-    ["filter",          "🫧 Filter"],
-    ["measure_temp",    "🌡️ Measure Temperature"],
-    ["weigh",           "⚖️ Weigh Contents"],
-    ["test_gas_splint",  "🕯️ Test Gas (Splint)"],
-    ["test_gas_glowing", "🕯️ Test Gas (Glowing)"],
-    ["test_litmus",      "📄 Test Gas (Litmus)"],
+    ["heat",             "🔥",  "Heat",              "danger" ],
+    ["stir",             "🌀",  "Stir",              ""       ],
+    ["filter",           "🫧",  "Filter",            ""       ],
+    ["measure_temp",     "🌡️",  "Measure Temp.",     ""       ],
+    ["weigh",            "⚖️",  "Weigh Contents",    ""       ],
+    ["test_gas_splint",  "🕯️",  "Gas Test (Splint)", ""       ],
+    ["test_gas_glowing", "🕯️",  "Gas (Glowing)",     ""       ],
+    ["test_litmus",      "📄",  "Litmus Test",       ""       ],
 ];
 
+// ── Equipment palette groups ───────────────────────────────────────────────────
+const EQUIP_GROUPS = [
+    {
+        id: "vessels",
+        label: "Vessels",
+        color: "#60a5fa",
+        ids: ["conical_flask", "beaker_100", "beaker_250", "test_tube", "boiling_tube", "crucible"],
+    },
+    {
+        id: "measuring",
+        label: "Measuring",
+        color: "#34d399",
+        ids: ["burette", "pipette_25", "measuring_cylinder_10", "measuring_cylinder_25", "thermometer", "stop_clock", "balance"],
+    },
+    {
+        id: "tools",
+        label: "Tools & Accessories",
+        color: "#fb923c",
+        ids: ["bunsen", "stirring_rod", "filter_paper", "dropper", "splint", "litmus_red"],
+    },
+];
+
+// ── Chemical category metadata ─────────────────────────────────────────────────
+const CAT_META = {
+    acid:      { label: "Acids",       color: "#f87171" },
+    reagent:   { label: "Reagents",    color: "#c084fc" },
+    indicator: { label: "Indicators",  color: "#34d399" },
+    titrant:   { label: "Titrants",    color: "#fbbf24" },
+    solution:  { label: "Solutions",   color: "#60a5fa" },
+    solid:     { label: "Solids",      color: "#94a3b8" },
+};
+const CAT_ORDER = ["acid", "reagent", "indicator", "titrant", "solution", "solid"];
+
+// ── Helpers ────────────────────────────────────────────────────────────────────
+function groupChemicals() {
+    const groups = {};
+    Object.entries(CHEMICALS).forEach(([id, chem]) => {
+        const cat = chem.category || "solution";
+        if (!groups[cat]) groups[cat] = [];
+        groups[cat].push([id, chem]);
+    });
+    return groups;
+}
+
+// "Hydrochloric Acid (2.00 mol/dm³)" → { name: "Hydrochloric Acid", detail: "(2.00 mol/dm³)" }
+function splitLabel(label) {
+    const m = label.match(/^(.*?)\s*(\([^)]*\))\s*$/);
+    return m ? { name: m[1], detail: m[2] } : { name: label, detail: "" };
+}
+
+// ── Component ─────────────────────────────────────────────────────────────────
 export default function LabTab({
     vessels, setVessels,
     selectedVessel, setSelectedVessel,
@@ -34,39 +88,184 @@ export default function LabTab({
     bureteReading, setBuretteReading,
     createVessel, addChemicalToVessel, performAction, transferContents, clearBench, pushLog,
 }) {
+    // ── Animation state ────────────────────────────────────────────────────────
+    const [flashVesselId, setFlashVesselId] = useState(null);
+    const [flashType, setFlashType]         = useState("reaction");
+    const [newVesselIds, setNewVesselIds]   = useState(new Set());
+    const [obsKey, setObsKey]               = useState(0);
+    const [openSections, setOpenSections]   = useState(
+        () => new Set(["vessels", "measuring", ...CAT_ORDER])
+    );
+    const prevObsRef   = useRef(null);
+    const prevCountRef = useRef(0);
+
+    // Flash vessel whenever a new observation fires
+    useEffect(() => {
+        if (!lastObservation || lastObservation === prevObsRef.current) return;
+        prevObsRef.current = lastObservation;
+        setObsKey(k => k + 1);
+        if (!selectedVessel) return;
+        setFlashVesselId(selectedVessel);
+        setFlashType("reaction");
+        const t = setTimeout(() => setFlashVesselId(null), 900);
+        return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [lastObservation]);
+
+    // Bounce-in each newly added vessel
+    useEffect(() => {
+        if (vessels.length > prevCountRef.current && vessels.length > 0) {
+            const newest = vessels[vessels.length - 1];
+            setNewVesselIds(ids => new Set([...ids, newest.id]));
+            const t = setTimeout(() => {
+                setNewVesselIds(ids => { const s = new Set(ids); s.delete(newest.id); return s; });
+            }, 800);
+            prevCountRef.current = vessels.length;
+            return () => clearTimeout(t);
+        }
+        prevCountRef.current = vessels.length;
+    }, [vessels.length]);
+
+    // Per-action glow on the vessel
+    const handleAction = (action) => {
+        if (selectedVessel) {
+            const typeMap = { heat: "heat", stir: "stir" };
+            const ft = typeMap[action];
+            if (ft) {
+                setFlashVesselId(selectedVessel);
+                setFlashType(ft);
+                setTimeout(() => setFlashVesselId(null), 900);
+            }
+        }
+        performAction(action);
+    };
+
+    const toggleSection = (id) =>
+        setOpenSections(prev => {
+            const next = new Set(prev);
+            next.has(id) ? next.delete(id) : next.add(id);
+            return next;
+        });
+
     const activeVessel = vessels.find(v => v.id === selectedVessel);
+    const chemGroups   = groupChemicals();
+
+    const vesselAnimClass = (v) => {
+        const cls = ["vessel-card"];
+        if (selectedVessel === v.id)  cls.push("selected");
+        if (newVesselIds.has(v.id))   cls.push("vessel-new");
+        if (flashVesselId === v.id)   cls.push(
+            flashType === "heat" ? "vessel-heat" :
+            flashType === "stir" ? "vessel-stir" :
+            "vessel-reaction"
+        );
+        return cls.join(" ");
+    };
 
     return (
         <div style={{ display: "flex", height: "calc(100vh - 130px)", overflow: "hidden" }}>
 
-            {/* ── Left panel: Equipment + Chemicals ── */}
-            <div style={{ width: 240, borderRight: "1px solid #1a3a5a", overflow: "auto", padding: 12, flexShrink: 0 }}>
-                <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 14, color: "#8ab4d4", marginBottom: 10, letterSpacing: 1 }}>
-                    EQUIPMENT
-                </div>
-                {Object.entries(EQUIPMENT).map(([id, eq]) => (
-                    <button key={id} className="chem-btn" style={{ marginBottom: 4 }} onClick={() => createVessel(id)}>
-                        {eq.icon} {eq.label}
-                    </button>
+            {/* ════════════════════════════════════════════════════════════════ */}
+            {/* LEFT PANEL — Palette                                            */}
+            {/* ════════════════════════════════════════════════════════════════ */}
+            <div className="palette-panel">
+
+                <div className="palette-heading">EQUIPMENT</div>
+
+                {EQUIP_GROUPS.map(group => (
+                    <div key={group.id}>
+                        <button
+                            className="palette-group-hdr"
+                            onClick={() => toggleSection(group.id)}
+                            style={{ "--grp-color": group.color }}
+                        >
+                            <span className="palette-chevron">
+                                {openSections.has(group.id) ? "▾" : "▸"}
+                            </span>
+                            <span className="palette-group-label" style={{ color: group.color }}>
+                                {group.label}
+                            </span>
+                        </button>
+
+                        {openSections.has(group.id) && (
+                            <div className="palette-items">
+                                {group.ids.map(id => EQUIPMENT[id] && (
+                                    <button
+                                        key={id}
+                                        className="equip-card"
+                                        onClick={() => createVessel(id)}
+                                        title={`Add ${EQUIPMENT[id].label} to bench`}
+                                    >
+                                        <span className="equip-icon">{EQUIPMENT[id].icon}</span>
+                                        <span className="equip-label">{EQUIPMENT[id].label}</span>
+                                        <span className="equip-add">＋</span>
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 ))}
 
-                <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 14, color: "#8ab4d4", margin: "16px 0 10px", letterSpacing: 1 }}>
-                    CHEMICALS
-                </div>
-                {Object.entries(CHEMICALS).map(([id, chem]) => (
-                    <button
-                        key={id}
-                        className={`chem-btn ${selectedChemical === id ? "selected" : ""}`}
-                        style={{ marginBottom: 3 }}
-                        onClick={() => setSelectedChemical(selectedChemical === id ? "" : id)}
-                    >
-                        <div style={{ width: 10, height: 10, borderRadius: 2, background: chem.color, border: "1px solid #888", display: "inline-block", marginRight: 6, verticalAlign: "middle" }} />
-                        {chem.label}
-                    </button>
-                ))}
+                <div style={{ borderTop: "1px solid #1a3a5a", margin: "10px 0 6px" }} />
+                <div className="palette-heading">CHEMICALS</div>
+
+                {CAT_ORDER.map(cat => {
+                    const items = chemGroups[cat];
+                    if (!items?.length) return null;
+                    const meta = CAT_META[cat];
+                    return (
+                        <div key={cat}>
+                            <button
+                                className="palette-group-hdr"
+                                onClick={() => toggleSection(cat)}
+                                style={{ "--grp-color": meta.color }}
+                            >
+                                <span className="palette-chevron">
+                                    {openSections.has(cat) ? "▾" : "▸"}
+                                </span>
+                                <span className="palette-group-label" style={{ color: meta.color }}>
+                                    {meta.label}
+                                </span>
+                                <span className="palette-count">{items.length}</span>
+                            </button>
+
+                            {openSections.has(cat) && (
+                                <div className="palette-items">
+                                    {items.map(([id, chem]) => {
+                                        const { name, detail } = splitLabel(chem.label);
+                                        const isSel = selectedChemical === id;
+                                        return (
+                                            <button
+                                                key={id}
+                                                className={`chem-card${isSel ? " selected" : ""}`}
+                                                onClick={() => setSelectedChemical(isSel ? "" : id)}
+                                                title={chem.label}
+                                            >
+                                                <span
+                                                    className="chem-swatch"
+                                                    style={{
+                                                        background: chem.color,
+                                                        boxShadow: isSel ? `0 0 6px ${chem.color}80` : "none",
+                                                    }}
+                                                />
+                                                <span className="chem-body">
+                                                    <span className="chem-name">{name}</span>
+                                                    {detail && <span className="chem-detail">{detail}</span>}
+                                                </span>
+                                                {isSel && <span className="chem-check">✓</span>}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+                    );
+                })}
             </div>
 
-            {/* ── Centre: Bench ── */}
+            {/* ════════════════════════════════════════════════════════════════ */}
+            {/* CENTRE — Bench                                                  */}
+            {/* ════════════════════════════════════════════════════════════════ */}
             <div style={{ flex: 1, overflow: "auto", padding: 20 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
                     <div style={{ fontFamily: "'Playfair Display', serif", color: "#c8e8ff", fontSize: 16 }}>🧪 Laboratory Bench</div>
@@ -85,7 +284,7 @@ export default function LabTab({
                     {vessels.map(vessel => (
                         <div
                             key={vessel.id}
-                            className={`vessel-card ${selectedVessel === vessel.id ? "selected" : ""}`}
+                            className={vesselAnimClass(vessel)}
                             style={{ width: 180, position: "relative" }}
                             onClick={() => setSelectedVessel(vessel.id)}
                         >
@@ -101,14 +300,14 @@ export default function LabTab({
                                     {vessel.contents.map((c, i) => (
                                         <div key={i} style={{ fontSize: 11, color: "#8ab4d4", display: "flex", justifyContent: "space-between", padding: "2px 0", borderBottom: "1px solid rgba(42,90,138,0.2)" }}>
                                             <span style={{ maxWidth: 130, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                                                {CHEMICALS[c.chemical]?.label || c.chemical}
+                                                {splitLabel(CHEMICALS[c.chemical]?.label ?? c.chemical).name}
                                             </span>
                                             <span style={{ color: "#4a9adf", fontFamily: "'JetBrains Mono', monospace", fontSize: 10 }}>
                                                 {c.volume ? `${c.volume}cm³` : c.mass ? `${c.mass}g` : ""}
                                             </span>
                                         </div>
                                     ))}
-                                    <div style={{ marginTop: 8, height: 16, borderRadius: 4, background: vessel.color, border: "1px solid rgba(255,255,255,0.1)" }} />
+                                    <div style={{ marginTop: 8, height: 16, borderRadius: 4, background: vessel.color, border: "1px solid rgba(255,255,255,0.1)", transition: "background 0.8s ease" }} />
                                 </div>
                             )}
                             <button
@@ -126,7 +325,7 @@ export default function LabTab({
                 {lastObservation && (
                     <div style={{ marginTop: 20 }}>
                         <div style={{ fontSize: 13, color: "#8ab4d4", marginBottom: 6, fontFamily: "'Playfair Display', serif" }}>🔬 Latest Observation</div>
-                        <div className="obs-box">{lastObservation}</div>
+                        <div key={obsKey} className="obs-box obs-animate">{lastObservation}</div>
                     </div>
                 )}
 
@@ -144,26 +343,35 @@ export default function LabTab({
                 )}
             </div>
 
-            {/* ── Right panel: Actions ── */}
+            {/* ════════════════════════════════════════════════════════════════ */}
+            {/* RIGHT PANEL — Actions                                           */}
+            {/* ════════════════════════════════════════════════════════════════ */}
             <div style={{ width: 260, borderLeft: "1px solid #1a3a5a", overflow: "auto", padding: 12, flexShrink: 0 }}>
-                <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 14, color: "#8ab4d4", marginBottom: 10, letterSpacing: 1 }}>
+
+                <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 13, color: "#8ab4d4", marginBottom: 8, letterSpacing: 1 }}>
                     ADD TO VESSEL
                 </div>
 
                 {selectedVessel ? (
-                    <div style={{ background: "rgba(0,0,0,0.2)", borderRadius: 6, padding: "10px", marginBottom: 12, border: "1px solid #2a5a8a", fontSize: 12, color: "#4adf7a" }}>
-                        Selected: {activeVessel?.label || "–"}
+                    <div style={{ background: "rgba(74,154,223,0.08)", borderRadius: 6, padding: "8px 10px", marginBottom: 12, border: "1px solid #2a5a8a", fontSize: 12, color: "#4adf7a", display: "flex", alignItems: "center", gap: 6 }}>
+                        <span style={{ fontSize: 16 }}>{activeVessel?.icon}</span>
+                        <span>{activeVessel?.label || "–"}</span>
                     </div>
                 ) : (
-                    <div style={{ fontSize: 12, color: "#6a4a2a", marginBottom: 12, padding: "8px 10px", background: "rgba(90,60,0,0.2)", borderRadius: 6 }}>
-                        ⚠️ Click a vessel on the bench first
+                    <div style={{ fontSize: 12, color: "#8a6a2a", marginBottom: 12, padding: "8px 10px", background: "rgba(90,60,0,0.15)", borderRadius: 6, border: "1px solid rgba(120,80,0,0.3)" }}>
+                        ⚠ Click a vessel on the bench first
                     </div>
                 )}
 
                 <div style={{ marginBottom: 8 }}>
                     <div style={{ fontSize: 11, color: "#6a9abf", marginBottom: 4 }}>Selected Chemical:</div>
-                    <div style={{ fontSize: 12, color: "#c8e8ff", minHeight: 20 }}>
-                        {selectedChemical ? CHEMICALS[selectedChemical]?.label : "–"}
+                    <div style={{ fontSize: 12, color: "#c8e8ff", minHeight: 20, display: "flex", alignItems: "center", gap: 6 }}>
+                        {selectedChemical ? (
+                            <>
+                                <span style={{ width: 8, height: 8, borderRadius: 2, background: CHEMICALS[selectedChemical]?.color, border: "1px solid rgba(255,255,255,0.3)", flexShrink: 0, display: "inline-block" }} />
+                                {splitLabel(CHEMICALS[selectedChemical]?.label ?? "").name}
+                            </>
+                        ) : "—"}
                     </div>
                 </div>
 
@@ -190,16 +398,24 @@ export default function LabTab({
                     </div>
                 )}
 
-                <button className="action-btn" style={{ width: "100%", marginBottom: 16, background: "linear-gradient(135deg,#1a4a6a,#1a6a9a)" }}
+                <button className="action-btn success" style={{ width: "100%", marginBottom: 16, fontSize: 13 }}
                         onClick={addChemicalToVessel} disabled={!selectedVessel || !selectedChemical}>
-                    + Add to Vessel
+                    ＋ Add to Vessel
                 </button>
 
-                <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 13, color: "#8ab4d4", marginBottom: 10, letterSpacing: 1 }}>ACTIONS</div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                    {ACTIONS.map(([action, label]) => (
-                        <button key={action} className="action-btn" style={{ textAlign: "left" }} onClick={() => performAction(action)}>
-                            {label}
+                <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 13, color: "#8ab4d4", marginBottom: 8, letterSpacing: 1 }}>
+                    ACTIONS
+                </div>
+                <div className="action-grid">
+                    {ACTIONS.map(([action, icon, label, variant]) => (
+                        <button
+                            key={action}
+                            className={`action-tile${variant ? " " + variant : ""}`}
+                            onClick={() => handleAction(action)}
+                            title={label}
+                        >
+                            <span className="action-tile-icon">{icon}</span>
+                            <span className="action-tile-label">{label}</span>
                         </button>
                     ))}
                 </div>
@@ -218,7 +434,7 @@ export default function LabTab({
                             <option key={v.id} value={v.id}>{v.icon} {v.label}</option>
                         ))}
                     </select>
-                    <div style={{ fontSize: 11, color: "#6a9abf", marginBottom: 4 }}>Volume to transfer (cm³):</div>
+                    <div style={{ fontSize: 11, color: "#6a9abf", marginBottom: 4 }}>Volume (cm³):</div>
                     <input type="number" value={transferAmount} onChange={e => setTransferAmount(parseFloat(e.target.value))}
                            min={0.1} max={500} step={0.5} style={{ width: "100%", boxSizing: "border-box", marginBottom: 6 }} />
                     <button className="action-btn" style={{ width: "100%", background: "linear-gradient(135deg,#2a4a1a,#3a6a2a)" }}
@@ -231,8 +447,8 @@ export default function LabTab({
                 <div style={{ marginTop: 12, borderTop: "1px solid #1a3a5a", paddingTop: 12 }}>
                     <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 13, color: "#8ab4d4", marginBottom: 8 }}>STOP-CLOCK</div>
                     <div style={{ display: "flex", gap: 6 }}>
-                        <button className="action-btn success" style={{ flex: 1 }} onClick={() => performAction("start_clock")}>▶ Start</button>
-                        <button className="action-btn danger"  style={{ flex: 1 }} onClick={() => performAction("stop_clock")}>■ Stop</button>
+                        <button className="action-btn success" style={{ flex: 1 }} onClick={() => handleAction("start_clock")}>▶ Start</button>
+                        <button className="action-btn danger"  style={{ flex: 1 }} onClick={() => handleAction("stop_clock")}>■ Stop</button>
                     </div>
                     <button className="action-btn" style={{ width: "100%", marginTop: 6 }} onClick={() => setClockTime(0)}>↺ Reset</button>
                 </div>
@@ -242,10 +458,9 @@ export default function LabTab({
                     <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 13, color: "#8ab4d4", marginBottom: 8 }}>BURETTE READING</div>
                     <input type="number" value={bureteReading} onChange={e => setBuretteReading(parseFloat(e.target.value))}
                            min={0} max={50} step={0.05} style={{ width: "100%", boxSizing: "border-box" }} />
-                    {/* Validate: burette must be a multiple of 0.05 */}
                     {Math.abs(bureteReading * 20 - Math.round(bureteReading * 20)) > 0.001 ? (
                         <div style={{ fontSize: 10, color: "#df8a4a", marginTop: 3 }}>
-                            ⚠️ Not to 0.05 cm³ precision — final digit must be 0 or 5
+                            ⚠ Not to 0.05 cm³ — final digit must be 0 or 5
                         </div>
                     ) : (
                         <div style={{ fontSize: 10, color: "#4adf7a", marginTop: 3 }}>
@@ -258,7 +473,7 @@ export default function LabTab({
                     </button>
                 </div>
 
-                {/* Precision Reference */}
+                {/* Precision reference */}
                 <div style={{ marginTop: 12, borderTop: "1px solid #1a3a5a", paddingTop: 12 }}>
                     <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 13, color: "#8ab4d4", marginBottom: 8 }}>📐 MEASUREMENT PRECISION</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>

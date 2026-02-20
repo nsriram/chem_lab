@@ -173,3 +173,275 @@ option { background: #0a1628; }
   border-radius: 0 0 8px 8px;
   transition: background 0.5s;
 }
+
+/* ══════════════════════════════════════════════════════════════
+   ANIMATIONS
+   ══════════════════════════════════════════════════════════════ */
+
+/* Vessel appears on bench */
+@keyframes bounceIn {
+  0%   { transform: scale(0.55); opacity: 0; }
+  60%  { transform: scale(1.06); opacity: 1; }
+  80%  { transform: scale(0.97); }
+  100% { transform: scale(1);    }
+}
+
+/* Chemical reaction / colour change */
+@keyframes reactionFlash {
+  0%   { box-shadow: 0 0 0   rgba(74, 223, 140, 0);   border-color: #2a4a6a; }
+  25%  { box-shadow: 0 0 22px rgba(74, 223, 140, 0.75); border-color: #4adf8c; }
+  60%  { box-shadow: 0 0 14px rgba(74, 223, 140, 0.4);  border-color: #3acf7a; }
+  100% { box-shadow: 0 0 0   rgba(74, 223, 140, 0);   border-color: #2a4a6a; }
+}
+
+/* Heat action */
+@keyframes heatGlow {
+  0%   { box-shadow: 0 0 0   rgba(255, 140, 0, 0);   border-color: #2a4a6a; }
+  25%  { box-shadow: 0 0 22px rgba(255, 140, 0, 0.8);  border-color: #ff8c00; }
+  60%  { box-shadow: 0 0 14px rgba(255, 180, 0, 0.4);  border-color: #ffb300; }
+  100% { box-shadow: 0 0 0   rgba(255, 140, 0, 0);   border-color: #2a4a6a; }
+}
+
+/* Stir action */
+@keyframes stirShake {
+  0%   { transform: rotate(0deg)   scale(1);    }
+  20%  { transform: rotate(-3deg)  scale(1.02); }
+  40%  { transform: rotate( 3deg)  scale(1.02); }
+  60%  { transform: rotate(-2deg)  scale(1.01); }
+  80%  { transform: rotate( 2deg)  scale(1.01); }
+  100% { transform: rotate(0deg)   scale(1);    }
+}
+
+/* Observation box slides in */
+@keyframes obsSlideIn {
+  0%   { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0);   }
+}
+
+/* Palette item hover nudge */
+@keyframes nudgeRight {
+  0%   { transform: translateX(0); }
+  50%  { transform: translateX(3px); }
+  100% { transform: translateX(0); }
+}
+
+/* ── Animation utility classes ────────────────────────────── */
+.vessel-new      { animation: bounceIn   0.65s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
+.vessel-reaction { animation: reactionFlash 0.9s ease-out; }
+.vessel-heat     { animation: heatGlow      0.9s ease-out; }
+.vessel-stir     { animation: stirShake     0.55s ease-in-out; }
+.obs-animate     { animation: obsSlideIn    0.35s ease-out; }
+
+/* ══════════════════════════════════════════════════════════════
+   PALETTE PANEL (left sidebar)
+   ══════════════════════════════════════════════════════════════ */
+
+.palette-panel {
+  width: 252px;
+  border-right: 1px solid #1a3a5a;
+  overflow-y: auto;
+  padding: 8px 8px 24px;
+  flex-shrink: 0;
+}
+
+.palette-heading {
+  font-family: 'Playfair Display', serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.8px;
+  color: #4a7a9a;
+  padding: 4px 6px 6px;
+  margin-top: 4px;
+}
+
+.palette-group-hdr {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 5px 6px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.15s;
+  margin-bottom: 2px;
+}
+.palette-group-hdr:hover { background: rgba(255,255,255,0.05); }
+
+.palette-chevron {
+  font-size: 10px;
+  color: var(--grp-color, #60a5fa);
+  width: 12px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.palette-group-label {
+  font-family: 'Playfair Display', serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  line-height: 1;
+}
+
+.palette-count {
+  margin-left: auto;
+  font-size: 9px;
+  color: #3a6a8a;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.palette-items { padding: 0 0 4px 4px; }
+
+/* ── Equipment card ──────────────────────────────────────── */
+.equip-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 6px;
+  padding: 7px 10px;
+  margin-bottom: 3px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s;
+}
+.equip-card:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.2);
+  transform: translateX(3px);
+}
+.equip-card:active { transform: translateX(1px) scale(0.98); }
+
+.equip-icon  { font-size: 17px; flex-shrink: 0; line-height: 1; }
+.equip-label { font-size: 12.5px; font-family: 'Crimson Text', serif; color: #c8dce8; flex: 1; text-align: left; }
+.equip-add   {
+  font-size: 14px;
+  color: #2a6a8a;
+  opacity: 0;
+  transition: opacity 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+.equip-card:hover .equip-add { opacity: 1; color: #4a9adf; }
+
+/* ── Chemical card ───────────────────────────────────────── */
+.chem-card {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 6px;
+  margin-bottom: 3px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s;
+  text-align: left;
+}
+.chem-card:hover {
+  background: rgba(255,255,255,0.09);
+  border-color: rgba(255,255,255,0.16);
+  transform: translateX(3px);
+}
+.chem-card:active { transform: translateX(1px) scale(0.98); }
+.chem-card.selected {
+  background: rgba(74,154,223,0.13);
+  border-color: #4a9adf;
+  box-shadow: 0 0 8px rgba(74,154,223,0.2);
+}
+
+.chem-swatch {
+  width: 5px;
+  flex-shrink: 0;
+  border-radius: 5px 0 0 5px;
+  transition: box-shadow 0.2s;
+}
+
+.chem-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 5px 8px;
+  min-width: 0;
+}
+
+.chem-name {
+  font-size: 12.5px;
+  font-family: 'Crimson Text', serif;
+  color: #c8dce8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+.chem-card:hover .chem-name { color: #e8f4ff; }
+.chem-card.selected .chem-name { color: #e8f4ff; }
+
+.chem-detail {
+  display: block;
+  font-size: 9.5px;
+  font-family: 'JetBrains Mono', monospace;
+  color: #3a6a8a;
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.chem-card:hover .chem-detail   { color: #5a8aaa; }
+.chem-card.selected .chem-detail { color: #4a9adf; }
+
+.chem-check {
+  width: 20px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: #4adf9a;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   ACTION TILES (right panel grid)
+   ══════════════════════════════════════════════════════════════ */
+
+.action-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  margin-bottom: 4px;
+}
+
+.action-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 9px 4px;
+  background: linear-gradient(160deg, #1a3a5a, #152e4a);
+  border: 1px solid #2a4a6a;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.18s, transform 0.15s, border-color 0.18s;
+  font-family: 'Crimson Text', serif;
+}
+.action-tile:hover {
+  background: linear-gradient(160deg, #2a4a6a, #22406a);
+  border-color: #4a7aaa;
+  transform: translateY(-2px);
+}
+.action-tile:active { transform: translateY(0) scale(0.97); }
+.action-tile.danger {
+  background: linear-gradient(160deg, #5a1a1a, #6a2020);
+  border-color: #8a3030;
+}
+.action-tile.danger:hover {
+  background: linear-gradient(160deg, #6a2020, #7a2a2a);
+  border-color: #aa4040;
+}
+
+.action-tile-icon  { font-size: 20px; line-height: 1; }
+.action-tile-label { font-size: 11px; color: #a8c8e0; text-align: center; line-height: 1.2; }
