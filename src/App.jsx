@@ -76,8 +76,8 @@ export default function ChemLabApp() {
                     setActivePaperId={lab.setActivePaperId}
                     expandedQ={lab.expandedQ}
                     setExpandedQ={lab.setExpandedQ}
-                    studentNotes={lab.studentNotes}
-                    setStudentNotes={lab.setStudentNotes}
+                    partAnswers={lab.partAnswers}
+                    setPartAnswers={lab.setPartAnswers}
                 />
             )}
 
@@ -127,7 +127,7 @@ export default function ChemLabApp() {
                 <EvaluateTab
                     evaluation={lab.evaluation}
                     actionLog={lab.actionLog}
-                    studentNotes={lab.studentNotes}
+                    partAnswers={lab.partAnswers}
                     paper={lab.activePaper}
                     tables={lab.tables}
                     graphs={lab.graphs}

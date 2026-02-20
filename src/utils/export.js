@@ -21,7 +21,7 @@ function sectionHeader(doc, text, y) {
     return y + 12;
 }
 
-export function exportReportPDF({ paper, actionLog, studentNotes, evaluation }) {
+export function exportReportPDF({ paper, actionLog, partAnswers = {}, evaluation }) {
     const doc = new jsPDF({ unit: "mm", format: "a4" });
 
     let y = MARGIN;
@@ -125,20 +125,74 @@ export function exportReportPDF({ paper, actionLog, studentNotes, evaluation }) 
         }
     }
 
-    // ── Student notes ─────────────────────────────────────────────────────────
-    if (studentNotes?.trim()) {
+    // ── Student answers per question part ────────────────────────────────────
+    if (paper?.questions?.length) {
         y = checkPage(doc, y, 20);
-        y = sectionHeader(doc, "Student Written Answers", y);
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(9);
-        doc.setTextColor(168, 200, 224);
-        const lines = doc.splitTextToSize(studentNotes, CW);
-        for (const line of lines) {
-            y = checkPage(doc, y, 5);
-            doc.text(line, MARGIN, y);
-            y += 4.8;
+        y = sectionHeader(doc, "Written Answers", y);
+
+        for (const q of paper.questions) {
+            y = checkPage(doc, y, 12);
+
+            // Question title bar
+            doc.setFillColor(16, 40, 64);
+            doc.rect(MARGIN, y, CW, 7, "F");
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(9);
+            doc.setTextColor(180, 220, 255);
+            doc.text(q.title, MARGIN + 3, y + 5);
+            y += 10;
+
+            for (const part of q.parts) {
+                const answer = partAnswers[part.id] ?? "";
+                const colW = (CW - 4) / 2;
+
+                // Measure both sides to find row height
+                doc.setFontSize(8);
+                const qLines = doc.splitTextToSize(part.instruction, colW - 4);
+                const aLines = answer.trim()
+                    ? doc.splitTextToSize(answer, colW - 4)
+                    : ["—"];
+                const lineH = 4.2;
+                const headerH = 6;
+                const rowH = Math.max(qLines.length, aLines.length) * lineH + headerH + 6;
+
+                y = checkPage(doc, y, rowH);
+
+                // Row background
+                doc.setFillColor(14, 35, 56);
+                doc.roundedRect(MARGIN, y, CW, rowH, 1.5, 1.5, "F");
+
+                // Divider
+                const midX = MARGIN + colW + 2;
+                doc.setDrawColor(30, 60, 90);
+                doc.line(midX, y + 2, midX, y + rowH - 2);
+
+                // Part label header (left)
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(7.5);
+                doc.setTextColor(74, 154, 223);
+                doc.text(`${part.label}  [${part.marks} mk]`, MARGIN + 3, y + 4.5);
+
+                // Answer header (right)
+                doc.setTextColor(80, 180, 110);
+                doc.text("Student Answer", midX + 3, y + 4.5);
+
+                // Question instruction (left)
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(8);
+                doc.setTextColor(160, 200, 230);
+                doc.text(qLines, MARGIN + 3, y + headerH + 2);
+
+                // Student answer (right)
+                doc.setTextColor(answer.trim() ? 210 : 80, answer.trim() ? 235 : 100, answer.trim() ? 255 : 120);
+                if (!answer.trim()) doc.setFont("helvetica", "italic");
+                doc.text(aLines, midX + 3, y + headerH + 2);
+                doc.setFont("helvetica", "normal");
+
+                y += rowH + 3;
+            }
+            y += 4;
         }
-        y += 4;
     }
 
     // ── Action log ────────────────────────────────────────────────────────────

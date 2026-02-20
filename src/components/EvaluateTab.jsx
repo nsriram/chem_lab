@@ -1,6 +1,6 @@
 import { exportReportPDF } from "../utils/export";
 
-export default function EvaluateTab({ evaluation, actionLog, studentNotes, paper, tables, graphs, runEvaluation, onBack, onStartFresh }) {
+export default function EvaluateTab({ evaluation, actionLog, partAnswers, paper, tables, graphs, runEvaluation, onBack, onStartFresh }) {
     return (
         <div style={{ padding: 24, maxWidth: 900, margin: "0 auto" }}>
             {!evaluation ? (
@@ -118,22 +118,51 @@ export default function EvaluateTab({ evaluation, actionLog, studentNotes, paper
                         </div>
                     </div>
 
-                    {/* Student Notes Review */}
-                    {studentNotes && (
+                    {/* Per-question answers */}
+                    {paper?.questions?.length > 0 && (
                         <div style={{ background: "rgba(0,0,0,0.2)", borderRadius: 10, padding: 20, border: "1px solid #2a4a6a", marginBottom: 16 }}>
-                            <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 16, color: "#c8e8ff", marginBottom: 14 }}>
-                                📝 Your Written Answers
+                            <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 16, color: "#c8e8ff", marginBottom: 16 }}>
+                                📝 Written Answers
                             </div>
-                            <div style={{ whiteSpace: "pre-wrap", fontSize: 14, color: "#a8c8e0", lineHeight: 1.7 }}>
-                                {studentNotes}
-                            </div>
+                            {paper.questions.map(q => (
+                                <div key={q.id} style={{ marginBottom: 20 }}>
+                                    <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 14, color: "#8ab4d4", borderBottom: "1px solid #1a3a5a", paddingBottom: 6, marginBottom: 12 }}>
+                                        {q.title}
+                                    </div>
+                                    {q.parts.map(part => {
+                                        const answer = partAnswers?.[part.id];
+                                        return (
+                                            <div key={part.id} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 10, padding: "10px 12px", background: "rgba(255,255,255,0.02)", borderRadius: 6, border: "1px solid #1a3a5a" }}>
+                                                {/* Question side */}
+                                                <div style={{ borderRight: "1px solid #1a3a5a", paddingRight: 12 }}>
+                                                    <div style={{ fontSize: 11, color: "#4a9adf", textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 4, fontFamily: "'JetBrains Mono', monospace" }}>
+                                                        {part.label} · {part.marks} mk
+                                                    </div>
+                                                    <div style={{ fontSize: 12, color: "#8ab4d4", lineHeight: 1.6 }}>
+                                                        {part.instruction}
+                                                    </div>
+                                                </div>
+                                                {/* Answer side */}
+                                                <div>
+                                                    <div style={{ fontSize: 11, color: "#5a9a6a", textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 4, fontFamily: "'JetBrains Mono', monospace" }}>
+                                                        ✏️ Student Answer
+                                                    </div>
+                                                    <div style={{ fontSize: 13, color: answer ? "#c8e8ff" : "#3a5a7a", fontStyle: answer ? "normal" : "italic", lineHeight: 1.6, whiteSpace: "pre-wrap", fontFamily: "'JetBrains Mono', monospace" }}>
+                                                        {answer || "No answer provided"}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            ))}
                         </div>
                     )}
 
                     <div style={{ marginTop: 20, padding: "16px 20px", background: "rgba(0,0,0,0.2)", borderRadius: 10, border: "1px solid #2a4a6a" }}>
                         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                             <button className="action-btn success" style={{ fontSize: 13 }}
-                                onClick={() => exportReportPDF({ paper, actionLog, studentNotes, evaluation })}>
+                                onClick={() => exportReportPDF({ paper, actionLog, partAnswers, evaluation })}>
                                 📥 Download Report (PDF)
                             </button>
                             <button className="action-btn" onClick={onBack}>← Back to Question Paper</button>

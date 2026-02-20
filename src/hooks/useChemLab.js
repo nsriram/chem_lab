@@ -27,7 +27,7 @@ export function useChemLab() {
     const [logHistory, setLogHistory] = useState(() => s.logHistory ?? [[]]);
     const [historyIndex, setHistoryIndex] = useState(() => s.historyIndex ?? 0);
     const [lastObservation, setLastObservation] = useState("");
-    const [studentNotes, setStudentNotes] = useState(() => s.studentNotes ?? "");
+    const [partAnswers, setPartAnswers] = useState(() => s.partAnswers ?? {});
     const [evaluation, setEvaluation] = useState(() => s.evaluation ?? null);
     const [selectedChemical, setSelectedChemical] = useState("");
     const [addVolume, setAddVolume] = useState(10);
@@ -50,14 +50,14 @@ export function useChemLab() {
             localStorage.setItem(STORAGE_KEY, JSON.stringify({
                 activeTab, activePaperId, expandedQ,
                 vessels, actionLog, logHistory, historyIndex,
-                studentNotes, evaluation, clockTime,
+                partAnswers, evaluation, clockTime,
                 tables, graphs, activeDataTab,
             }));
         } catch {
             // Storage quota exceeded — ignore
         }
     }, [activeTab, activePaperId, expandedQ, vessels, actionLog, logHistory,
-        historyIndex, studentNotes, evaluation, clockTime, tables, graphs, activeDataTab]);
+        historyIndex, partAnswers, evaluation, clockTime, tables, graphs, activeDataTab]);
 
     useEffect(() => {
         if (clockRunning) {
@@ -308,7 +308,10 @@ export function useChemLab() {
 
     const runEvaluation = () => {
         const paper = QUESTION_PAPERS[activePaperId] ?? QUESTION_PAPERS[0];
-        const result = evaluateLog(actionLog, studentNotes, paper);
+        const joinedNotes = Object.entries(partAnswers)
+            .map(([id, ans]) => `${id}: ${ans}`)
+            .join("\n");
+        const result = evaluateLog(actionLog, joinedNotes, paper);
         setEvaluation(result);
         setActiveTab("evaluate");
     };
@@ -326,7 +329,7 @@ export function useChemLab() {
         setHistoryIndex(0);
         setVessels([]);
         setSelectedVessel(null);
-        setStudentNotes("");
+        setPartAnswers({});
         setEvaluation(null);
         setClockTime(0);
         setTables([]);
@@ -352,7 +355,7 @@ export function useChemLab() {
         bureteReading, setBuretteReading,
         expandedQ, setExpandedQ,
         activePaperId, setActivePaperId,
-        studentNotes, setStudentNotes,
+        partAnswers, setPartAnswers,
         tables, setTables,
         graphs, setGraphs,
         activeDataTab, setActiveDataTab,

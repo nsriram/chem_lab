@@ -1,7 +1,11 @@
 import { QUESTION_PAPERS } from "../data/questionPaper";
 
-export default function PaperTab({ activePaperId, setActivePaperId, expandedQ, setExpandedQ, studentNotes, setStudentNotes }) {
+export default function PaperTab({ activePaperId, setActivePaperId, expandedQ, setExpandedQ, partAnswers, setPartAnswers }) {
     const paper = QUESTION_PAPERS[activePaperId] ?? QUESTION_PAPERS[0];
+
+    function setAnswer(partId, value) {
+        setPartAnswers(prev => ({ ...prev, [partId]: value }));
+    }
 
     return (
         <div style={{ padding: "24px", maxWidth: 900, margin: "0 auto" }}>
@@ -62,7 +66,7 @@ export default function PaperTab({ activePaperId, setActivePaperId, expandedQ, s
                                 {q.context}
                             </div>
                             {q.parts.map(part => (
-                                <div key={part.id} style={{ marginBottom: 16, padding: "12px 16px", background: "rgba(255,255,255,0.02)", borderRadius: 6, border: "1px solid #1a3a5a" }}>
+                                <div key={part.id} style={{ marginBottom: 16, padding: "14px 16px", background: "rgba(255,255,255,0.02)", borderRadius: 6, border: "1px solid #1a3a5a" }}>
                                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
                                         <strong style={{ color: "#c8e8ff", fontFamily: "'Playfair Display', serif" }}>{part.label}</strong>
                                         <span style={{ fontSize: 12, color: "#4a9adf", fontFamily: "'JetBrains Mono', monospace" }}>
@@ -73,29 +77,35 @@ export default function PaperTab({ activePaperId, setActivePaperId, expandedQ, s
                                         {part.instruction}
                                     </div>
                                     {part.hint && (
-                                        <div style={{ fontSize: 12, color: "#8a7a4a", fontStyle: "italic" }}>
+                                        <div style={{ fontSize: 12, color: "#8a7a4a", fontStyle: "italic", marginBottom: 10 }}>
                                             💡 Hint: {part.hint}
                                         </div>
                                     )}
+                                    {/* Per-part answer box */}
+                                    <div style={{ borderTop: "1px solid #1a3a5a", paddingTop: 10 }}>
+                                        <div style={{ fontSize: 11, color: "#5a8aaa", textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 5 }}>
+                                            ✏️ Your Answer
+                                        </div>
+                                        <textarea
+                                            value={partAnswers[part.id] ?? ""}
+                                            onChange={e => setAnswer(part.id, e.target.value)}
+                                            placeholder="Write your answer here…"
+                                            style={{
+                                                width: "100%", minHeight: 72, resize: "vertical",
+                                                lineHeight: 1.6, boxSizing: "border-box",
+                                                background: "rgba(10,25,45,0.6)", color: "#c8e8ff",
+                                                border: "1px solid #2a5a8a", borderRadius: 4,
+                                                padding: "7px 10px", fontSize: 13,
+                                                fontFamily: "'JetBrains Mono', monospace",
+                                            }}
+                                        />
+                                    </div>
                                 </div>
                             ))}
                         </div>
                     )}
                 </div>
             ))}
-
-            {/* Student answer booklet */}
-            <div style={{ marginTop: 20, padding: 20, background: "rgba(0,0,0,0.2)", borderRadius: 10, border: "1px solid #2a4a6a" }}>
-                <div style={{ fontFamily: "'Playfair Display', serif", marginBottom: 10, color: "#c8e8ff" }}>
-                    📝 Student Answer Booklet
-                </div>
-                <textarea
-                    value={studentNotes}
-                    onChange={e => setStudentNotes(e.target.value)}
-                    placeholder="Write your observations, calculations, and conclusions here..."
-                    style={{ width: "100%", minHeight: 200, resize: "vertical", lineHeight: 1.7, boxSizing: "border-box" }}
-                />
-            </div>
         </div>
     );
 }
