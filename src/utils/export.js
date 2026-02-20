@@ -1,161 +1,193 @@
-// ─── Download helper ─────────────────────────────────────────────────────────
+import { jsPDF } from "jspdf";
 
-function downloadBlob(content, filename, type) {
-    const blob = new Blob([content], { type });
-    const url  = URL.createObjectURL(blob);
-    const a    = Object.assign(document.createElement("a"), { href: url, download: filename });
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 0);
-}
+const W = 210, H = 297, MARGIN = 18, CW = W - MARGIN * 2;
 
 function datestamp() {
     return new Date().toISOString().slice(0, 10);
 }
 
-// ─── Export: full session JSON ────────────────────────────────────────────────
-
-export function exportSessionJSON({ paper, actionLog, studentNotes, evaluation, tables, graphs }) {
-    const payload = {
-        exportedAt: new Date().toISOString(),
-        paper: { id: paper?.id, title: paper?.title },
-        studentNotes,
-        evaluation,
-        actionLog,
-        tables,
-        graphs,
-    };
-    downloadBlob(JSON.stringify(payload, null, 2), `chemlab-session-${datestamp()}.json`, "application/json");
+function checkPage(doc, y, needed = 10) {
+    if (y + needed > H - 16) { doc.addPage(); return MARGIN; }
+    return y;
 }
 
-// ─── Pure builders (exported for testing) ────────────────────────────────────
-
-export function buildCSV(actionLog) {
-    const esc = v => `"${String(v ?? "").replace(/"/g, '""').replace(/\n/g, " ")}"`;
-    const header = ["Time", "Action", "Vessel", "Chemical", "Amount", "Details"].map(esc).join(",");
-    const rows   = actionLog.map(e =>
-        [e.timestamp, e.action, e.vessel, e.chemical, e.amount, e.details].map(esc).join(",")
-    );
-    return [header, ...rows].join("\n");
+function sectionHeader(doc, text, y) {
+    doc.setFillColor(20, 50, 80);
+    doc.rect(MARGIN, y, CW, 8, "F");
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.setTextColor(200, 232, 255);
+    doc.text(text, MARGIN + 4, y + 5.5);
+    return y + 12;
 }
 
-export function buildNotesTxt(notes, paperTitle) {
-    const bar = "═".repeat(50);
-    return [
-        "Cambridge Chemistry Lab Simulator",
-        bar,
-        paperTitle ?? "Cambridge 9701/33 Advanced Practical Skills",
-        bar,
-        "",
-        "STUDENT ANSWER BOOKLET",
-        "─".repeat(50),
-        "",
-        notes,
-    ].join("\n");
-}
+export function exportReportPDF({ paper, actionLog, studentNotes, evaluation }) {
+    const doc = new jsPDF({ unit: "mm", format: "a4" });
 
-// ─── Export: action log CSV ───────────────────────────────────────────────────
+    let y = MARGIN;
 
-export function exportActionLogCSV(actionLog) {
-    downloadBlob(buildCSV(actionLog), `chemlab-log-${datestamp()}.csv`, "text/csv");
-}
+    // ── Header band ──────────────────────────────────────────────────────────
+    doc.setFillColor(14, 38, 64);
+    doc.rect(0, 0, W, 30, "F");
 
-// ─── Export: student notes .txt ───────────────────────────────────────────────
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(15);
+    doc.setTextColor(200, 232, 255);
+    doc.text("Cambridge Chemistry Lab Simulator", MARGIN, 13);
 
-export function exportNotesTxt(notes, paperTitle) {
-    downloadBlob(buildNotesTxt(notes, paperTitle), `chemlab-answers-${datestamp()}.txt`, "text/plain");
-}
-
-// ─── Print report ─────────────────────────────────────────────────────────────
-
-export function printReport({ paper, actionLog, studentNotes, evaluation }) {
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8.5);
+    doc.setTextColor(120, 170, 210);
+    doc.text(paper?.title ?? "Lab Report", MARGIN, 21);
     const date = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+    doc.text(date, W - MARGIN, 21, { align: "right" });
 
-    const escHtml = s => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    y = 40;
 
-    const evalHtml = evaluation ? `
-    <section>
-      <h2>Evaluation Results</h2>
-      <p class="grade-line">
-        Grade: <strong>${escHtml(evaluation.grade)}</strong> &nbsp;·&nbsp;
-        Score: <strong>${evaluation.total} / ${evaluation.maxMarks}</strong> &nbsp;·&nbsp;
-        ${Math.round((evaluation.total / evaluation.maxMarks) * 100)}%
-      </p>
-      ${(evaluation.sections ?? []).map(sec => `
-        <h3>${escHtml(sec.label)} — ${sec.score}/${sec.max}</h3>
-        <ul>
-          ${sec.criteria.map(c => `<li class="crit-${escHtml(c.status)}">${escHtml(c.text)} <span class="marks">[+${c.marks}]</span></li>`).join("")}
-        </ul>
-      `).join("")}
-    </section>` : "";
+    // ── Score summary ─────────────────────────────────────────────────────────
+    if (evaluation) {
+        const pct = Math.round((evaluation.total / evaluation.maxMarks) * 100);
+        const hi = evaluation.total >= evaluation.maxMarks * 0.7;
+        const mid = evaluation.total >= evaluation.maxMarks * 0.5;
+        const level = hi ? "Distinction" : mid ? "Merit" : "Needs improvement";
+        const fillRgb = hi ? [74, 210, 110] : mid ? [210, 160, 60] : [210, 70, 70];
 
-    const logRows = actionLog.map(e => `
-      <tr>
-        <td>${escHtml(e.timestamp)}</td>
-        <td>${escHtml(e.action)}</td>
-        <td>${escHtml(e.vessel)}</td>
-        <td>${escHtml(e.details)}</td>
-      </tr>`).join("") || "<tr><td colspan='4'><em>No actions recorded.</em></td></tr>";
+        doc.setFillColor(22, 60, 90);
+        doc.roundedRect(MARGIN, y, CW, 28, 3, 3, "F");
 
-    const html = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>Lab Report – ${escHtml(paper?.title ?? "Session")}</title>
-  <style>
-    *  { box-sizing: border-box; }
-    body { font-family: "Times New Roman", Times, serif; margin: 2.5cm 2cm; color: #111; font-size: 11pt; line-height: 1.5; }
-    h1  { font-size: 16pt; margin: 0 0 4pt; }
-    h2  { font-size: 13pt; border-bottom: 1pt solid #555; margin: 18pt 0 6pt; page-break-after: avoid; }
-    h3  { font-size: 11pt; margin: 10pt 0 3pt; }
-    .meta { font-size: 9.5pt; color: #444; margin-bottom: 14pt; }
-    .grade-line { font-size: 12pt; margin: 4pt 0 10pt; }
-    ul  { margin: 4pt 0; padding-left: 20pt; }
-    li  { margin: 2pt 0; font-size: 10pt; }
-    .crit-pass    { color: #145214; }
-    .crit-partial { color: #5a4a00; }
-    .crit-warn    { color: #7a5a00; }
-    .crit-fail    { color: #8a0000; }
-    .marks { color: #555; font-style: italic; }
-    table { width: 100%; border-collapse: collapse; font-size: 9pt; margin-top: 6pt; }
-    th    { background: #f0f0f0; padding: 3pt 6pt; text-align: left; border: 1pt solid #aaa; }
-    td    { padding: 2pt 6pt; border: 1pt solid #ccc; vertical-align: top; word-break: break-word; }
-    .notes-box { border: 1pt solid #999; padding: 10pt; white-space: pre-wrap; min-height: 80pt; font-size: 11pt; }
-    @page  { margin: 2cm; }
-  </style>
-</head>
-<body>
-  <h1>⚗️ Cambridge Chemistry Lab Simulator</h1>
-  <div class="meta">
-    <strong>Paper:</strong> ${escHtml(paper?.title ?? "—")} &nbsp;·&nbsp;
-    ${escHtml(paper?.subtitle ?? "")} &nbsp;·&nbsp;
-    <strong>Date:</strong> ${date} &nbsp;·&nbsp;
-    <strong>Actions logged:</strong> ${actionLog.length}
-  </div>
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(18);
+        doc.setTextColor(...fillRgb);
+        doc.text(`${evaluation.total} / ${evaluation.maxMarks}`, MARGIN + 6, y + 13);
 
-  ${studentNotes ? `
-  <section>
-    <h2>Student Answer Booklet</h2>
-    <div class="notes-box">${escHtml(studentNotes)}</div>
-  </section>` : ""}
+        doc.setFontSize(11);
+        doc.setTextColor(200, 232, 255);
+        doc.text(`Grade: ${evaluation.grade}`, MARGIN + 6, y + 21);
 
-  <section>
-    <h2>Action Log (${actionLog.length} entries)</h2>
-    <table>
-      <thead><tr><th>Time</th><th>Action</th><th>Vessel</th><th>Details</th></tr></thead>
-      <tbody>${logRows}</tbody>
-    </table>
-  </section>
+        doc.setFontSize(10);
+        doc.setTextColor(130, 175, 215);
+        doc.text(`${pct}%  ·  ${level}`, MARGIN + 6, y + 26);
 
-  ${evalHtml}
-</body>
-</html>`;
+        // Bar background
+        const bx = W / 2 + 10, bw = CW / 2 - 14;
+        doc.setFillColor(30, 55, 80);
+        doc.roundedRect(bx, y + 10, bw, 7, 1.5, 1.5, "F");
+        doc.setFillColor(...fillRgb);
+        doc.roundedRect(bx, y + 10, Math.max(3, bw * pct / 100), 7, 1.5, 1.5, "F");
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8);
+        doc.setTextColor(200, 232, 255);
+        doc.text(`${pct}%`, bx + bw / 2, y + 15.5, { align: "center" });
 
-    const win = window.open("", "_blank", "width=860,height=720");
-    if (!win) { alert("Please allow pop-ups to use the Print Report feature."); return; }
-    win.document.write(html);
-    win.document.close();
-    win.focus();
-    // Small delay lets the browser finish layout before print dialog
-    setTimeout(() => win.print(), 600);
+        y += 36;
+    }
+
+    // ── Section breakdown ─────────────────────────────────────────────────────
+    if (evaluation?.sections?.length) {
+        y = checkPage(doc, y, 20);
+        y = sectionHeader(doc, "Assessment Breakdown", y);
+
+        for (const sec of evaluation.sections) {
+            y = checkPage(doc, y, 14);
+
+            const sp = sec.score / sec.max;
+            const sc = sp >= 0.7 ? [74, 210, 110] : sp >= 0.5 ? [210, 160, 60] : [210, 70, 70];
+
+            doc.setFillColor(18, 44, 68);
+            doc.roundedRect(MARGIN, y, CW, 8, 2, 2, "F");
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(9.5);
+            doc.setTextColor(...sc);
+            doc.text(`${sec.score} / ${sec.max}`, W - MARGIN - 4, y + 5.5, { align: "right" });
+            doc.setTextColor(210, 235, 255);
+            doc.text(sec.label, MARGIN + 4, y + 5.5);
+            y += 11;
+
+            for (const c of sec.criteria) {
+                y = checkPage(doc, y, 7);
+                const dotRgb = c.status === "pass"    ? [74, 200, 100]
+                             : c.status === "partial" ? [200, 180, 60]
+                             : c.status === "warn"    ? [200, 140, 40]
+                             : [200, 75, 75];
+                doc.setFillColor(...dotRgb);
+                doc.circle(MARGIN + 3, y + 1.8, 1.3, "F");
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(8.5);
+                doc.setTextColor(175, 210, 235);
+                const lines = doc.splitTextToSize(c.text, CW - 22);
+                doc.text(lines, MARGIN + 7, y + 2.5);
+                doc.setFont("helvetica", "italic");
+                doc.setTextColor(120, 150, 175);
+                doc.text(`+${c.marks} mk`, W - MARGIN - 3, y + 2.5, { align: "right" });
+                y += lines.length * 4.8 + 1.5;
+            }
+            y += 3;
+        }
+    }
+
+    // ── Student notes ─────────────────────────────────────────────────────────
+    if (studentNotes?.trim()) {
+        y = checkPage(doc, y, 20);
+        y = sectionHeader(doc, "Student Written Answers", y);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(9);
+        doc.setTextColor(168, 200, 224);
+        const lines = doc.splitTextToSize(studentNotes, CW);
+        for (const line of lines) {
+            y = checkPage(doc, y, 5);
+            doc.text(line, MARGIN, y);
+            y += 4.8;
+        }
+        y += 4;
+    }
+
+    // ── Action log ────────────────────────────────────────────────────────────
+    if (actionLog.length > 0) {
+        y = checkPage(doc, y, 20);
+        y = sectionHeader(doc, `Action Log  (${actionLog.length} entries)`, y);
+
+        // Column positions
+        const cols = [MARGIN + 1, MARGIN + 26, MARGIN + 62, MARGIN + 96];
+
+        doc.setFillColor(22, 58, 100);
+        doc.rect(MARGIN, y, CW, 6.5, "F");
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(7.5);
+        doc.setTextColor(200, 230, 255);
+        ["Time", "Action", "Vessel", "Details"].forEach((h, i) => doc.text(h, cols[i], y + 4.3));
+        y += 6.5;
+
+        doc.setFont("helvetica", "normal");
+        for (let i = 0; i < actionLog.length; i++) {
+            y = checkPage(doc, y, 6.5);
+            const e = actionLog[i];
+            doc.setFillColor(i % 2 === 0 ? 18 : 14, i % 2 === 0 ? 38 : 30, i % 2 === 0 ? 58 : 46);
+            doc.rect(MARGIN, y, CW, 6, "F");
+            doc.setFontSize(7.5);
+            doc.setTextColor(110, 160, 200);
+            doc.text(String(e.timestamp ?? "").slice(0, 14), cols[0], y + 4);
+            doc.setTextColor(80, 150, 220);
+            doc.text(String(e.action ?? "").slice(0, 20), cols[1], y + 4);
+            doc.setTextColor(140, 180, 210);
+            doc.text(String(e.vessel ?? "").slice(0, 18), cols[2], y + 4);
+            doc.setTextColor(160, 200, 160);
+            doc.text(String(e.details ?? "").slice(0, 55), cols[3], y + 4);
+            y += 6;
+        }
+    }
+
+    // ── Page footers ──────────────────────────────────────────────────────────
+    const total = doc.internal.getNumberOfPages();
+    for (let p = 1; p <= total; p++) {
+        doc.setPage(p);
+        doc.setDrawColor(30, 60, 90);
+        doc.line(MARGIN, H - 12, W - MARGIN, H - 12);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(7.5);
+        doc.setTextColor(80, 115, 150);
+        doc.text("Cambridge Chemistry Lab Simulator", MARGIN, H - 7);
+        doc.text(`Page ${p} of ${total}`, W - MARGIN, H - 7, { align: "right" });
+    }
+
+    doc.save(`chemlab-report-${datestamp()}.pdf`);
 }

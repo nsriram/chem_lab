@@ -1,4 +1,4 @@
-import { exportSessionJSON, exportActionLogCSV, exportNotesTxt, printReport } from "../utils/export";
+import { exportReportPDF } from "../utils/export";
 
 export default function EvaluateTab({ evaluation, actionLog, studentNotes, paper, tables, graphs, runEvaluation, onBack, onStartFresh }) {
     return (
@@ -131,28 +131,11 @@ export default function EvaluateTab({ evaluation, actionLog, studentNotes, paper
                     )}
 
                     <div style={{ marginTop: 20, padding: "16px 20px", background: "rgba(0,0,0,0.2)", borderRadius: 10, border: "1px solid #2a4a6a" }}>
-                        <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 14, color: "#8ab4d4", marginBottom: 12 }}>
-                            💾 Export / Print
-                        </div>
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
-                            <button className="action-btn" style={{ fontSize: 12 }}
-                                onClick={() => printReport({ paper, actionLog, studentNotes, evaluation })}>
-                                🖨️ Print Report
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                            <button className="action-btn success" style={{ fontSize: 13 }}
+                                onClick={() => exportReportPDF({ paper, actionLog, studentNotes, evaluation })}>
+                                📥 Download Report (PDF)
                             </button>
-                            <button className="action-btn" style={{ fontSize: 12 }}
-                                onClick={() => exportSessionJSON({ paper, actionLog, studentNotes, evaluation, tables: tables ?? [], graphs: graphs ?? [] })}>
-                                📦 Export Session (JSON)
-                            </button>
-                            <button className="action-btn" style={{ fontSize: 12 }}
-                                onClick={() => exportActionLogCSV(actionLog)}>
-                                📊 Export Log (CSV)
-                            </button>
-                            <button className="action-btn" style={{ fontSize: 12 }}
-                                onClick={() => exportNotesTxt(studentNotes, paper?.title)}>
-                                📄 Export Notes (.txt)
-                            </button>
-                        </div>
-                        <div style={{ display: "flex", gap: 8 }}>
                             <button className="action-btn" onClick={onBack}>← Back to Question Paper</button>
                             <button className="action-btn" onClick={onStartFresh}>🔄 Start Fresh</button>
                         </div>
