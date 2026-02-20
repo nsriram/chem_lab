@@ -1,4 +1,100 @@
+import { useRef } from "react";
 import GraphPlot from "./GraphPlot";
+
+function autoHeight(el) {
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = el.scrollHeight + "px";
+}
+
+function ResizableTable({ tbl, ti, setTables }) {
+    const dragRef = useRef(null);
+
+    function startResize(e, colIndex) {
+        e.preventDefault();
+        const startWidth = (tbl.colWidths ?? tbl.headers.map(() => 150))[colIndex];
+        dragRef.current = { colIndex, startX: e.clientX, startWidth };
+
+        function onMove(ev) {
+            if (!dragRef.current) return;
+            const newWidth = Math.max(60, dragRef.current.startWidth + ev.clientX - dragRef.current.startX);
+            setTables(ts => ts.map((t, i) => {
+                if (i !== ti) return t;
+                const base = t.colWidths ?? t.headers.map(() => 150);
+                return { ...t, colWidths: base.map((w, j) => j === colIndex ? newWidth : w) };
+            }));
+        }
+
+        function onUp() {
+            dragRef.current = null;
+            document.removeEventListener("mousemove", onMove);
+            document.removeEventListener("mouseup", onUp);
+        }
+
+        document.addEventListener("mousemove", onMove);
+        document.addEventListener("mouseup", onUp);
+    }
+
+    const colWidths = tbl.colWidths ?? tbl.headers.map(() => 150);
+
+    return (
+        <table style={{ borderCollapse: "collapse", tableLayout: "fixed", width: "100%", fontFamily: "'JetBrains Mono', monospace", fontSize: 12 }}>
+            <colgroup>
+                {colWidths.map((w, i) => <col key={i} style={{ width: w }} />)}
+                <col style={{ width: 30 }} />
+            </colgroup>
+            <thead>
+                <tr>
+                    {tbl.headers.map((h, hi) => (
+                        <th key={hi} style={{ border: "1px solid #2a5a8a", padding: 0, position: "relative", overflow: "hidden" }}>
+                            <input
+                                value={h}
+                                onChange={e => setTables(ts => ts.map((t, i) => i === ti
+                                    ? { ...t, headers: t.headers.map((hh, j) => j === hi ? e.target.value : hh) }
+                                    : t))}
+                                style={{ width: "100%", background: "rgba(26,74,122,0.4)", color: "#c8e8ff", border: "none", padding: "6px 18px 6px 8px", fontWeight: "bold", fontFamily: "'JetBrains Mono', monospace", fontSize: 12, boxSizing: "border-box" }}
+                            />
+                            {/* Resize handle */}
+                            <div
+                                onMouseDown={e => startResize(e, hi)}
+                                title="Drag to resize column"
+                                style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 6, cursor: "col-resize", background: "linear-gradient(to right, transparent, rgba(100,160,220,0.25))" }}
+                            />
+                        </th>
+                    ))}
+                    <th style={{ border: "1px solid #2a5a8a", background: "rgba(0,0,0,0.2)" }} />
+                </tr>
+            </thead>
+            <tbody>
+                {tbl.rows.map((row, ri) => (
+                    <tr key={ri}>
+                        {row.map((cell, ci) => (
+                            <td key={ci} style={{ border: "1px solid #1a3a5a", padding: 0, verticalAlign: "top" }}>
+                                <textarea
+                                    value={cell}
+                                    rows={1}
+                                    ref={autoHeight}
+                                    onChange={e => {
+                                        autoHeight(e.target);
+                                        setTables(ts => ts.map((t, i) => i === ti
+                                            ? { ...t, rows: t.rows.map((r, rj) => rj === ri ? r.map((c, cj) => cj === ci ? e.target.value : c) : r) }
+                                            : t));
+                                    }}
+                                    style={{ display: "block", width: "100%", background: "transparent", color: "#a8c8e0", border: "none", padding: "5px 8px", fontFamily: "'JetBrains Mono', monospace", fontSize: 12, boxSizing: "border-box", resize: "none", overflow: "hidden", lineHeight: 1.5, minHeight: 28 }}
+                                />
+                            </td>
+                        ))}
+                        <td style={{ border: "1px solid #1a3a5a", textAlign: "center", verticalAlign: "middle" }}>
+                            <button
+                                onClick={() => setTables(ts => ts.map((t, i) => i === ti ? { ...t, rows: t.rows.filter((_, rj) => rj !== ri) } : t))}
+                                style={{ background: "none", border: "none", color: "#df6060", cursor: "pointer", fontSize: 13 }}>×</button>
+                        </td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    );
+}
 
 export default function DataTab({ tables, setTables, graphs, setGraphs, activeDataTab, setActiveDataTab }) {
     return (
@@ -22,6 +118,7 @@ export default function DataTab({ tables, setTables, graphs, setGraphs, activeDa
                                 title: `Table ${ts.length + 1}`,
                                 headers: ["Variable 1", "Variable 2", "Variable 3"],
                                 rows: [["", "", ""], ["", "", ""]],
+                                colWidths: [160, 160, 160],
                             }])
                         }>+ New Table</button>
                     </div>
@@ -44,7 +141,12 @@ export default function DataTab({ tables, setTables, graphs, setGraphs, activeDa
                                 <div style={{ display: "flex", gap: 8 }}>
                                     <button className="action-btn" style={{ fontSize: 11 }} onClick={() =>
                                         setTables(ts => ts.map((t, i) => i === ti
-                                            ? { ...t, headers: [...t.headers, `Col ${t.headers.length + 1}`], rows: t.rows.map(r => [...r, ""]) }
+                                            ? {
+                                                ...t,
+                                                headers: [...t.headers, `Col ${t.headers.length + 1}`],
+                                                rows: t.rows.map(r => [...r, ""]),
+                                                colWidths: [...(t.colWidths ?? t.headers.map(() => 150)), 150],
+                                              }
                                             : t))
                                     }>+ Column</button>
                                     <button className="action-btn" style={{ fontSize: 11 }} onClick={() =>
@@ -59,45 +161,7 @@ export default function DataTab({ tables, setTables, graphs, setGraphs, activeDa
                             </div>
 
                             <div style={{ overflowX: "auto" }}>
-                                <table style={{ borderCollapse: "collapse", width: "100%", fontFamily: "'JetBrains Mono', monospace", fontSize: 12 }}>
-                                    <thead>
-                                        <tr>
-                                            {tbl.headers.map((h, hi) => (
-                                                <th key={hi} style={{ border: "1px solid #2a5a8a", padding: 0 }}>
-                                                    <input
-                                                        value={h}
-                                                        onChange={e => setTables(ts => ts.map((t, i) => i === ti
-                                                            ? { ...t, headers: t.headers.map((hh, j) => j === hi ? e.target.value : hh) }
-                                                            : t))}
-                                                        style={{ width: "100%", background: "rgba(26,74,122,0.4)", color: "#c8e8ff", border: "none", padding: "6px 8px", fontWeight: "bold", fontFamily: "'JetBrains Mono', monospace", fontSize: 12, boxSizing: "border-box" }}
-                                                    />
-                                                </th>
-                                            ))}
-                                            <th style={{ border: "1px solid #2a5a8a", width: 28, background: "rgba(0,0,0,0.2)" }} />
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {tbl.rows.map((row, ri) => (
-                                            <tr key={ri}>
-                                                {row.map((cell, ci) => (
-                                                    <td key={ci} style={{ border: "1px solid #1a3a5a", padding: 0 }}>
-                                                        <input
-                                                            value={cell}
-                                                            onChange={e => setTables(ts => ts.map((t, i) => i === ti
-                                                                ? { ...t, rows: t.rows.map((r, rj) => rj === ri ? r.map((c, cj) => cj === ci ? e.target.value : c) : r) }
-                                                                : t))}
-                                                            style={{ width: "100%", background: "transparent", color: "#a8c8e0", border: "none", padding: "5px 8px", fontFamily: "'JetBrains Mono', monospace", fontSize: 12, boxSizing: "border-box" }}
-                                                        />
-                                                    </td>
-                                                ))}
-                                                <td style={{ border: "1px solid #1a3a5a", textAlign: "center" }}>
-                                                    <button onClick={() => setTables(ts => ts.map((t, i) => i === ti ? { ...t, rows: t.rows.filter((_, rj) => rj !== ri) } : t))}
-                                                        style={{ background: "none", border: "none", color: "#df6060", cursor: "pointer", fontSize: 13 }}>×</button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                                <ResizableTable tbl={tbl} ti={ti} setTables={setTables} />
                             </div>
                         </div>
                     ))}
