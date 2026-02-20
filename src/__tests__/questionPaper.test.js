@@ -84,6 +84,29 @@ describe("faMap on every paper", () => {
         }
     });
 
+    it("every paper exposes a non-empty unknownFAs array", () => {
+        for (const paper of QUESTION_PAPERS) {
+            expect(Array.isArray(paper.unknownFAs)).toBe(true);
+            expect(paper.unknownFAs.length).toBeGreaterThan(0);
+        }
+    });
+
+    it("every unknownFAs entry is also a key in faMap", () => {
+        for (const paper of QUESTION_PAPERS) {
+            for (const fa of paper.unknownFAs) {
+                expect(paper.faMap[fa]).toBeDefined();
+            }
+        }
+    });
+
+    it("unknownFAs labels match FA N format", () => {
+        for (const paper of QUESTION_PAPERS) {
+            for (const fa of paper.unknownFAs) {
+                expect(fa).toMatch(/^FA \d+$/);
+            }
+        }
+    });
+
     it("every faMap key starts with 'FA '", () => {
         for (const paper of QUESTION_PAPERS) {
             for (const key of Object.keys(paper.faMap)) {

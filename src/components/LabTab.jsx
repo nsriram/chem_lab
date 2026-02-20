@@ -209,7 +209,10 @@ export default function LabTab({
 
                 {/* ── Exam Materials (FA-labelled bottles) ── */}
                 {activePaper?.faMap && (() => {
+                    const unknownSet = new Set(activePaper.unknownFAs ?? []);
                     const faEntries = Object.entries(activePaper.faMap);
+                    const unknowns = faEntries.filter(([lbl]) => unknownSet.has(lbl));
+                    const knowns   = faEntries.filter(([lbl]) => !unknownSet.has(lbl));
                     return (
                         <>
                             <div style={{ borderTop: "1px solid #1a3a5a", margin: "10px 0 6px" }} />
@@ -219,41 +222,86 @@ export default function LabTab({
                             <div style={{ fontSize: 10, color: "#8a7040", padding: "0 8px 6px", fontStyle: "italic" }}>
                                 {activePaper.title}
                             </div>
-                            <button
-                                className="palette-group-hdr"
-                                onClick={() => toggleSection("exam_fa")}
-                                style={{ "--grp-color": "#f9a825" }}
-                            >
-                                <span className="palette-chevron">
-                                    {openSections.has("exam_fa") ? "▾" : "▸"}
-                                </span>
-                                <span className="palette-group-label" style={{ color: "#f9a825" }}>
-                                    Labelled Bottles
-                                </span>
-                                <span className="palette-count">{faEntries.length}</span>
-                            </button>
-                            {openSections.has("exam_fa") && (
-                                <div className="palette-items">
-                                    {faEntries.map(([faLabel]) => {
-                                        const isSel = selectedChemical === faLabel;
-                                        return (
-                                            <button
-                                                key={faLabel}
-                                                className={`chem-card fa-card${isSel ? " selected" : ""}`}
-                                                onClick={() => setSelectedChemical(isSel ? "" : faLabel)}
-                                                title={faLabel}
-                                            >
-                                                <span className="chem-swatch fa-swatch" />
-                                                <span className="chem-body">
-                                                    <span className="chem-name fa-label">{faLabel}</span>
-                                                    <span className="chem-detail">Unknown — identify by testing</span>
-                                                </span>
-                                                {isSel && <span className="chem-check">✓</span>}
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                            )}
+
+                            {/* Unknowns group */}
+                            {unknowns.length > 0 && (<>
+                                <button
+                                    className="palette-group-hdr"
+                                    onClick={() => toggleSection("exam_unknown")}
+                                    style={{ "--grp-color": "#f9a825" }}
+                                >
+                                    <span className="palette-chevron">
+                                        {openSections.has("exam_unknown") ? "▾" : "▸"}
+                                    </span>
+                                    <span className="palette-group-label" style={{ color: "#f9a825" }}>
+                                        Unknowns to Identify
+                                    </span>
+                                    <span className="palette-count">{unknowns.length}</span>
+                                </button>
+                                {openSections.has("exam_unknown") && (
+                                    <div className="palette-items">
+                                        {unknowns.map(([faLabel]) => {
+                                            const isSel = selectedChemical === faLabel;
+                                            return (
+                                                <button
+                                                    key={faLabel}
+                                                    className={`chem-card fa-card${isSel ? " selected" : ""}`}
+                                                    onClick={() => setSelectedChemical(isSel ? "" : faLabel)}
+                                                    title={`${faLabel} — identity unknown`}
+                                                >
+                                                    <span className="chem-swatch fa-swatch" />
+                                                    <span className="chem-body">
+                                                        <span className="chem-name fa-label">{faLabel}</span>
+                                                        <span className="chem-detail" style={{ fontStyle: "italic" }}>Unknown — identify by testing</span>
+                                                    </span>
+                                                    {isSel && <span className="chem-check">✓</span>}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+                            </>)}
+
+                            {/* Known reagents group */}
+                            {knowns.length > 0 && (<>
+                                <button
+                                    className="palette-group-hdr"
+                                    onClick={() => toggleSection("exam_known")}
+                                    style={{ "--grp-color": "#c8820a" }}
+                                >
+                                    <span className="palette-chevron">
+                                        {openSections.has("exam_known") ? "▾" : "▸"}
+                                    </span>
+                                    <span className="palette-group-label" style={{ color: "#c8820a" }}>
+                                        Labelled Reagents
+                                    </span>
+                                    <span className="palette-count">{knowns.length}</span>
+                                </button>
+                                {openSections.has("exam_known") && (
+                                    <div className="palette-items">
+                                        {knowns.map(([faLabel, chemId]) => {
+                                            const isSel = selectedChemical === faLabel;
+                                            const chem = CHEMICALS[chemId];
+                                            const { name, detail } = splitLabel(chem?.label ?? chemId);
+                                            return (
+                                                <button
+                                                    key={faLabel}
+                                                    className={`chem-card fa-card fa-card-known${isSel ? " selected" : ""}`}
+                                                    onClick={() => setSelectedChemical(isSel ? "" : faLabel)}
+                                                    title={`${faLabel} = ${chem?.label ?? chemId}`}
+                                                >
+                                                    <span className="chem-swatch fa-swatch fa-swatch-known" />
+                                                    <span className="chem-body">
+                                                        <span className="chem-name fa-label">{faLabel}</span>
+                                                        <span className="chem-detail">{name}{detail ? ` ${detail}` : ""}</span>
+                                                    </span>
+                                                    {isSel && <span className="chem-check">✓</span>}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+                            </>)}
                         </>
                     );
                 })()}

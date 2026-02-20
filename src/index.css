@@ -424,6 +424,25 @@ option { background: #0a1628; }
 }
 .fa-card.selected .fa-label { color: #ffcc44 !important; }
 
+/* Known-reagent FA variant — slightly muted amber to distinguish from unknowns */
+.fa-card-known {
+  background: linear-gradient(90deg, #1e1a0e, #181508) !important;
+  border-color: #4a380a !important;
+  opacity: 0.85;
+}
+.fa-card-known:hover { border-color: #a06810 !important; opacity: 1; }
+.fa-card-known.selected { border-color: #c8820a !important; opacity: 1; }
+.fa-card-known .fa-label { color: #c8820a !important; }
+.fa-card-known.selected .fa-label { color: #e8a830 !important; }
+.fa-swatch-known {
+  background: repeating-linear-gradient(
+    135deg,
+    #a06810 0px, #a06810 3px,
+    #1e1a0e 3px, #1e1a0e 6px
+  ) !important;
+  opacity: 0.7;
+}
+
 .chem-check {
   width: 20px;
   flex-shrink: 0;
