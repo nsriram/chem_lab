@@ -257,6 +257,26 @@ export const REACTION_RULES = [
         },
     },
 
+    // ── Fe³⁺ oxidises I⁻ (FeCl3 + KI) ───────────────────────────────────────
+    // MUST precede fecl3-naoh so the I⁻ test fires before a plain NaOH test.
+    {
+        id: "redox/fecl3-ki",
+        requires: ["FeCl3", "KI"],
+        produce() {
+            return {
+                observation: "Fe³⁺ oxidises I⁻ to I₂. Solution turns deep yellow-brown (I₂ formed). Fe³⁺ reduced to Fe²⁺ (pale green). Add starch → blue-black confirms I₂. Key test: Fe³⁺ oxidises I⁻ but Fe²⁺ does NOT — use to distinguish FeSO₄ from FeCl₃.",
+                newColor: "#8a6010",
+                colorChange: "orange-brown → deep yellow-brown (I₂ liberated; Fe³⁺ → Fe²⁺)",
+            };
+        },
+        blind() {
+            return {
+                observation: "Solution turns deep yellow-brown. Add starch → blue-black colour confirms presence of an oxidising species in the unknown. Fading of original colour.",
+                colorChange: "coloured solution → deep yellow-brown; starch → blue-black",
+            };
+        },
+    },
+
     // ── Fe³⁺ cation tests (FeCl3) ─────────────────────────────────────────────
     // Must precede naoh-cuso4 and nh3-cuso4 rules.
     {
@@ -404,6 +424,23 @@ export const REACTION_RULES = [
     },
 
     // ── NO₂⁻ redox ────────────────────────────────────────────────────────────
+    {
+        id: "redox/kmno4-kbr",
+        requires: ["KMnO4_acid", "KBr"],
+        produce() {
+            return {
+                observation: "Purple KMnO₄ slowly decolourises. Br⁻ oxidised to Br₂. Solution turns orange-brown (Br₂). Less rapid than with I⁻ — reducing power: I⁻ > Br⁻ > Cl⁻. Add organic solvent (e.g. cyclohexane) → orange-brown organic layer confirms Br₂. Confirms Br⁻.",
+                newColor: "#c87820",
+                colorChange: "purple → orange-brown (Br₂ liberated; Br⁻ confirmed)",
+            };
+        },
+        blind() {
+            return {
+                observation: "Purple solution slowly decolourises. Solution turns orange-brown. If organic solvent added → orange-brown organic layer forms.",
+                colorChange: "purple → orange-brown",
+            };
+        },
+    },
     {
         id: "redox/kmno4-nano2",
         requires: ["KMnO4_acid", "NaNO2"],
@@ -599,6 +636,54 @@ export const REACTION_RULES = [
             return {
                 observation: "Pale brown precipitate forms with small amount of reagent, then dissolves in excess giving a colourless solution. No persistent precipitate in excess.",
                 colorChange: "colourless → pale brown → colourless in excess",
+            };
+        },
+    },
+
+    // ── Na2CO3 + FeCl3 (hydrolysis — ppt + CO2) ──────────────────────────────
+    // Carbonate does NOT precipitate iron carbonate: Fe³⁺ hydrolyses preferentially.
+    // MUST be placed before acid-carbonate and bacl2-carbonate rules.
+    {
+        id: "qualitative/na2co3-fecl3",
+        requires: ["Na2CO3", "FeCl3"],
+        produce() {
+            return {
+                observation: "Rust-brown/red-brown precipitate forms immediately. CO₂ effervescence. Fe³⁺ is hydrolysed by CO₃²⁻ to give Fe(OH)₃(s) — not FeCO₃. 2FeCl₃ + 3Na₂CO₃ + 3H₂O → 2Fe(OH)₃↓ + 3CO₂↑ + 6NaCl. The brown ppt distinguishes Fe³⁺ from Ca²⁺ (white ppt) and Cu²⁺ (blue-green ppt).",
+                newColor: "#b05a10",
+                precipitate: "Fe(OH)₃(s) – rust-brown ppt (hydrolysis, not FeCO₃)",
+                hasPrecipitate: true,
+                gas: "CO₂ (effervescence)",
+                colorChange: "orange-brown → rust-brown precipitate + effervescence",
+            };
+        },
+        blind() {
+            return {
+                observation: "Rust-brown precipitate forms immediately with effervescence. CO₂ gas evolved.",
+                precipitate: "Rust-brown precipitate",
+                gas: "Effervescence (CO₂)",
+                colorChange: "coloured solution → rust-brown precipitate + effervescence",
+            };
+        },
+    },
+
+    // ── NaNO2 + acid → brown fumes ────────────────────────────────────────────
+    {
+        id: "qualitative/nano2-acid",
+        matches: (chemicals) =>
+            chemicals.includes("NaNO2") &&
+            (chemicals.includes("HCl") || chemicals.includes("H2SO4")),
+        produce() {
+            return {
+                observation: "Brown/reddish-brown fumes of NO₂ evolved. Pale blue/colourless NO also formed. Solution turns pale blue then colourless. 3HNO₂ → HNO₃ + 2NO↑ + H₂O (disproportionation). Acidified solution is unstable. Dangerous — fumes are toxic (hood required).",
+                gas: "NO₂ (brown fumes) + NO (colourless); toxic",
+                colorChange: "colourless → pale blue → colourless (with brown fumes above solution)",
+            };
+        },
+        blind() {
+            return {
+                observation: "Brown fumes evolved on adding acid. Solution becomes unstable and colourless. Fumes are toxic.",
+                gas: "Brown fumes; toxic",
+                colorChange: "colourless (brown fumes above solution)",
             };
         },
     },
@@ -812,6 +897,76 @@ export const REACTION_RULES = [
         },
     },
 
+    // ── Aluminium + alkali (amphoteric — MUST precede mg-acid / zn-acid) ────────
+    {
+        id: "qualitative/al-naoh",
+        matches: (chemicals) =>
+            chemicals.includes("Al_foil") && chemicals.includes("NaOH"),
+        produce() {
+            return {
+                observation: "Al dissolves vigorously in NaOH(aq). Steady then vigorous effervescence. H₂ gas evolved — pops with lighted splint. Solution warms. Tetrahydroxoaluminate [Al(OH)₄]⁻ (aluminate) formed in solution. DISTINCTIVE: very few metals dissolve in alkali (Al is amphoteric).",
+                gas: "H₂ – pops with lighted splint",
+                colorChange: "colourless solution (Al dissolves vigorously in NaOH)",
+                tempChange: 8,
+            };
+        },
+        blind() {
+            return {
+                observation: "Metal dissolves vigorously in NaOH(aq). Steady effervescence. Colourless gas evolved — pops with lighted splint. Solution warms. Unusual behaviour: dissolves in alkali.",
+                gas: "Colourless gas; pops with lighted splint",
+                colorChange: "colourless solution (metal dissolves in NaOH)",
+            };
+        },
+    },
+
+    // ── Aluminium + acid ──────────────────────────────────────────────────────
+    {
+        id: "qualitative/al-acid",
+        matches: (chemicals) =>
+            chemicals.includes("Al_foil") &&
+            (chemicals.includes("HCl") || chemicals.includes("H2SO4")),
+        produce() {
+            return {
+                observation: "Aluminium foil dissolves in acid with steady effervescence. H₂ gas evolved — pops with lighted splint. Solution warms. Colourless Al³⁺ solution (AlCl₃ or Al₂(SO₄)₃) forms. Foil gradually disappears.",
+                gas: "H₂ – pops with lighted splint",
+                colorChange: "colourless (effervescence; Al dissolving)",
+                tempChange: 10,
+            };
+        },
+        blind() {
+            return {
+                observation: "Metal dissolves in acid with steady effervescence. Colourless gas evolved — pops with lighted splint. Solution warms. Metal gradually disappears.",
+                gas: "Colourless gas; pops with lighted splint",
+                colorChange: "colourless (effervescence; metal dissolving)",
+            };
+        },
+    },
+
+    // ── Aluminium + CuSO4 (displacement) ─────────────────────────────────────
+    {
+        id: "energetics/al-cuso4",
+        matches: (chemicals) =>
+            chemicals.includes("Al_foil") && chemicals.includes("CuSO4"),
+        produce() {
+            const deltaT = 12;
+            return {
+                observation: `Blue CuSO₄ solution slowly decolourises. Red/brown copper metal deposits on aluminium foil surface. Al displaces Cu (Al higher in reactivity series). Temperature rises ~${deltaT}°C. Reaction eventually slows as Cu coating inhibits further contact.`,
+                newColor: "#d4b896",
+                precipitate: "Cu(s) – red/brown metallic coating on Al",
+                hasPrecipitate: true,
+                tempChange: deltaT,
+                colorChange: "blue → colourless + red-brown Cu deposits on Al",
+            };
+        },
+        blind() {
+            return {
+                observation: "Blue solution slowly fades. Red/brown solid deposits on the metal surface. Temperature rises. Reaction slows as solid coating forms on the metal.",
+                precipitate: "Red/brown metallic solid on surface",
+                colorChange: "blue → colourless + red-brown deposits on metal",
+            };
+        },
+    },
+
     // ── Mg + acid (OR-logic on both sides) ────────────────────────────────────
     {
         id: "qualitative/mg-acid",
@@ -830,6 +985,29 @@ export const REACTION_RULES = [
                 observation: "Vigorous effervescence. Solid dissolves rapidly. Colourless gas evolved — pops with lighted splint. Solution warms noticeably.",
                 gas: "Colourless gas; pops with lighted splint",
                 colorChange: "colourless (vigorous effervescence)",
+            };
+        },
+    },
+
+    // ── Zn + NaOH (amphoteric — MUST precede zn-acid) ────────────────────────
+    {
+        id: "qualitative/zn-naoh",
+        matches: (chemicals) =>
+            (chemicals.includes("Zn") || chemicals.includes("Zn_powder")) &&
+            chemicals.includes("NaOH"),
+        produce() {
+            return {
+                observation: "Zinc dissolves in NaOH(aq) — amphoteric behaviour. Effervescence; H₂ gas evolved (pops with lighted splint). Colourless tetrahydroxozincate [Zn(OH)₄]²⁻ (zincate) forms. Reaction is less vigorous than Al + NaOH. Zn_powder reacts faster (larger surface area). DISTINCTIVE: Zn and Al both dissolve in NaOH; Mg does not.",
+                gas: "H₂ – pops with lighted splint",
+                colorChange: "colourless (Zn dissolves; effervescence)",
+                tempChange: 5,
+            };
+        },
+        blind() {
+            return {
+                observation: "Metal dissolves in NaOH(aq). Effervescence; colourless gas evolved (pops with lighted splint). Reaction occurs slowly; powder form reacts faster. Amphoteric behaviour.",
+                gas: "Colourless gas; pops with lighted splint",
+                colorChange: "colourless (metal dissolves in NaOH; effervescence)",
             };
         },
     },
@@ -921,18 +1099,30 @@ export const REACTION_RULES = [
     // ── Iodine / titration ────────────────────────────────────────────────────
     {
         id: "titration/starch-iodine",
-        requires: ["starch", "FA3_oxidiser"],
+        // Fires whenever starch is present AND I₂ has been (or can be) generated:
+        // – FA3_oxidiser (iodate/IO₃⁻ source)
+        // – KI + any oxidant that liberates I₂: KMnO4_acid, H2O2, CuSO4, FeCl3
+        matches: (chemicals) =>
+            chemicals.includes("starch") && (
+                chemicals.includes("FA3_oxidiser") ||
+                (chemicals.includes("KI") && (
+                    chemicals.includes("KMnO4_acid") ||
+                    chemicals.includes("H2O2") ||
+                    chemicals.includes("CuSO4") ||
+                    chemicals.includes("FeCl3")
+                ))
+            ),
         produce() {
             return {
-                observation: "Dark blue-black colour appears — starch-iodine complex formed. Indicates iodine present.",
+                observation: "Dark blue-black colour appears — starch-iodine complex formed. Confirms I₂ present in solution.",
                 newColor: "#1a1a4a",
-                colorChange: "colourless → blue-black (starch-iodine complex)",
+                colorChange: "colourless/yellow-brown → deep blue-black (starch-iodine complex)",
             };
         },
         blind() {
             return {
-                observation: "Dark blue-black colour appears.",
-                colorChange: "colourless → blue-black",
+                observation: "Dark blue-black colour appears on adding starch.",
+                colorChange: "colourless/yellow-brown → deep blue-black",
             };
         },
     },
@@ -959,6 +1149,27 @@ export const REACTION_RULES = [
             return {
                 observation: "Effervescence. Gas relights glowing splint (O₂). FA3 oxidises H₂O₂, or H₂O₂ reduces FA3 depending on concentrations.",
                 gas: "O₂ – relights glowing splint",
+            };
+        },
+    },
+
+    // ── KNO3 thermal decomposition ────────────────────────────────────────────
+    {
+        id: "thermal/kno3-heat",
+        requires: ["KNO3"],
+        actionFilter: "heat",
+        produce() {
+            return {
+                observation: "KNO₃ melts to a colourless liquid on heating (~334°C). On strong heating: decomposes to potassium nitrite (KNO₂) and oxygen (O₂). 2KNO₃ → 2KNO₂ + O₂. Glowing splint relit by evolved O₂. Molten KNO₃ is a powerful oxidiser. Group 1 nitrates decompose to nitrite + O₂ (unlike Group 2 nitrates which go to oxide + NO₂ + O₂).",
+                gas: "O₂ – relights glowing splint",
+                colorChange: "white crystalline solid → colourless melt → white KNO₂ residue",
+            };
+        },
+        blind() {
+            return {
+                observation: "Solid melts to colourless liquid on heating. On stronger heating: colourless gas evolved that relights glowing splint.",
+                gas: "Colourless gas; relights glowing splint",
+                colorChange: "white solid → colourless melt",
             };
         },
     },
