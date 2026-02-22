@@ -477,28 +477,43 @@ export default function LabTab({
                     </div>
                 </div>
 
-                {selectedChemical && CHEMICALS[selectedChemical]?.type === "solution" && (
-                    <div style={{ marginBottom: 8 }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 4 }}>
-                            <span style={{ fontSize: 11, color: "#6a9abf" }}>Volume (cm³):</span>
-                            <span style={{ fontSize: 10, color: "#5a7a9a", fontFamily: "'JetBrains Mono', monospace" }}>±0.025 cm³</span>
-                        </div>
-                        <input type="number" value={addVolume} onChange={e => setAddVolume(parseFloat(e.target.value))}
-                               min={0.1} max={100} step={0.05} style={{ width: "100%", boxSizing: "border-box" }} />
-                        <div style={{ fontSize: 10, color: "#4a7a6a", marginTop: 2 }}>Record to 0.05 cm³ (e.g. 25.00)</div>
-                    </div>
-                )}
-                {selectedChemical && CHEMICALS[selectedChemical]?.type === "solid" && (
-                    <div style={{ marginBottom: 8 }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 4 }}>
-                            <span style={{ fontSize: 11, color: "#6a9abf" }}>Mass (g):</span>
-                            <span style={{ fontSize: 10, color: "#5a7a9a", fontFamily: "'JetBrains Mono', monospace" }}>±0.005 g</span>
-                        </div>
-                        <input type="number" value={addMass} onChange={e => setAddMass(parseFloat(e.target.value))}
-                               min={0.01} max={50} step={0.01} style={{ width: "100%", boxSizing: "border-box" }} />
-                        <div style={{ fontSize: 10, color: "#4a7a6a", marginTop: 2 }}>Record to 0.01 g (e.g. 1.23 g)</div>
-                    </div>
-                )}
+                {(() => {
+                    // Resolve FA label → actual chemical so type-based inputs work for FAs too
+                    const isFa = String(selectedChemical).startsWith("FA ");
+                    const resolvedId = isFa
+                        ? (activePaper?.faMap?.[selectedChemical] ?? selectedChemical)
+                        : selectedChemical;
+                    const resolvedType = CHEMICALS[resolvedId]?.type;
+
+                    if (!selectedChemical) return null;
+                    if (resolvedType === "solution" || (isFa && resolvedType !== "solid")) {
+                        return (
+                            <div style={{ marginBottom: 8 }}>
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 4 }}>
+                                    <span style={{ fontSize: 11, color: "#6a9abf" }}>Volume (cm³):</span>
+                                    <span style={{ fontSize: 10, color: "#5a7a9a", fontFamily: "'JetBrains Mono', monospace" }}>±0.025 cm³</span>
+                                </div>
+                                <input type="number" value={addVolume} onChange={e => setAddVolume(parseFloat(e.target.value))}
+                                       min={0.1} max={100} step={0.05} style={{ width: "100%", boxSizing: "border-box" }} />
+                                <div style={{ fontSize: 10, color: "#4a7a6a", marginTop: 2 }}>Record to 0.05 cm³ (e.g. 25.00)</div>
+                            </div>
+                        );
+                    }
+                    if (resolvedType === "solid") {
+                        return (
+                            <div style={{ marginBottom: 8 }}>
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 4 }}>
+                                    <span style={{ fontSize: 11, color: "#6a9abf" }}>Mass (g):</span>
+                                    <span style={{ fontSize: 10, color: "#5a7a9a", fontFamily: "'JetBrains Mono', monospace" }}>±0.005 g</span>
+                                </div>
+                                <input type="number" value={addMass} onChange={e => setAddMass(parseFloat(e.target.value))}
+                                       min={0.01} max={50} step={0.01} style={{ width: "100%", boxSizing: "border-box" }} />
+                                <div style={{ fontSize: 10, color: "#4a7a6a", marginTop: 2 }}>Record to 0.01 g (e.g. 1.23 g)</div>
+                            </div>
+                        );
+                    }
+                    return null;
+                })()}
 
                 <button className="action-btn success" style={{ width: "100%", marginBottom: 16, fontSize: 13 }}
                         onClick={addChemicalToVessel} disabled={!selectedVessel || !selectedChemical}>
