@@ -3,6 +3,7 @@ import PaperTab from "./components/PaperTab";
 import LabTab from "./components/LabTab";
 import DataTab from "./components/DataTab";
 import EvaluateTab from "./components/EvaluateTab";
+import FreeLabTab from "./components/FreeLabTab";
 
 export default function ChemLabApp() {
     const lab = useChemLab();
@@ -59,6 +60,7 @@ export default function ChemLabApp() {
                     ["lab", "🧪 Laboratory"],
                     ["data", "📈 Data & Graphs"],
                     ["evaluate", "📊 Evaluate"],
+                    ["freelab", "🔬 Free Lab"],
                 ].map(([id, label]) => (
                     <button key={id} className={`tab-btn ${lab.activeTab === id ? "active" : ""}`}
                         onClick={() => lab.setActiveTab(id)}>{label}</button>
@@ -134,6 +136,18 @@ export default function ChemLabApp() {
                     runEvaluation={lab.runEvaluation}
                     onBack={() => { lab.setEvaluation(null); lab.setActiveTab("paper"); }}
                     onStartFresh={lab.startFresh}
+                />
+            )}
+
+            {lab.activeTab === "freelab" && (
+                <FreeLabTab
+                    freeExperiment={lab.freeExperiment}
+                    setFreeExperiment={lab.setFreeExperiment}
+                    freeLabReport={lab.freeLabReport}
+                    setFreeLabReport={lab.setFreeLabReport}
+                    actionLog={lab.actionLog}
+                    clearLog={lab.clearLog}
+                    setActiveTab={lab.setActiveTab}
                 />
             )}
         </div>

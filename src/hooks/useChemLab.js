@@ -42,6 +42,8 @@ export function useChemLab() {
     const [tables, setTables] = useState(() => s.tables ?? []);
     const [graphs, setGraphs] = useState(() => s.graphs ?? []);
     const [activeDataTab, setActiveDataTab] = useState(() => s.activeDataTab ?? "tables");
+    const [freeExperiment, setFreeExperiment] = useState(() => s.freeExperiment ?? null);
+    const [freeLabReport, setFreeLabReport] = useState(() => s.freeLabReport ?? null);
     const clockRef = useRef(null);
 
     // Persist state to localStorage whenever it changes
@@ -52,12 +54,14 @@ export function useChemLab() {
                 vessels, actionLog, logHistory, historyIndex,
                 partAnswers, evaluation, clockTime,
                 tables, graphs, activeDataTab,
+                freeExperiment, freeLabReport,
             }));
         } catch {
             // Storage quota exceeded — ignore
         }
     }, [activeTab, activePaperId, expandedQ, vessels, actionLog, logHistory,
-        historyIndex, partAnswers, evaluation, clockTime, tables, graphs, activeDataTab]);
+        historyIndex, partAnswers, evaluation, clockTime, tables, graphs, activeDataTab,
+        freeExperiment, freeLabReport]);
 
     useEffect(() => {
         if (clockRunning) {
@@ -76,6 +80,12 @@ export function useChemLab() {
         setLogHistory(newHistory);
         setHistoryIndex(newHistory.length - 1);
     }, [actionLog, logHistory, historyIndex]);
+
+    const clearLog = useCallback(() => {
+        setActionLog([]);
+        setLogHistory([[]]);
+        setHistoryIndex(0);
+    }, []);
 
     const undo = () => {
         if (historyIndex > 0) {
@@ -423,5 +433,8 @@ export function useChemLab() {
         runEvaluation,
         clearBench,
         startFresh,
+        clearLog,
+        freeExperiment, setFreeExperiment,
+        freeLabReport,  setFreeLabReport,
     };
 }
