@@ -10,6 +10,28 @@
 //   actionFilter string   — optional: rule only fires on this action type
 //   produce      fn       — (vessel, action, params) => partial ReactionResult
 
+// ─── Titration endpoint helper ────────────────────────────────────────────────
+// Calculates acid and base equivalents (in mmol) present in a vessel so that
+// indicator rules can determine the colour at each 1 cm³ addition step.
+// Note: mmol = C(mol/dm³) × V(cm³)  because 1 dm³ = 1000 cm³.
+const _ACID_CONC  = { HCl: 2.00, H2SO4: 1.00, oxalic_acid: 0.05 };
+const _BASE_CONC  = { NaOH: 1.00, Na2CO3: 1.00, NH3_aq: 1.00 };
+const _ACID_EQUIV = { H2SO4: 2 };   // diprotic: 2 H⁺ per molecule
+const _BASE_EQUIV = { Na2CO3: 2 };  // dibasic:  2 OH⁻ equivalents per molecule
+
+function _titrationBalance(vessel) {
+    let acidMmol = 0, baseMmol = 0;
+    for (const c of vessel.contents || []) {
+        const vol = c.volume || 0;
+        if (_ACID_CONC[c.chemical] !== undefined)
+            acidMmol += vol * _ACID_CONC[c.chemical] * (_ACID_EQUIV[c.chemical] || 1);
+        if (_BASE_CONC[c.chemical] !== undefined)
+            baseMmol += vol * _BASE_CONC[c.chemical] * (_BASE_EQUIV[c.chemical] || 1);
+    }
+    // excess > 0 → base in excess; excess < 0 → acid in excess
+    return { acidMmol, baseMmol, excess: baseMmol - acidMmol };
+}
+
 export const REACTION_RULES = [
 
     // ── Kinetics ──────────────────────────────────────────────────────────────
@@ -841,6 +863,153 @@ export const REACTION_RULES = [
             };
         },
     },
+    // ── Acid-base indicator endpoint rules ────────────────────────────────────
+    // MUST precede naoh-neutralise (first match wins).
+    // Fire whenever the indicator is in the vessel alongside any acid or base.
+    // The produce() function calculates the current acid/base balance and returns
+    // the correct colour + observation at each 1 cm³ addition step.
+    {
+        id: "titration/phenolphthalein",
+        matches: (chemicals) =>
+            chemicals.includes("phenolphthalein") &&
+            (chemicals.includes("HCl") || chemicals.includes("H2SO4") ||
+             chemicals.includes("NaOH") || chemicals.includes("Na2CO3") ||
+             chemicals.includes("NH3_aq")),
+        produce(vessel) {
+            const { acidMmol, baseMmol, excess } = _titrationBalance(vessel);
+            const contents = vessel.contents || [];
+            const hasCarbonate = contents.some(c => c.chemical === "Na2CO3");
+            const co2Note = hasCarbonate ? " (CO₂ effervescence may be observed as HCl reacts with Na₂CO₃)" : "";
+
+            // Only indicator + acid, no base yet
+            if (baseMmol === 0 && acidMmol > 0) {
+                return {
+                    observation: `Phenolphthalein indicator added. Solution is COLOURLESS in acidic conditions (pH < 8.2).${co2Note} Add alkali from burette to begin titration.`,
+                    newColor: "#fff0f8",
+                    colorChange: "colourless (acidic, pH < 8.2)",
+                };
+            }
+            // Only indicator + base, no acid yet
+            if (acidMmol === 0 && baseMmol > 0) {
+                return {
+                    observation: "Phenolphthalein indicator in alkaline solution: permanent PINK. No acid present. Add acid to begin titration.",
+                    newColor: "#ffb0d0",
+                    colorChange: "pink (alkaline, pH > 8.2)",
+                };
+            }
+            // Both acid and base present — calculate balance
+            if (excess < -2.0) {
+                return {
+                    observation: `Acid in large excess (acid: ${acidMmol.toFixed(1)} mmol, base: ${baseMmol.toFixed(1)} mmol). Phenolphthalein COLOURLESS. Continue adding alkali from burette.${co2Note}`,
+                    newColor: "#fff0f8",
+                    colorChange: "colourless (still acidic)",
+                };
+            }
+            if (excess < 0) {
+                return {
+                    observation: `⚠️ NEAR ENDPOINT — acid excess only ${Math.abs(excess).toFixed(1)} mmol. Faint pink appears then fades on swirling. Add alkali DROPWISE now.${co2Note}`,
+                    newColor: "#ffe0f0",
+                    colorChange: "colourless → faint pink that fades (add dropwise!)",
+                };
+            }
+            if (excess <= 1.0) {
+                return {
+                    observation: `✓ ENDPOINT REACHED — pale permanent PINK. Base excess only ${excess.toFixed(1)} mmol (≈ half-drop equivalence). Record burette reading now.`,
+                    newColor: "#ffb0d0",
+                    colorChange: "colourless → permanent pale pink ✓ ENDPOINT",
+                };
+            }
+            return {
+                observation: `Over-titrated — ${excess.toFixed(1)} mmol excess alkali. Phenolphthalein DEEP PINK/MAGENTA. Endpoint was already passed. Repeat titration.`,
+                newColor: "#e060a0",
+                colorChange: "deep pink/magenta (over-titrated — excess alkali)",
+            };
+        },
+        blind(vessel) {
+            const { acidMmol, baseMmol, excess } = _titrationBalance(vessel);
+            if (baseMmol === 0 && acidMmol > 0)
+                return { observation: "Indicator added. Solution colourless. Add alkali from burette." };
+            if (acidMmol === 0 && baseMmol > 0)
+                return { observation: "Indicator in alkaline solution: permanent pink. No acid present." };
+            if (excess < -2.0)
+                return { observation: "Colourless. Still acidic. Continue adding alkali." };
+            if (excess < 0)
+                return { observation: "⚠️ Faint pink appears then fades. NEAR ENDPOINT — add dropwise." };
+            if (excess <= 1.0)
+                return { observation: "✓ Pale permanent PINK — ENDPOINT reached. Record burette reading." };
+            return { observation: "Deep pink/magenta — over-titrated. Repeat with fresh solution." };
+        },
+    },
+    {
+        id: "titration/methyl-orange",
+        matches: (chemicals) =>
+            chemicals.includes("methyl_orange") &&
+            (chemicals.includes("HCl") || chemicals.includes("H2SO4") ||
+             chemicals.includes("NaOH") || chemicals.includes("Na2CO3") ||
+             chemicals.includes("NH3_aq")),
+        produce(vessel) {
+            const { acidMmol, baseMmol, excess } = _titrationBalance(vessel);
+            const contents = vessel.contents || [];
+            const hasCarbonate = contents.some(c => c.chemical === "Na2CO3");
+            const co2Note = hasCarbonate ? " CO₂ effervescence occurs as HCl reacts with Na₂CO₃ — this is normal." : "";
+
+            if (baseMmol === 0 && acidMmol > 0) {
+                return {
+                    observation: `Methyl orange indicator added. Solution is RED in acidic conditions (pH < 3.1).${co2Note} Add alkali from burette to begin titration. Endpoint colour = ORANGE (not yellow).`,
+                    newColor: "#cc2200",
+                    colorChange: "red (strongly acidic, pH < 3.1)",
+                };
+            }
+            if (acidMmol === 0 && baseMmol > 0) {
+                return {
+                    observation: "Methyl orange in alkaline solution: YELLOW (pH > 4.4). Add acid to begin titration.",
+                    newColor: "#ddaa00",
+                    colorChange: "yellow (alkaline, pH > 4.4)",
+                };
+            }
+            if (excess < -2.0) {
+                return {
+                    observation: `Acid in large excess (acid: ${acidMmol.toFixed(1)} mmol, base: ${baseMmol.toFixed(1)} mmol). Methyl orange RED. Continue adding alkali.${co2Note}`,
+                    newColor: "#cc2200",
+                    colorChange: "red (strongly acidic)",
+                };
+            }
+            if (excess < 0) {
+                return {
+                    observation: `⚠️ NEAR ENDPOINT — turning from RED to ORANGE. Acid excess only ${Math.abs(excess).toFixed(1)} mmol. Add alkali DROPWISE. Endpoint is ORANGE (permanent), not yellow.${co2Note}`,
+                    newColor: "#dd6600",
+                    colorChange: "red → orange (near endpoint — add dropwise!)",
+                };
+            }
+            if (excess <= 1.0) {
+                return {
+                    observation: `✓ ENDPOINT REACHED — solution is ORANGE (pH ≈ 4.0). Base excess ${excess.toFixed(1)} mmol. Record burette reading. Note: methyl orange endpoint for strong acid/Na₂CO₃ titrations.`,
+                    newColor: "#cc6600",
+                    colorChange: "red → orange ✓ ENDPOINT (pH ≈ 4.0)",
+                };
+            }
+            return {
+                observation: `Over-titrated — ${excess.toFixed(1)} mmol excess alkali. Methyl orange YELLOW (pH > 4.4). Endpoint was at orange. Repeat titration.`,
+                newColor: "#ddaa00",
+                colorChange: "orange → yellow (over-titrated)",
+            };
+        },
+        blind(vessel) {
+            const { acidMmol, baseMmol, excess } = _titrationBalance(vessel);
+            if (baseMmol === 0 && acidMmol > 0)
+                return { observation: "Red (strongly acidic). Add alkali from burette. Endpoint colour = orange." };
+            if (acidMmol === 0 && baseMmol > 0)
+                return { observation: "Yellow (alkaline). Add acid to begin titration." };
+            if (excess < -2.0)
+                return { observation: "Red. Still strongly acidic. Continue adding alkali." };
+            if (excess < 0)
+                return { observation: "⚠️ Turning orange. NEAR ENDPOINT — add dropwise now." };
+            if (excess <= 1.0)
+                return { observation: "✓ ORANGE — ENDPOINT reached. Record burette reading." };
+            return { observation: "Yellow — over-titrated (too much alkali). Repeat titration." };
+        },
+    },
+
     {
         id: "qualitative/naoh-neutralise",
         // NaOH + acid → salt + water (neutralisation, no visible change)

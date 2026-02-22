@@ -14,6 +14,8 @@ export const CHEMICALS = {
     "KI":                   { label: "Potassium Iodide (0.50 mol/dm³)",           type: "solution", color: "#fafafa", category: "reagent" },
     "Na2S2O3_titrant":      { label: "Sodium Thiosulfate (22.00 g/dm³)",          type: "solution", color: "#e8f8f8", category: "titrant" },
     "starch":               { label: "Starch Solution",                            type: "solution", color: "#fffff0", category: "indicator" },
+    "phenolphthalein":      { label: "Phenolphthalein indicator",                  type: "solution", color: "#fff0f8", category: "indicator" },
+    "methyl_orange":        { label: "Methyl Orange indicator",                    type: "solution", color: "#ffa040", category: "indicator" },
     "distilled_water":      { label: "Distilled Water",                            type: "solution", color: "#f0f8ff", category: "solution" },
     "FA3_oxidiser":         { label: "FA 3 – Oxidising Agent (0.0175 mol/dm³)",   type: "solution", color: "#ffe4b5", category: "solution" },
     "H2O2":                 { label: "Hydrogen Peroxide",                          type: "solution", color: "#f0fff0", category: "reagent" },
