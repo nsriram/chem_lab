@@ -93,10 +93,19 @@ export function useChemLab() {
 
     const createVessel = (equipmentId) => {
         const eq = EQUIPMENT[equipmentId];
+        // Find the highest existing instance number for this type so each
+        // label is unique even after deletions (e.g. "Beaker (100 cm³) 3").
+        const maxN = vessels
+            .filter(v => v.type === equipmentId)
+            .reduce((max, v) => {
+                const m = v.label.match(/(\d+)$/);
+                return m ? Math.max(max, parseInt(m[1], 10)) : max;
+            }, 0);
+        const instanceLabel = `${eq.label} ${maxN + 1}`;
         const newVessel = {
             id: Date.now(),
             type: equipmentId,
-            label: eq.label,
+            label: instanceLabel,
             icon: eq.icon,
             contents: [],
             color: "#f0f8ff",
@@ -104,7 +113,7 @@ export function useChemLab() {
             temp: 22,
         };
         setVessels(v => [...v, newVessel]);
-        pushLog({ action: "equipment_selected", equipment: eq.label, details: `Added ${eq.label} to bench` });
+        pushLog({ action: "equipment_selected", equipment: instanceLabel, details: `Added ${instanceLabel} to bench` });
     };
 
     const addChemicalToVessel = () => {
