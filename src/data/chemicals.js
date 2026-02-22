@@ -25,6 +25,7 @@ export const CHEMICALS = {
     "Na2CO3":               { label: "Sodium Carbonate (1.0 mol/dm³)",            type: "solution", color: "#f0f5ff", category: "reagent" },
     "FeSO4":                { label: "Iron(II) Sulfate (0.50 mol/dm³)",           type: "solution", color: "#e0f0d0", category: "solution" },
     "Zn_powder":            { label: "Zinc Powder",                                type: "solid",    color: "#d8d8d0", category: "solid" },
+    "Al_foil":              { label: "Aluminium Foil",                             type: "solid",    color: "#e8e8e8", category: "solid" },
     "oxalic_acid":          { label: "Oxalic Acid (0.05 mol/dm³)",                type: "solution", color: "#fffaf0", category: "reagent" },
     "Cu2O":                 { label: "Copper(I) Oxide",                           type: "solid",    color: "#c8502a", category: "solid" },
     "FeCl3":                { label: "Iron(III) Chloride (0.5 mol/dm³)",          type: "solution", color: "#c8780a", category: "solution" },
