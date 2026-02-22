@@ -11,7 +11,7 @@ function autoHeight(el) {
 // ── ChemCell ──────────────────────────────────────────────────────────────────
 // Compact table-cell textarea with Ctrl+, / Ctrl+. keyboard shortcuts.
 // No visible toolbar — a small badge appears in the corner when mode is active.
-function ChemCell({ value, onChange }) {
+export function ChemCell({ value, onChange }) {
     const [mode, setMode] = useState(null);
     const ref = useRef(null);
 
@@ -86,7 +86,7 @@ function ChemCell({ value, onChange }) {
 // ── ChemInput ─────────────────────────────────────────────────────────────────
 // Single-line input with Ctrl+, / Ctrl+. keyboard shortcuts.
 // Used for table titles, graph axis labels, etc.
-function ChemInput({ value, onChange, placeholder, style }) {
+export function ChemInput({ value, onChange, placeholder, style }) {
     const [mode, setMode] = useState(null);
     const ref = useRef(null);
 
@@ -129,8 +129,22 @@ function ChemInput({ value, onChange, placeholder, style }) {
     );
 }
 
-function ResizableTable({ tbl, ti, setTables }) {
+export function ResizableTable({ tbl, ti, setTables }) {
     const dragRef = useRef(null);
+
+    function removeColumn(colIndex) {
+        if (tbl.headers.length <= 1) return;
+        setTables(ts => ts.map((t, i) => {
+            if (i !== ti) return t;
+            const base = t.colWidths ?? t.headers.map(() => 150);
+            return {
+                ...t,
+                headers: t.headers.filter((_, j) => j !== colIndex),
+                rows: t.rows.map(r => r.filter((_, j) => j !== colIndex)),
+                colWidths: base.filter((_, j) => j !== colIndex),
+            };
+        }));
+    }
 
     function startResize(e, colIndex) {
         e.preventDefault();
@@ -174,8 +188,16 @@ function ResizableTable({ tbl, ti, setTables }) {
                                 onChange={v => setTables(ts => ts.map((t, i) => i === ti
                                     ? { ...t, headers: t.headers.map((hh, j) => j === hi ? v : hh) }
                                     : t))}
-                                style={{ width: "100%", background: "rgba(26,74,122,0.4)", color: "#c8e8ff", border: "none", padding: "6px 18px 6px 8px", fontWeight: "bold", fontFamily: "'JetBrains Mono', monospace", fontSize: 12, boxSizing: "border-box" }}
+                                style={{ width: "100%", background: "rgba(26,74,122,0.4)", color: "#c8e8ff", border: "none", padding: "6px 26px 6px 8px", fontWeight: "bold", fontFamily: "'JetBrains Mono', monospace", fontSize: 12, boxSizing: "border-box" }}
                             />
+                            {/* Column remove button */}
+                            {tbl.headers.length > 1 && (
+                                <button
+                                    onClick={() => removeColumn(hi)}
+                                    title="Remove this column"
+                                    style={{ position: "absolute", top: "50%", transform: "translateY(-50%)", right: 8, background: "none", border: "none", color: "#df6060", cursor: "pointer", fontSize: 12, lineHeight: 1, padding: "2px 3px" }}
+                                >×</button>
+                            )}
                             {/* Resize handle */}
                             <div
                                 onMouseDown={e => startResize(e, hi)}

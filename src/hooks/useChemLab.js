@@ -356,7 +356,10 @@ export function useChemLab() {
     const runEvaluation = () => {
         const paper = QUESTION_PAPERS[activePaperId] ?? QUESTION_PAPERS[0];
         const joinedNotes = Object.entries(partAnswers)
-            .map(([id, ans]) => `${id}: ${ans}`)
+            .map(([id, ans]) => {
+                const text = typeof ans === 'string' ? ans : (ans?.text ?? '');
+                return `${id}: ${text}`;
+            })
             .join("\n");
         const result = evaluateLog(actionLog, joinedNotes, paper);
         setEvaluation(result);
