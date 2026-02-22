@@ -32,6 +32,34 @@ function _titrationBalance(vessel) {
     return { acidMmol, baseMmol, excess: baseMmol - acidMmol };
 }
 
+// ─── Iodometric titration helper ─────────────────────────────────────────────
+// Tracks how much I₂ the oxidant generates (via KI) and how much Na₂S₂O₃ has
+// consumed it so far. Used by titration/iodometric for progressive colour changes.
+// mmol = C(mol/dm³) × V(cm³)
+const _IODO_OXID = {
+    KMnO4_acid:   { conc: 0.0175, i2PerMol: 2.5 },  // 2MnO₄⁻ + 10I⁻ → 5I₂
+    FA3_oxidiser: { conc: 0.0175, i2PerMol: 2.5 },  // same stoichiometry
+    H2O2:         { conc: 0.100,  i2PerMol: 1.0 },  // H₂O₂ + 2I⁻ + 2H⁺ → I₂
+    CuSO4:        { conc: 1.000,  i2PerMol: 0.5 },  // 2Cu²⁺ + 4I⁻ → 2CuI + I₂
+    FeCl3:        { conc: 0.500,  i2PerMol: 0.5 },  // 2Fe³⁺ + 2I⁻ → 2Fe²⁺ + I₂
+};
+const _S2O3_CONC = 22.00 / 248.2;  // 0.0886 mol/dm³ for Na₂S₂O₃·5H₂O (Mr = 248.2)
+
+function _iodometricBalance(vessel) {
+    let i2Mmol = 0, thioMmol = 0;
+    for (const c of vessel.contents || []) {
+        const vol = c.volume || 0;
+        const ox = _IODO_OXID[c.chemical];
+        if (ox) i2Mmol += vol * ox.conc * ox.i2PerMol;
+        if (c.chemical === 'Na2S2O3_titrant') thioMmol += vol * _S2O3_CONC;
+    }
+    // I₂ + 2Na₂S₂O₃ → 2NaI + Na₂S₄O₆  (1 mol I₂ consumed per 2 mol Na₂S₂O₃)
+    const i2Consumed  = thioMmol / 2;
+    const i2Remaining = Math.max(0, i2Mmol - i2Consumed);
+    const i2Fraction  = i2Mmol > 0 ? (i2Remaining / i2Mmol) : 0;
+    return { i2Mmol, thioMmol, i2Remaining, i2Fraction };
+}
+
 export const REACTION_RULES = [
 
     // ── Kinetics ──────────────────────────────────────────────────────────────
@@ -133,6 +161,84 @@ export const REACTION_RULES = [
                 precipitate: "Pink/red-brown solid",
                 colorChange: "coloured solution → pale + pink/red-brown solid deposits",
             };
+        },
+    },
+
+    // ── Iodometric titration ───────────────────────────────────────────────────
+    // MUST precede redox/kmno4-ki and redox/ki-* rules — the volume-aware rule
+    // fires first whenever Na₂S₂O₃ titrant is present alongside an oxidant + KI.
+    // Colour stages: deep brown → yellow-brown → pale yellow (add starch) →
+    //                blue-black (with starch) → colourless ✓ ENDPOINT.
+    {
+        id: "titration/iodometric",
+        matches: (chemicals) =>
+            chemicals.includes("Na2S2O3_titrant") &&
+            chemicals.includes("KI") &&
+            (chemicals.includes("KMnO4_acid") || chemicals.includes("FA3_oxidiser") ||
+             chemicals.includes("H2O2") || chemicals.includes("CuSO4") ||
+             chemicals.includes("FeCl3")),
+        produce(vessel) {
+            const { i2Remaining, i2Fraction } = _iodometricBalance(vessel);
+            const chems = (vessel.contents || []).map(c => c.chemical);
+            const hasStarch = chems.includes("starch");
+
+            if (i2Fraction > 0.4) {
+                return {
+                    observation: `Deep brown solution — I₂ present (${i2Remaining.toFixed(3)} mmol remaining, ${(i2Fraction*100).toFixed(0)}% of I₂ unconsumed). Continue adding Na₂S₂O₃ from burette.`,
+                    newColor: "#6a3a08",
+                    colorChange: "deep brown (I₂ in large excess)",
+                };
+            }
+            if (i2Fraction > 0.1) {
+                return {
+                    observation: `Yellow-brown, fading — I₂ being consumed (${i2Remaining.toFixed(3)} mmol remaining, ${(100*(1-i2Fraction)).toFixed(0)}% consumed). Continue titrating steadily.`,
+                    newColor: "#b89020",
+                    colorChange: "deep brown → yellow-brown (I₂ fading)",
+                };
+            }
+            if (i2Fraction > 0.01) {
+                if (hasStarch) {
+                    return {
+                        observation: `⚠️ NEAR ENDPOINT — blue-black (starch-iodine complex; ${i2Remaining.toFixed(3)} mmol I₂ remaining). Add Na₂S₂O₃ DROPWISE — one drop at a time — until blue-black just disappears permanently.`,
+                        newColor: "#12122a",
+                        colorChange: "yellow-brown → blue-black with starch (add dropwise!)",
+                    };
+                }
+                return {
+                    observation: `⚠️ NEAR ENDPOINT — pale YELLOW (${i2Remaining.toFixed(3)} mmol I₂ remaining). Add ~10 drops starch indicator NOW for a sharp endpoint, then continue titrating dropwise.`,
+                    newColor: "#d8c830",
+                    colorChange: "brown → pale yellow (near endpoint — add starch now!)",
+                };
+            }
+            // At/past endpoint
+            if (hasStarch) {
+                return {
+                    observation: `✓ ENDPOINT — blue-black DISAPPEARS → COLOURLESS. All I₂ consumed by Na₂S₂O₃ (I₂ + 2Na₂S₂O₃ → 2NaI + Na₂S₄O₆). Record burette reading.`,
+                    newColor: "#f5f5f5",
+                    colorChange: "blue-black → colourless ✓ ENDPOINT",
+                };
+            }
+            return {
+                observation: `✓ ENDPOINT — solution is pale straw/YELLOW → nearly colourless. All I₂ consumed. Record burette reading. (Tip: for a sharper endpoint add starch when near pale yellow.)`,
+                newColor: "#fafae8",
+                colorChange: "pale yellow → colourless/straw ✓ ENDPOINT",
+            };
+        },
+        blind(vessel) {
+            const { i2Fraction } = _iodometricBalance(vessel);
+            const chems = (vessel.contents || []).map(c => c.chemical);
+            const hasStarch = chems.includes("starch");
+            if (i2Fraction > 0.4)
+                return { observation: "Deep brown. Continue adding titrant from burette." };
+            if (i2Fraction > 0.1)
+                return { observation: "Yellow-brown (fading). Continue titrating." };
+            if (i2Fraction > 0.01 && !hasStarch)
+                return { observation: "⚠️ Pale yellow. Near endpoint — add starch now, then add dropwise." };
+            if (i2Fraction > 0.01 && hasStarch)
+                return { observation: "⚠️ Blue-black (starch). Near endpoint — add titrant dropwise." };
+            return hasStarch
+                ? { observation: "✓ Blue-black → colourless. ENDPOINT. Record burette reading." }
+                : { observation: "✓ Pale straw/colourless. ENDPOINT. Record burette reading." };
         },
     },
 
@@ -1292,22 +1398,6 @@ export const REACTION_RULES = [
             return {
                 observation: "Dark blue-black colour appears on adding starch.",
                 colorChange: "colourless/yellow-brown → deep blue-black",
-            };
-        },
-    },
-    {
-        id: "titration/thiosulfate-titrant-fa3",
-        requires: ["Na2S2O3_titrant", "FA3_oxidiser"],
-        produce() {
-            return {
-                observation: "Yellow-brown iodine colour fades as Na₂S₂O₃ reduces I₂. Near endpoint: add starch → blue-black. At endpoint: blue-black disappears → colourless.",
-                colorChange: "yellow-brown → (blue-black with starch) → colourless at endpoint",
-            };
-        },
-        blind() {
-            return {
-                observation: "Yellow-brown colour fades. Near endpoint: add starch → blue-black. At endpoint: blue-black disappears → colourless.",
-                colorChange: "yellow-brown → (blue-black with starch) → colourless at endpoint",
             };
         },
     },
