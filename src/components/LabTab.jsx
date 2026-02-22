@@ -30,13 +30,13 @@ const EQUIP_GROUPS = [
         id: "vessels",
         label: "Vessels",
         color: "#60a5fa",
-        ids: ["conical_flask", "beaker_100", "beaker_250", "test_tube", "boiling_tube", "crucible"],
+        ids: ["conical_flask", "beaker_100", "beaker_250", "polystyrene_cup", "test_tube", "boiling_tube", "crucible"],
     },
     {
         id: "measuring",
         label: "Measuring",
         color: "#34d399",
-        ids: ["burette", "pipette_25", "measuring_cylinder_10", "measuring_cylinder_25", "thermometer", "stop_clock", "balance"],
+        ids: ["burette", "pipette_25", "measuring_cylinder_10", "measuring_cylinder_25", "measuring_cylinder_50", "thermometer", "stop_clock", "balance"],
     },
     {
         id: "tools",
