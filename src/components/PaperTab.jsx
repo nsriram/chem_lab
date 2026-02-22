@@ -1,4 +1,5 @@
 import { QUESTION_PAPERS } from "../data/questionPaper";
+import ChemTextInput from "./ChemTextInput";
 
 export default function PaperTab({ activePaperId, setActivePaperId, expandedQ, setExpandedQ, partAnswers, setPartAnswers }) {
     const paper = QUESTION_PAPERS[activePaperId] ?? QUESTION_PAPERS[0];
@@ -86,18 +87,10 @@ export default function PaperTab({ activePaperId, setActivePaperId, expandedQ, s
                                         <div style={{ fontSize: 11, color: "#5a8aaa", textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 5 }}>
                                             ✏️ Your Answer
                                         </div>
-                                        <textarea
+                                        <ChemTextInput
                                             value={partAnswers[part.id] ?? ""}
-                                            onChange={e => setAnswer(part.id, e.target.value)}
+                                            onChange={v => setAnswer(part.id, v)}
                                             placeholder="Write your answer here…"
-                                            style={{
-                                                width: "100%", minHeight: 72, resize: "vertical",
-                                                lineHeight: 1.6, boxSizing: "border-box",
-                                                background: "rgba(10,25,45,0.6)", color: "#c8e8ff",
-                                                border: "1px solid #2a5a8a", borderRadius: 4,
-                                                padding: "7px 10px", fontSize: 13,
-                                                fontFamily: "'JetBrains Mono', monospace",
-                                            }}
                                         />
                                     </div>
                                 </div>

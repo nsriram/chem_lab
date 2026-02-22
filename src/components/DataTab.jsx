@@ -1,10 +1,132 @@
-import { useRef } from "react";
+import { useRef, useState, useCallback } from "react";
 import GraphPlot from "./GraphPlot";
+import { TO_SUB, TO_SUP } from "./ChemTextInput";
 
 function autoHeight(el) {
     if (!el) return;
     el.style.height = "auto";
     el.style.height = el.scrollHeight + "px";
+}
+
+// ── ChemCell ──────────────────────────────────────────────────────────────────
+// Compact table-cell textarea with Ctrl+, / Ctrl+. keyboard shortcuts.
+// No visible toolbar — a small badge appears in the corner when mode is active.
+function ChemCell({ value, onChange }) {
+    const [mode, setMode] = useState(null);
+    const ref = useRef(null);
+
+    // Used as callback ref so autoHeight fires on mount
+    const setRef = useCallback(el => {
+        ref.current = el;
+        autoHeight(el);
+    }, []);
+
+    function handleChange(e) {
+        autoHeight(e.target);
+        onChange(e.target.value);
+    }
+
+    function handleKeyDown(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === ',') {
+            e.preventDefault(); setMode(m => m === 'sub' ? null : 'sub'); return;
+        }
+        if ((e.ctrlKey || e.metaKey) && e.key === '.') {
+            e.preventDefault(); setMode(m => m === 'sup' ? null : 'sup'); return;
+        }
+        if (!mode) return;
+        if (e.key === 'Escape') { setMode(null); return; }
+        const map = mode === 'sub' ? TO_SUB : TO_SUP;
+        if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+            const mapped = map[e.key.toLowerCase()];
+            if (mapped) {
+                e.preventDefault();
+                const el = ref.current;
+                const s = el.selectionStart, end = el.selectionEnd;
+                const nv = (value ?? '').slice(0, s) + mapped + (value ?? '').slice(end);
+                onChange(nv);
+                requestAnimationFrame(() => { el.selectionStart = el.selectionEnd = s + mapped.length; });
+            }
+        }
+    }
+
+    return (
+        <div style={{ position: 'relative' }}>
+            <textarea
+                ref={setRef}
+                value={value}
+                rows={1}
+                onChange={handleChange}
+                onKeyDown={handleKeyDown}
+                title="Ctrl+, = subscript mode · Ctrl+. = superscript mode · Esc to exit"
+                style={{
+                    display: 'block', width: '100%',
+                    background: 'transparent', color: '#a8c8e0', border: 'none',
+                    padding: '5px 8px',
+                    fontFamily: "'JetBrains Mono', monospace", fontSize: 12,
+                    boxSizing: 'border-box', resize: 'none', overflow: 'hidden',
+                    lineHeight: 1.5, minHeight: 28,
+                    outline: mode ? `1px solid ${mode === 'sub' ? '#2a5adf' : '#df7a2a'}` : 'none',
+                    outlineOffset: -1,
+                }}
+            />
+            {mode && (
+                <div style={{
+                    position: 'absolute', top: 2, right: 4, fontSize: 8, lineHeight: 1,
+                    color: mode === 'sub' ? '#60a0ff' : '#ffa060',
+                    fontFamily: "'JetBrains Mono', monospace", pointerEvents: 'none',
+                    background: 'rgba(10,20,40,0.8)', padding: '1px 3px', borderRadius: 2,
+                }}>
+                    {mode === 'sub' ? 'SUB' : 'SUP'}
+                </div>
+            )}
+        </div>
+    );
+}
+
+// ── ChemInput ─────────────────────────────────────────────────────────────────
+// Single-line input with Ctrl+, / Ctrl+. keyboard shortcuts.
+// Used for table titles, graph axis labels, etc.
+function ChemInput({ value, onChange, placeholder, style }) {
+    const [mode, setMode] = useState(null);
+    const ref = useRef(null);
+
+    function handleKeyDown(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === ',') {
+            e.preventDefault(); setMode(m => m === 'sub' ? null : 'sub'); return;
+        }
+        if ((e.ctrlKey || e.metaKey) && e.key === '.') {
+            e.preventDefault(); setMode(m => m === 'sup' ? null : 'sup'); return;
+        }
+        if (!mode) return;
+        if (e.key === 'Escape') { setMode(null); return; }
+        const map = mode === 'sub' ? TO_SUB : TO_SUP;
+        if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+            const mapped = map[e.key.toLowerCase()];
+            if (mapped) {
+                e.preventDefault();
+                const el = ref.current;
+                const s = el.selectionStart, end = el.selectionEnd;
+                const nv = (value ?? '').slice(0, s) + mapped + (value ?? '').slice(end);
+                onChange(nv);
+                requestAnimationFrame(() => { el.selectionStart = el.selectionEnd = s + mapped.length; });
+            }
+        }
+    }
+
+    return (
+        <input
+            ref={ref}
+            value={value}
+            onChange={e => onChange(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={placeholder}
+            title="Ctrl+, = subscript · Ctrl+. = superscript · Esc to exit mode"
+            style={{
+                ...style,
+                outline: mode ? `1px solid ${mode === 'sub' ? '#2a5adf' : '#df7a2a'}` : style?.outline,
+            }}
+        />
+    );
 }
 
 function ResizableTable({ tbl, ti, setTables }) {
@@ -47,10 +169,10 @@ function ResizableTable({ tbl, ti, setTables }) {
                 <tr>
                     {tbl.headers.map((h, hi) => (
                         <th key={hi} style={{ border: "1px solid #2a5a8a", padding: 0, position: "relative", overflow: "hidden" }}>
-                            <input
+                            <ChemInput
                                 value={h}
-                                onChange={e => setTables(ts => ts.map((t, i) => i === ti
-                                    ? { ...t, headers: t.headers.map((hh, j) => j === hi ? e.target.value : hh) }
+                                onChange={v => setTables(ts => ts.map((t, i) => i === ti
+                                    ? { ...t, headers: t.headers.map((hh, j) => j === hi ? v : hh) }
                                     : t))}
                                 style={{ width: "100%", background: "rgba(26,74,122,0.4)", color: "#c8e8ff", border: "none", padding: "6px 18px 6px 8px", fontWeight: "bold", fontFamily: "'JetBrains Mono', monospace", fontSize: 12, boxSizing: "border-box" }}
                             />
@@ -70,17 +192,11 @@ function ResizableTable({ tbl, ti, setTables }) {
                     <tr key={ri}>
                         {row.map((cell, ci) => (
                             <td key={ci} style={{ border: "1px solid #1a3a5a", padding: 0, verticalAlign: "top" }}>
-                                <textarea
+                                <ChemCell
                                     value={cell}
-                                    rows={1}
-                                    ref={autoHeight}
-                                    onChange={e => {
-                                        autoHeight(e.target);
-                                        setTables(ts => ts.map((t, i) => i === ti
-                                            ? { ...t, rows: t.rows.map((r, rj) => rj === ri ? r.map((c, cj) => cj === ci ? e.target.value : c) : r) }
-                                            : t));
-                                    }}
-                                    style={{ display: "block", width: "100%", background: "transparent", color: "#a8c8e0", border: "none", padding: "5px 8px", fontFamily: "'JetBrains Mono', monospace", fontSize: 12, boxSizing: "border-box", resize: "none", overflow: "hidden", lineHeight: 1.5, minHeight: 28 }}
+                                    onChange={v => setTables(ts => ts.map((t, i) => i === ti
+                                        ? { ...t, rows: t.rows.map((r, rj) => rj === ri ? r.map((c, cj) => cj === ci ? v : c) : r) }
+                                        : t))}
                                 />
                             </td>
                         ))}
@@ -133,9 +249,9 @@ export default function DataTab({ tables, setTables, graphs, setGraphs, activeDa
                     {tables.map((tbl, ti) => (
                         <div key={tbl.id} style={{ background: "rgba(0,0,0,0.25)", border: "1px solid #2a4a6a", borderRadius: 10, padding: 18, marginBottom: 20 }}>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                                <input
+                                <ChemInput
                                     value={tbl.title}
-                                    onChange={e => setTables(ts => ts.map((t, i) => i === ti ? { ...t, title: e.target.value } : t))}
+                                    onChange={v => setTables(ts => ts.map((t, i) => i === ti ? { ...t, title: v } : t))}
                                     style={{ fontFamily: "'Playfair Display', serif", fontSize: 15, color: "#c8e8ff", background: "transparent", border: "none", borderBottom: "1px solid #2a5a8a", width: 300 }}
                                 />
                                 <div style={{ display: "flex", gap: 8 }}>
@@ -198,17 +314,17 @@ export default function DataTab({ tables, setTables, graphs, setGraphs, activeDa
                     {graphs.map((g, gi) => (
                         <div key={g.id} style={{ background: "rgba(0,0,0,0.25)", border: "1px solid #2a4a6a", borderRadius: 10, padding: 18, marginBottom: 24 }}>
                             <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 14, alignItems: "center" }}>
-                                <input value={g.title}
-                                    onChange={e => setGraphs(gs => gs.map((gg, i) => i === gi ? { ...gg, title: e.target.value } : gg))}
+                                <ChemInput value={g.title}
+                                    onChange={v => setGraphs(gs => gs.map((gg, i) => i === gi ? { ...gg, title: v } : gg))}
                                     style={{ fontFamily: "'Playfair Display', serif", fontSize: 15, color: "#c8e8ff", background: "transparent", border: "none", borderBottom: "1px solid #2a5a8a", width: 220 }}
                                     placeholder="Graph title"
                                 />
-                                <input value={g.xLabel}
-                                    onChange={e => setGraphs(gs => gs.map((gg, i) => i === gi ? { ...gg, xLabel: e.target.value } : gg))}
+                                <ChemInput value={g.xLabel}
+                                    onChange={v => setGraphs(gs => gs.map((gg, i) => i === gi ? { ...gg, xLabel: v } : gg))}
                                     style={{ fontSize: 12, width: 160 }} placeholder="x-axis label"
                                 />
-                                <input value={g.yLabel}
-                                    onChange={e => setGraphs(gs => gs.map((gg, i) => i === gi ? { ...gg, yLabel: e.target.value } : gg))}
+                                <ChemInput value={g.yLabel}
+                                    onChange={v => setGraphs(gs => gs.map((gg, i) => i === gi ? { ...gg, yLabel: v } : gg))}
                                     style={{ fontSize: 12, width: 160 }} placeholder="y-axis label"
                                 />
                                 <label style={{ fontSize: 12, color: "#8ab4d4", display: "flex", alignItems: "center", gap: 4 }}>
