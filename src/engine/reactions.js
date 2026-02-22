@@ -20,10 +20,18 @@ function ruleMatches(rule, chemicals, vessel, action) {
 
 export function simulateReaction(vessel, action, params = {}) {
     const chemicals = (vessel.contents || []).map(c => c.chemical);
+    // Any content added as an unknown FA → observations must not reveal identity
+    const hasUnknown = (vessel.contents || []).some(c => c.unknown);
     const base = baseResult(vessel);
     for (const rule of REACTION_RULES) {
         if (ruleMatches(rule, chemicals, vessel, action)) {
-            return { ...base, ...rule.produce(vessel, action, params) };
+            const result = { ...base, ...rule.produce(vessel, action, params) };
+            // Merge blind overrides on top — only text/label fields; colour/temp/precipitate
+            // boolean are kept from produce() so the visual simulation still works.
+            if (hasUnknown && rule.blind) {
+                return { ...result, ...rule.blind(vessel, action, params) };
+            }
+            return result;
         }
     }
     return {

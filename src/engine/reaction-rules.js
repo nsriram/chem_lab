@@ -32,6 +32,19 @@ export const REACTION_RULES = [
                 colorChange: "clear → cloudy/opaque yellow-white",
             };
         },
+        blind(vessel) {
+            const contents = vessel.contents || [];
+            const thio = contents.find(c => c.chemical === "Na2S2O3");
+            const acid = contents.find(c => c.chemical === "HCl");
+            const concentration = (thio.volume / (thio.volume + acid.volume)) * 0.10;
+            const time = Math.round(200 / concentration + Math.random() * 20 - 10);
+            return {
+                observation: `Solution turns cloudy/opaque after ~${time}s. Pale yellow solid precipitate forms. Faint pungent smell.`,
+                reactionTime: time,
+                precipitate: "Pale yellow solid precipitate",
+                gas: "Pungent gas (faint)",
+            };
+        },
     },
 
     // ── Energetics / displacement ──────────────────────────────────────────────
@@ -60,6 +73,22 @@ export const REACTION_RULES = [
                 colorChange: "blue → colourless + red-brown solid",
             };
         },
+        blind(vessel) {
+            const contents = vessel.contents || [];
+            const cu = contents.find(c => c.chemical === "CuSO4");
+            const mg = contents.find(c => c.chemical === "Mg_powder")
+                    || contents.find(c => c.chemical === "Mg_ribbon");
+            const molesCu = (cu?.volume || 0) * 0.001 * 1.0;
+            const molesMg = (mg?.mass || 0) / 24.3;
+            const limitingMoles = Math.min(molesCu, molesMg);
+            const deltaT = Math.round((limitingMoles * 350000) / (50 * 4.18));
+            const maxTemp = 22 + deltaT;
+            return {
+                observation: `Vigorous reaction. Coloured solution becomes pale/colourless. Red-brown solid deposits. Temperature rises to ~${maxTemp}°C (ΔT ≈ ${deltaT}°C).`,
+                precipitate: "Red-brown solid",
+                colorChange: "coloured solution → pale + red-brown solid",
+            };
+        },
     },
     {
         id: "energetics/zn-cuso4",
@@ -76,6 +105,13 @@ export const REACTION_RULES = [
                 colorChange: "blue → colourless + red-brown Cu deposits",
             };
         },
+        blind() {
+            return {
+                observation: "Coloured solution slowly fades. Pink/red-brown solid deposits on the metal. Slight temperature rise.",
+                precipitate: "Pink/red-brown solid",
+                colorChange: "coloured solution → pale + pink/red-brown solid deposits",
+            };
+        },
     },
 
     // ── Redox (KMnO4 — extended) ───────────────────────────────────────────────
@@ -86,6 +122,12 @@ export const REACTION_RULES = [
             return {
                 observation: "Purple KMnO₄ decolourised immediately to colourless. S₂O₃²⁻ reduces MnO₄⁻.",
                 newColor: "#f5f5f5",
+                colorChange: "purple → colourless",
+            };
+        },
+        blind() {
+            return {
+                observation: "Purple solution decolourised immediately to colourless.",
                 colorChange: "purple → colourless",
             };
         },
@@ -100,6 +142,12 @@ export const REACTION_RULES = [
                 colorChange: "purple → colourless",
             };
         },
+        blind() {
+            return {
+                observation: "Purple solution decolourised to colourless.",
+                colorChange: "purple → colourless",
+            };
+        },
     },
     {
         id: "redox/kmno4-feso4",
@@ -109,6 +157,12 @@ export const REACTION_RULES = [
                 observation: "Purple KMnO₄ rapidly decolourised. Fe²⁺ oxidised to Fe³⁺ (MnO₄⁻ → Mn²⁺). Solution turns pale yellow-orange from Fe³⁺ ions.",
                 newColor: "#d4a060",
                 colorChange: "purple → pale yellow-orange (Fe³⁺ formed)",
+            };
+        },
+        blind() {
+            return {
+                observation: "Purple solution rapidly decolourised. Resulting solution is pale yellow-orange.",
+                colorChange: "purple → pale yellow-orange",
             };
         },
     },
@@ -123,6 +177,12 @@ export const REACTION_RULES = [
                 gas: "O₂ – relights glowing splint",
             };
         },
+        blind() {
+            return {
+                observation: "Purple solution rapidly decolourised. Effervescence — colourless gas evolved (relights glowing splint).",
+                gas: "Colourless gas; relights glowing splint",
+            };
+        },
     },
     {
         id: "redox/kmno4-ki",
@@ -132,6 +192,12 @@ export const REACTION_RULES = [
                 observation: "I⁻ oxidised to I₂ by MnO₄⁻. Solution turns deep yellow-brown (I₂). Add starch to confirm — turns blue-black. KMnO₄ purple consumed.",
                 newColor: "#6a4a10",
                 colorChange: "purple → yellow-brown (I₂ liberated)",
+            };
+        },
+        blind() {
+            return {
+                observation: "Purple solution fades. Resulting solution turns deep yellow-brown. Add starch → blue-black colour appears.",
+                colorChange: "purple → yellow-brown",
             };
         },
     },
@@ -146,6 +212,12 @@ export const REACTION_RULES = [
                 gas: "CO₂",
             };
         },
+        blind() {
+            return {
+                observation: "Purple solution decolourised slowly at room temperature, rapidly on warming. Effervescence of colourless, odourless gas. Reaction rate accelerates on its own.",
+                gas: "Colourless, odourless gas",
+            };
+        },
     },
     {
         id: "redox/ki-h2o2",
@@ -155,6 +227,12 @@ export const REACTION_RULES = [
                 observation: "H₂O₂ oxidises I⁻ to I₂. Solution turns yellow-brown. Add starch solution → turns blue-black, confirming I₂ present.",
                 newColor: "#9a7020",
                 colorChange: "colourless → yellow-brown (I₂)",
+            };
+        },
+        blind() {
+            return {
+                observation: "Solution turns yellow-brown. Add starch solution → turns blue-black.",
+                colorChange: "colourless → yellow-brown",
             };
         },
     },
@@ -168,6 +246,13 @@ export const REACTION_RULES = [
                 precipitate: "CuI(s) – cream/buff ppt",
                 hasPrecipitate: true,
                 colorChange: "blue → yellow-brown (CuI ppt + I₂ in solution)",
+            };
+        },
+        blind() {
+            return {
+                observation: "Cream/buff precipitate forms. Solution turns yellow-brown. Add starch → blue-black colour appears.",
+                precipitate: "Cream/buff solid precipitate",
+                colorChange: "coloured solution → cream ppt + yellow-brown solution",
             };
         },
     },
@@ -186,6 +271,13 @@ export const REACTION_RULES = [
                 colorChange: "orange-brown → rust-brown precipitate (Fe(OH)₃)",
             };
         },
+        blind() {
+            return {
+                observation: "Rust-brown/red-brown precipitate forms immediately. Insoluble in excess NaOH. Does NOT dissolve in excess.",
+                precipitate: "Rust-brown precipitate, insoluble in excess NaOH",
+                colorChange: "→ rust-brown precipitate",
+            };
+        },
     },
     {
         id: "qualitative/fecl3-nh3",
@@ -197,6 +289,13 @@ export const REACTION_RULES = [
                 precipitate: "Fe(OH)₃(s) – rust-brown ppt, insoluble in excess NH₃",
                 hasPrecipitate: true,
                 colorChange: "orange-brown → rust-brown precipitate (Fe(OH)₃)",
+            };
+        },
+        blind() {
+            return {
+                observation: "Rust-brown precipitate forms. Insoluble in excess NH₃(aq).",
+                precipitate: "Rust-brown precipitate, insoluble in excess NH₃",
+                colorChange: "→ rust-brown precipitate",
             };
         },
     },
@@ -213,6 +312,13 @@ export const REACTION_RULES = [
                 colorChange: "no visible change in solution (gas evolved)",
             };
         },
+        blind() {
+            return {
+                observation: "On warming: pungent smell. Damp red litmus paper held in vapour turns blue. No visible change to solution.",
+                gas: "Pungent gas; turns damp red litmus blue",
+                colorChange: "no visible change in solution (gas evolved)",
+            };
+        },
     },
     {
         id: "qualitative/nh4cl-naoh",
@@ -221,6 +327,12 @@ export const REACTION_RULES = [
             return {
                 observation: "No precipitate at room temperature. On warming, pungent ammonia gas evolved — turns damp red litmus blue. Confirms NH₄⁺. No colour change to solution.",
                 colorChange: "no visible change (NH₃ gas on warming)",
+            };
+        },
+        blind() {
+            return {
+                observation: "No precipitate at room temperature. On warming, pungent gas evolved — turns damp red litmus blue. No colour change to solution.",
+                colorChange: "no visible change (pungent gas on warming)",
             };
         },
     },
@@ -238,6 +350,13 @@ export const REACTION_RULES = [
                 colorChange: "colourless → faint milky white (Ca(OH)₂)",
             };
         },
+        blind() {
+            return {
+                observation: "Slight white precipitate forms — may appear milky rather than a distinct ppt. Slightly soluble so precipitate may partially dissolve. Insoluble in excess NaOH.",
+                precipitate: "Faint white milky precipitate (slightly soluble)",
+                colorChange: "colourless → faint milky white",
+            };
+        },
     },
     {
         id: "qualitative/cacl2-na2co3",
@@ -249,6 +368,13 @@ export const REACTION_RULES = [
                 precipitate: "CaCO₃(s) – white ppt; dissolves in dilute HCl with CO₂ effervescence",
                 hasPrecipitate: true,
                 colorChange: "colourless → milky white (CaCO₃)",
+            };
+        },
+        blind() {
+            return {
+                observation: "White precipitate forms immediately. Dissolves with effervescence in dilute hydrochloric acid.",
+                precipitate: "White precipitate; dissolves in dilute HCl with effervescence",
+                colorChange: "colourless → white precipitate",
             };
         },
     },
@@ -268,6 +394,13 @@ export const REACTION_RULES = [
                 colorChange: "red solid → red-brown Cu residue + pale blue Cu²⁺ filtrate",
             };
         },
+        blind() {
+            return {
+                observation: "Solid dissolves in warm acid. Residue: red-brown metal. Filtrate: pale blue solution. Filter to separate. Filtrate tests positive with NaOH (pale blue precipitate).",
+                precipitate: "Red-brown solid metallic residue",
+                colorChange: "solid → red-brown residue + pale blue filtrate",
+            };
+        },
     },
 
     // ── NO₂⁻ redox ────────────────────────────────────────────────────────────
@@ -279,6 +412,12 @@ export const REACTION_RULES = [
                 observation: "Purple KMnO₄ rapidly decolourised. NO₂⁻ is oxidised to NO₃⁻. MnO₄⁻ reduced to Mn²⁺. Confirms reducing nitrite (NO₂⁻) — not shown by nitrate (NO₃⁻).",
                 newColor: "#f5f5f5",
                 colorChange: "purple → colourless (NO₂⁻ reduces KMnO₄; NO₃⁻ does not)",
+            };
+        },
+        blind() {
+            return {
+                observation: "Purple solution rapidly decolourised.",
+                colorChange: "purple → colourless",
             };
         },
     },
@@ -302,6 +441,13 @@ export const REACTION_RULES = [
                 colorChange: "colourless → white curdy (AgCl)",
             };
         },
+        blind() {
+            return {
+                observation: "Curdy white precipitate forms immediately. Turns grey-purple on exposure to sunlight. Dissolves readily in dilute and concentrated NH₃(aq).",
+                precipitate: "Curdy white precipitate; soluble in dilute NH₃(aq)",
+                colorChange: "colourless → white curdy precipitate",
+            };
+        },
     },
     {
         id: "qualitative/agno3-bromide",
@@ -313,6 +459,13 @@ export const REACTION_RULES = [
                 precipitate: "AgBr(s) – cream ppt; insoluble in dil. NH₃; dissolves in conc. NH₃",
                 hasPrecipitate: true,
                 colorChange: "colourless → cream (AgBr)",
+            };
+        },
+        blind() {
+            return {
+                observation: "Cream/pale cream precipitate forms immediately. Insoluble in dilute NH₃; dissolves only in concentrated NH₃(aq).",
+                precipitate: "Cream precipitate; insoluble in dilute NH₃; dissolves in conc. NH₃",
+                colorChange: "colourless → cream precipitate",
             };
         },
     },
@@ -328,6 +481,13 @@ export const REACTION_RULES = [
                 colorChange: "colourless → pale yellow (AgI)",
             };
         },
+        blind() {
+            return {
+                observation: "Pale yellow precipitate forms immediately. Insoluble in both dilute and concentrated NH₃(aq).",
+                precipitate: "Pale yellow precipitate; insoluble in NH₃ (any concentration)",
+                colorChange: "colourless → pale yellow precipitate",
+            };
+        },
     },
     {
         id: "qualitative/agno3-sulfate",
@@ -338,6 +498,12 @@ export const REACTION_RULES = [
                 newColor: "#f8f8f0",
                 precipitate: "Ag₂SO₄(s) – white ppt (slightly soluble)",
                 hasPrecipitate: true,
+            };
+        },
+        blind() {
+            return {
+                observation: "White/off-white precipitate forms — less dense/curdy than some silver precipitates. Slightly soluble in water. Soluble in excess dilute acid.",
+                precipitate: "White precipitate (slightly soluble)",
             };
         },
     },
@@ -353,6 +519,13 @@ export const REACTION_RULES = [
                 colorChange: "colourless → pale yellow (Ag₂CO₃)",
             };
         },
+        blind() {
+            return {
+                observation: "Pale yellow/cream precipitate forms. Soluble in dilute nitric acid.",
+                precipitate: "Pale yellow precipitate; soluble in dilute HNO₃",
+                colorChange: "colourless → pale yellow precipitate",
+            };
+        },
     },
     {
         id: "qualitative/agno3-sulfite",
@@ -363,6 +536,12 @@ export const REACTION_RULES = [
                 newColor: "#c0b8a8",
                 precipitate: "Ag₂SO₃(s) – white ppt; darkens to Ag₂S on standing",
                 hasPrecipitate: true,
+            };
+        },
+        blind() {
+            return {
+                observation: "White precipitate forms. Darkens to brown/black on standing.",
+                precipitate: "White precipitate; darkens to brown/black on standing",
             };
         },
     },
@@ -378,6 +557,13 @@ export const REACTION_RULES = [
                 colorChange: "white → yellow → dark brown-black (Ag₂S)",
             };
         },
+        blind() {
+            return {
+                observation: "White precipitate forms immediately. Rapidly turns yellow then dark brown-black on standing.",
+                precipitate: "White → brown-black precipitate (darkens rapidly)",
+                colorChange: "white → yellow → dark brown-black",
+            };
+        },
     },
     {
         id: "qualitative/agno3-naoh",
@@ -391,6 +577,13 @@ export const REACTION_RULES = [
                 colorChange: "colourless → dark brown (Ag₂O)",
             };
         },
+        blind() {
+            return {
+                observation: "Dark brown precipitate forms. Soluble in excess NH₃(aq).",
+                precipitate: "Dark brown precipitate",
+                colorChange: "colourless → dark brown precipitate",
+            };
+        },
     },
     {
         id: "qualitative/agno3-nh3",
@@ -400,6 +593,12 @@ export const REACTION_RULES = [
                 observation: "Pale brown precipitate (Ag₂O) forms with small amount of NH₃, then dissolves in excess NH₃ giving colourless diamminesilver(I) complex [Ag(NH₃)₂]⁺ — Tollens' reagent. No persistent precipitate in excess.",
                 newColor: "#f5f5f5",
                 colorChange: "colourless → pale brown → colourless [Ag(NH₃)₂]⁺ (Tollens')",
+            };
+        },
+        blind() {
+            return {
+                observation: "Pale brown precipitate forms with small amount of reagent, then dissolves in excess giving a colourless solution. No persistent precipitate in excess.",
+                colorChange: "colourless → pale brown → colourless in excess",
             };
         },
     },
@@ -418,6 +617,13 @@ export const REACTION_RULES = [
                 colorChange: "effervescence (CO₂)",
             };
         },
+        blind() {
+            return {
+                observation: "Vigorous effervescence. Colourless, odourless gas evolved. Turns limewater milky white.",
+                gas: "Colourless, odourless gas; turns limewater milky",
+                colorChange: "effervescence",
+            };
+        },
     },
     {
         id: "qualitative/acid-sulfite",
@@ -429,6 +635,13 @@ export const REACTION_RULES = [
                 observation: "Effervescence of pungent/choking sulfur dioxide (SO₂). Turns damp red litmus blue then bleaches it. Decolourises acidified KMnO₄ solution. SO₃²⁻ + 2H⁺ → H₂O + SO₂.",
                 gas: "SO₂ – pungent choking gas; turns damp litmus red then bleaches",
                 colorChange: "effervescence (SO₂)",
+            };
+        },
+        blind() {
+            return {
+                observation: "Effervescence of pungent/choking gas. Turns damp litmus paper then bleaches it. Decolourises acidified KMnO₄ solution.",
+                gas: "Pungent, choking gas; turns damp litmus paper then bleaches",
+                colorChange: "effervescence (pungent gas)",
             };
         },
     },
@@ -444,6 +657,7 @@ export const REACTION_RULES = [
                 hasPrecipitate: true,
             };
         },
+        // Observation already describes only physical phenomena — no blind needed.
     },
     {
         id: "qualitative/bacl2-sulfate",
@@ -459,6 +673,12 @@ export const REACTION_RULES = [
                 hasPrecipitate: true,
             };
         },
+        blind() {
+            return {
+                observation: "White precipitate forms immediately. Insoluble in excess dilute HCl.",
+                precipitate: "White precipitate, insoluble in dilute HCl",
+            };
+        },
     },
     {
         id: "qualitative/bacl2-sulfite",
@@ -471,6 +691,12 @@ export const REACTION_RULES = [
                 hasPrecipitate: true,
             };
         },
+        blind() {
+            return {
+                observation: "White precipitate forms. Soluble in excess dilute strong acid.",
+                precipitate: "White precipitate, soluble in dilute HCl",
+            };
+        },
     },
     {
         id: "qualitative/bacl2-carbonate",
@@ -481,6 +707,12 @@ export const REACTION_RULES = [
                 newColor: "#f8f8f8",
                 precipitate: "BaCO₃(s) – white ppt, soluble in dilute HCl (with CO₂)",
                 hasPrecipitate: true,
+            };
+        },
+        blind() {
+            return {
+                observation: "White precipitate forms. Soluble in dilute hydrochloric acid with effervescence.",
+                precipitate: "White precipitate, soluble in dilute HCl (with effervescence)",
             };
         },
     },
@@ -497,6 +729,12 @@ export const REACTION_RULES = [
                 hasPrecipitate: true,
             };
         },
+        blind() {
+            return {
+                observation: "Pale blue precipitate forms. Insoluble in excess NaOH.",
+                precipitate: "Pale blue precipitate, insoluble in excess NaOH",
+            };
+        },
     },
     {
         id: "qualitative/naoh-feso4",
@@ -508,6 +746,13 @@ export const REACTION_RULES = [
                 precipitate: "Fe(OH)₂(s) – dirty green ppt (→ rust-brown on standing in air)",
                 hasPrecipitate: true,
                 colorChange: "pale green → dirty green ppt (→ rust-brown on air exposure)",
+            };
+        },
+        blind() {
+            return {
+                observation: "Dirty green/dark green precipitate forms. Insoluble in excess NaOH. Darkens to rusty red-brown on standing in air.",
+                precipitate: "Dirty green precipitate (→ rust-brown on standing in air)",
+                colorChange: "pale green → dirty green precipitate",
             };
         },
     },
@@ -538,6 +783,13 @@ export const REACTION_RULES = [
                 colorChange: "blue → pale blue ppt → deep royal blue solution in excess NH₃",
             };
         },
+        blind() {
+            return {
+                observation: "Pale blue precipitate forms initially. Dissolves in excess NH₃(aq) to give a deep royal blue solution.",
+                precipitate: "Pale blue precipitate initially → dissolves in excess NH₃",
+                colorChange: "coloured solution → pale blue ppt → deep royal blue in excess",
+            };
+        },
     },
     {
         id: "qualitative/nh3-feso4",
@@ -549,6 +801,13 @@ export const REACTION_RULES = [
                 precipitate: "Fe(OH)₂(s) – dirty green ppt, insoluble in excess NH₃",
                 hasPrecipitate: true,
                 colorChange: "pale green → dirty green ppt",
+            };
+        },
+        blind() {
+            return {
+                observation: "Dirty green/dark green precipitate forms. Insoluble in excess NH₃. Darkens to rust-brown on standing.",
+                precipitate: "Dirty green precipitate, insoluble in excess NH₃",
+                colorChange: "pale green → dirty green precipitate",
             };
         },
     },
@@ -563,6 +822,13 @@ export const REACTION_RULES = [
             return {
                 observation: "Vigorous effervescence. Mg dissolves rapidly. Hydrogen gas evolved — pops with lighted splint (H₂). Solution warms noticeably.",
                 gas: "H₂ – pops with lighted splint",
+                colorChange: "colourless (vigorous effervescence)",
+            };
+        },
+        blind() {
+            return {
+                observation: "Vigorous effervescence. Solid dissolves rapidly. Colourless gas evolved — pops with lighted splint. Solution warms noticeably.",
+                gas: "Colourless gas; pops with lighted splint",
                 colorChange: "colourless (vigorous effervescence)",
             };
         },
@@ -581,6 +847,13 @@ export const REACTION_RULES = [
                 colorChange: "colourless (effervescence; Zn dissolving)",
             };
         },
+        blind() {
+            return {
+                observation: "Solid dissolves with steady effervescence. Colourless gas evolved — pops with lighted splint. Solution warms.",
+                gas: "Colourless gas; pops with lighted splint",
+                colorChange: "colourless (effervescence)",
+            };
+        },
     },
 
     // ── Carbonate precipitation ────────────────────────────────────────────────
@@ -596,6 +869,13 @@ export const REACTION_RULES = [
                 colorChange: "blue → blue-green precipitate",
             };
         },
+        blind() {
+            return {
+                observation: "Blue-green precipitate forms. Coloured solution fades as solid precipitates.",
+                precipitate: "Blue-green precipitate",
+                colorChange: "coloured solution → blue-green precipitate",
+            };
+        },
     },
     {
         id: "qualitative/na2co3-feso4",
@@ -606,6 +886,13 @@ export const REACTION_RULES = [
                 newColor: "#c8d8b8",
                 precipitate: "FeCO₃(s) – pale green/white ppt",
                 hasPrecipitate: true,
+                colorChange: "pale green solution → pale green precipitate",
+            };
+        },
+        blind() {
+            return {
+                observation: "Pale green/white precipitate forms. Slight effervescence may be visible.",
+                precipitate: "Pale green/white precipitate",
                 colorChange: "pale green solution → pale green precipitate",
             };
         },
@@ -622,6 +909,13 @@ export const REACTION_RULES = [
                 colorChange: "clear → milky white (positive carbonate/CO₂ test)",
             };
         },
+        blind() {
+            return {
+                observation: "Limewater turns milky white. White precipitate forms.",
+                precipitate: "White milky precipitate",
+                colorChange: "clear → milky white",
+            };
+        },
     },
 
     // ── Iodine / titration ────────────────────────────────────────────────────
@@ -635,6 +929,12 @@ export const REACTION_RULES = [
                 colorChange: "colourless → blue-black (starch-iodine complex)",
             };
         },
+        blind() {
+            return {
+                observation: "Dark blue-black colour appears.",
+                colorChange: "colourless → blue-black",
+            };
+        },
     },
     {
         id: "titration/thiosulfate-titrant-fa3",
@@ -642,6 +942,12 @@ export const REACTION_RULES = [
         produce() {
             return {
                 observation: "Yellow-brown iodine colour fades as Na₂S₂O₃ reduces I₂. Near endpoint: add starch → blue-black. At endpoint: blue-black disappears → colourless.",
+                colorChange: "yellow-brown → (blue-black with starch) → colourless at endpoint",
+            };
+        },
+        blind() {
+            return {
+                observation: "Yellow-brown colour fades. Near endpoint: add starch → blue-black. At endpoint: blue-black disappears → colourless.",
                 colorChange: "yellow-brown → (blue-black with starch) → colourless at endpoint",
             };
         },

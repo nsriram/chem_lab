@@ -112,10 +112,14 @@ export function useChemLab() {
 
         // Resolve FA label → actual chemical ID using the active paper's faMap
         const faMap = activePaper?.faMap ?? {};
+        const unknownFAs = activePaper?.unknownFAs ?? [];
         const isFa = String(selectedChemical).startsWith("FA ");
         const actualChemId = isFa ? (faMap[selectedChemical] ?? selectedChemical) : selectedChemical;
         const chem = CHEMICALS[actualChemId];
         if (!chem) return;
+
+        // Mark content as unknown so the reaction engine uses blind observations
+        const isUnknownFA = isFa && unknownFAs.includes(selectedChemical);
 
         // Display label: FA label for exam materials, chemical name for regular chemicals
         const displayLabel = isFa ? selectedChemical : chem.label;
@@ -129,11 +133,17 @@ export function useChemLab() {
             let newContents;
             if (existing) {
                 newContents = v.contents.map(c => c.chemical === actualChemId
-                    ? { ...c, volume: (c.volume || 0) + (amount.volume || 0), mass: (c.mass || 0) + (amount.mass || 0) }
+                    ? {
+                        ...c,
+                        volume: (c.volume || 0) + (amount.volume || 0),
+                        mass: (c.mass || 0) + (amount.mass || 0),
+                        // Once an unknown FA is in the vessel, keep it flagged
+                        unknown: c.unknown || isUnknownFA,
+                    }
                     : c
                 );
             } else {
-                newContents = [...v.contents, { chemical: actualChemId, label: displayLabel, ...amount }];
+                newContents = [...v.contents, { chemical: actualChemId, label: displayLabel, ...amount, ...(isUnknownFA ? { unknown: true } : {}) }];
             }
             const tempVessel = { ...v, contents: newContents };
             const rxn = simulateReaction(tempVessel, "add");
@@ -224,14 +234,38 @@ export function useChemLab() {
                 .reduce((s, c) => s + (c.mass || 0), 0);
             obs = `⚖️ Mass of solid contents: ${totalMass.toFixed(2)} g  [Balance precision: ±0.005 g — record to 2 d.p.]`;
         } else if (action === "test_gas_splint") {
-            const hasGas = vessel.observations.some(o => o.includes("H₂") || o.includes("pops"));
-            obs = hasGas ? "🕯️ Gas pops with lighted splint → Hydrogen confirmed!" : "🕯️ Gas does not pop with splint.";
+            const hasUnknownContent = vessel.contents.some(c => c.unknown);
+            const pops = vessel.observations.some(o => o.includes("H₂") || o.includes("pops"));
+            if (pops) {
+                obs = hasUnknownContent
+                    ? "🕯️ Gas pops with lighted splint."
+                    : "🕯️ Gas pops with lighted splint → Hydrogen confirmed!";
+            } else {
+                obs = "🕯️ Gas does not pop with splint.";
+            }
         } else if (action === "test_gas_glowing") {
-            const hasO2 = vessel.observations.some(o => o.includes("O₂") || o.includes("relights"));
-            obs = hasO2 ? "🕯️ Glowing splint relights → Oxygen confirmed!" : "🕯️ Glowing splint does not relight.";
+            const hasUnknownContent = vessel.contents.some(c => c.unknown);
+            const relights = vessel.observations.some(o => o.includes("O₂") || o.includes("relights"));
+            if (relights) {
+                obs = hasUnknownContent
+                    ? "🕯️ Glowing splint relights."
+                    : "🕯️ Glowing splint relights → Oxygen confirmed!";
+            } else {
+                obs = "🕯️ Glowing splint does not relight.";
+            }
         } else if (action === "test_litmus") {
-            const hasNH3 = vessel.observations.some(o => o.includes("NH₃") || o.includes("ammonia"));
-            obs = hasNH3 ? "📄 Damp red litmus turns blue → Ammonia confirmed!" : "📄 Litmus does not change colour.";
+            const hasUnknownContent = vessel.contents.some(c => c.unknown);
+            const turnsBlue = vessel.observations.some(o =>
+                o.includes("NH₃") || o.includes("ammonia") ||
+                (o.includes("litmus") && o.toLowerCase().includes("blue"))
+            );
+            if (turnsBlue) {
+                obs = hasUnknownContent
+                    ? "📄 Damp red litmus turns blue."
+                    : "📄 Damp red litmus turns blue → Ammonia confirmed!";
+            } else {
+                obs = "📄 Litmus does not change colour.";
+            }
         }
 
         setLastObservation(`[${vessel.label}] ${action.replace(/_/g, ' ')}: ${obs}`);
