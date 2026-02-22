@@ -238,10 +238,14 @@ export function useChemLab() {
             const rounded = Math.round(vessel.temp * 2) / 2;
             obs = `🌡 Temperature: ${rounded.toFixed(1)} °C  [Thermometer precision: ±0.25 °C — record to 0.5 °C]`;
         } else if (action === "weigh") {
-            const totalMass = vessel.contents
+            const solidMass = vessel.contents
                 .filter(c => CHEMICALS[c.chemical]?.type === "solid")
                 .reduce((s, c) => s + (c.mass || 0), 0);
-            obs = `⚖️ Mass of solid contents: ${totalMass.toFixed(2)} g  [Balance precision: ±0.005 g — record to 2 d.p.]`;
+            const apparatusMass = EQUIPMENT[vessel.type]?.apparatusMass ?? 0;
+            const balanceReading = apparatusMass + solidMass;
+            obs = apparatusMass > 0
+                ? `⚖️ Balance reading: ${balanceReading.toFixed(2)} g  (apparatus: ${apparatusMass.toFixed(2)} g + solid contents: ${solidMass.toFixed(2)} g)  [±0.005 g — record to 2 d.p.]`
+                : `⚖️ Balance reading: ${solidMass.toFixed(2)} g  (solid contents only)  [±0.005 g — record to 2 d.p.]`;
         } else if (action === "test_gas_splint") {
             const hasUnknownContent = vessel.contents.some(c => c.unknown);
             const pops = vessel.observations.some(o => o.includes("H₂") || o.includes("pops"));
