@@ -9,11 +9,16 @@ function autoHeight(el) {
     el.style.height = el.scrollHeight + "px";
 }
 
+// Quick-insert palettes for the cell toolbar (most common in chemistry tables)
+const CELL_QUICK_SUB = ['₀','₁','₂','₃','₄','₅','₆','₇','₈','₉','₊','₋','ₙ','ₐ','ₑ'];
+const CELL_QUICK_SUP = ['⁰','¹','²','³','⁴','⁵','⁶','⁷','⁸','⁹','⁺','⁻','ⁿ'];
+
 // ── ChemCell ──────────────────────────────────────────────────────────────────
-// Compact table-cell textarea with Ctrl+, / Ctrl+. keyboard shortcuts.
-// No visible toolbar — a small badge appears in the corner when mode is active.
+// Compact table-cell textarea with sub/sup toolbar (shown on focus) and
+// Ctrl+, / Ctrl+. keyboard shortcuts.
 export function ChemCell({ value, onChange, style: styleOverride }) {
     const [mode, setMode] = useState(null);
+    const [focused, setFocused] = useState(false);
     const ref = useRef(null);
 
     // Used as callback ref so autoHeight fires on mount
@@ -50,6 +55,36 @@ export function ChemCell({ value, onChange, style: styleOverride }) {
         }
     }
 
+    function insertChar(char) {
+        const el = ref.current;
+        if (!el) { onChange((value ?? '') + char); return; }
+        const s = el.selectionStart, end = el.selectionEnd;
+        const nv = (value ?? '').slice(0, s) + char + (value ?? '').slice(end);
+        onChange(nv);
+        requestAnimationFrame(() => {
+            el.selectionStart = el.selectionEnd = s + char.length;
+            el.focus();
+        });
+    }
+
+    // Shared mini-button style
+    function modeBtn(active, activeColor, activeBg) {
+        return {
+            padding: '0 5px', fontSize: 9, lineHeight: '16px', borderRadius: 2,
+            cursor: 'pointer', border: `1px solid ${active ? activeColor : '#1a3a5a'}`,
+            background: active ? activeBg : 'rgba(255,255,255,0.04)',
+            color: active ? activeColor : '#5a8aaa',
+            fontFamily: "'JetBrains Mono', monospace", outline: 'none',
+        };
+    }
+    function quickBtn(color, bg) {
+        return {
+            padding: '0 3px', fontSize: 11, lineHeight: '16px', borderRadius: 2,
+            cursor: 'pointer', border: '1px solid #1a3a5a', background: bg,
+            color, fontFamily: 'inherit', minWidth: 18, textAlign: 'center', outline: 'none',
+        };
+    }
+
     return (
         <div style={{ position: 'relative' }}>
             <textarea
@@ -58,7 +93,9 @@ export function ChemCell({ value, onChange, style: styleOverride }) {
                 rows={1}
                 onChange={handleChange}
                 onKeyDown={handleKeyDown}
-                title="Ctrl+, = subscript mode · Ctrl+. = superscript mode · Esc to exit"
+                onFocus={() => setFocused(true)}
+                onBlur={() => { setFocused(false); setMode(null); }}
+                title="Ctrl+, = subscript · Ctrl+. = superscript · Esc to exit mode"
                 style={{
                     display: 'block', width: '100%',
                     background: 'transparent', color: '#a8c8e0', border: 'none',
@@ -71,14 +108,36 @@ export function ChemCell({ value, onChange, style: styleOverride }) {
                     ...styleOverride,
                 }}
             />
-            {mode && (
+            {/* Sub/sup toolbar — visible only when cell is focused */}
+            {focused && (
                 <div style={{
-                    position: 'absolute', top: 2, right: 4, fontSize: 8, lineHeight: 1,
-                    color: mode === 'sub' ? '#60a0ff' : '#ffa060',
-                    fontFamily: "'JetBrains Mono', monospace", pointerEvents: 'none',
-                    background: 'rgba(10,20,40,0.8)', padding: '1px 3px', borderRadius: 2,
+                    display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center',
+                    padding: '2px 4px 3px',
+                    borderTop: '1px solid #1a3a5a',
+                    background: 'rgba(8,18,36,0.85)',
                 }}>
-                    {mode === 'sub' ? 'SUB' : 'SUP'}
+                    <button type="button"
+                        onMouseDown={e => { e.preventDefault(); setMode(m => m === 'sub' ? null : 'sub'); }}
+                        title="Subscript (Ctrl+,)"
+                        style={modeBtn(mode === 'sub', '#60a0ff', 'rgba(30,70,180,0.35)')}>
+                        X₂
+                    </button>
+                    <button type="button"
+                        onMouseDown={e => { e.preventDefault(); setMode(m => m === 'sup' ? null : 'sup'); }}
+                        title="Superscript (Ctrl+.)"
+                        style={modeBtn(mode === 'sup', '#ffa060', 'rgba(180,80,20,0.35)')}>
+                        X²
+                    </button>
+                    {mode === 'sub' && CELL_QUICK_SUB.map(c => (
+                        <button key={c} type="button"
+                            onMouseDown={e => { e.preventDefault(); insertChar(c); }}
+                            style={quickBtn('#a0c8ff', 'rgba(30,70,180,0.15)')}>{c}</button>
+                    ))}
+                    {mode === 'sup' && CELL_QUICK_SUP.map(c => (
+                        <button key={c} type="button"
+                            onMouseDown={e => { e.preventDefault(); insertChar(c); }}
+                            style={quickBtn('#ffb080', 'rgba(180,80,20,0.15)')}>{c}</button>
+                    ))}
                 </div>
             )}
         </div>
