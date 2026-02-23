@@ -2,6 +2,7 @@ import { QUESTION_PAPERS } from "../data/questionPaper";
 import ChemTextInput from "./ChemTextInput";
 import { ChemInput, ResizableTable } from "./DataTab";
 import GraphPlot from "./GraphPlot";
+import { useLang } from "../contexts/LangContext";
 
 // Normalize answer value: old string format → new {text, tables, graphs} shape
 function normalizeAns(v) {
@@ -10,6 +11,7 @@ function normalizeAns(v) {
 }
 
 export default function PaperTab({ activePaperId, setActivePaperId, expandedQ, setExpandedQ, partAnswers, setPartAnswers }) {
+    const { t } = useLang();
     const paper = QUESTION_PAPERS[activePaperId] ?? QUESTION_PAPERS[0];
 
     // Merge a patch into a single part's answer object
@@ -38,7 +40,7 @@ export default function PaperTab({ activePaperId, setActivePaperId, expandedQ, s
             {/* Paper selector */}
             <div style={{ marginBottom: 20, padding: "14px 18px", background: "rgba(0,0,0,0.3)", borderRadius: 10, border: "1px solid #2a4a6a" }}>
                 <div style={{ fontSize: 12, color: "#6a9abf", textTransform: "uppercase", letterSpacing: "1px", marginBottom: 8 }}>
-                    Select Question Paper
+                    {t('paper.selectPaper')}
                 </div>
                 <select
                     value={activePaperId}
@@ -63,14 +65,14 @@ export default function PaperTab({ activePaperId, setActivePaperId, expandedQ, s
                 <div style={{ color: "#8ab4d4", marginBottom: 8 }}>{paper.subtitle}</div>
                 <div style={{ display: "flex", justifyContent: "center", gap: 24, fontSize: 13, color: "#6a9abf" }}>
                     <span>⏰ {paper.time}</span>
-                    <span>📝 {paper.marks} marks</span>
-                    <span>📖 Answer all questions</span>
+                    <span>📝 {paper.marks} {t('eval.marks')}</span>
+                    <span>{t('paper.answerAll')}</span>
                 </div>
             </div>
 
             {/* Instructions */}
             <div style={{ background: "rgba(180,120,40,0.1)", border: "1px solid #8a6a2a", borderRadius: 8, padding: "10px 16px", marginBottom: 20, fontSize: 13, color: "#d4b86a" }}>
-                ⚠️ <strong>Instructions:</strong> Answer all questions. Show precision of apparatus in recorded
+                ⚠️ <strong>{t('paper.instructions')}</strong> Answer all questions. Show precision of apparatus in recorded
                 data. Show working in calculations. Use the Laboratory tab to perform experiments. Your actions
                 are logged and evaluated.
             </div>
@@ -81,7 +83,7 @@ export default function PaperTab({ activePaperId, setActivePaperId, expandedQ, s
                     <div className="q-header" onClick={() => setExpandedQ(expandedQ === q.id ? null : q.id)}>
                         <div>
                             <span style={{ fontFamily: "'Playfair Display', serif", fontSize: 17, color: "#c8e8ff" }}>{q.title}</span>
-                            <span style={{ marginLeft: 12, fontSize: 12, color: "#6a9abf" }}>[{q.marks} marks]</span>
+                            <span style={{ marginLeft: 12, fontSize: 12, color: "#6a9abf" }}>[{q.marks} {t('eval.marks')}]</span>
                         </div>
                         <span style={{ color: "#4a9adf" }}>{expandedQ === q.id ? "▲" : "▼"}</span>
                     </div>
@@ -98,7 +100,7 @@ export default function PaperTab({ activePaperId, setActivePaperId, expandedQ, s
                                         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
                                             <strong style={{ color: "#c8e8ff", fontFamily: "'Playfair Display', serif" }}>{part.label}</strong>
                                             <span style={{ fontSize: 12, color: "#4a9adf", fontFamily: "'JetBrains Mono', monospace" }}>
-                                                [{part.marks} mark{part.marks > 1 ? "s" : ""}]
+                                                [{part.marks} {t('eval.marks')}]
                                             </span>
                                         </div>
                                         <div style={{ fontSize: 14, color: "#a8c8e0", lineHeight: 1.7, marginBottom: 10 }}>
@@ -106,19 +108,19 @@ export default function PaperTab({ activePaperId, setActivePaperId, expandedQ, s
                                         </div>
                                         {part.hint && (
                                             <div style={{ fontSize: 12, color: "#8a7a4a", fontStyle: "italic", marginBottom: 10 }}>
-                                                💡 Hint: {part.hint}
+                                                {t('paper.hint')} {part.hint}
                                             </div>
                                         )}
 
                                         {/* ── Answer area ── */}
                                         <div style={{ borderTop: "1px solid #1a3a5a", paddingTop: 10 }}>
                                             <div style={{ fontSize: 11, color: "#5a8aaa", textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 5 }}>
-                                                ✏️ Your Answer
+                                                {t('paper.yourAnswer')}
                                             </div>
                                             <ChemTextInput
                                                 value={ans.text}
                                                 onChange={v => updateAns(part.id, { text: v })}
-                                                placeholder="Write your answer here…"
+                                                placeholder={t('paper.placeholder')}
                                             />
 
                                             {/* ── Inline tables ── */}
@@ -135,12 +137,12 @@ export default function PaperTab({ activePaperId, setActivePaperId, expandedQ, s
                                                                 setTbls(part.id, ts => ts.map((t, i) => i === ti
                                                                     ? { ...t, headers: [...t.headers, `Col ${t.headers.length + 1}`], rows: t.rows.map(r => [...r, '']), colWidths: [...(t.colWidths ?? t.headers.map(() => 140)), 140] }
                                                                     : t))
-                                                            }>+ Column</button>
+                                                            }>{t('paper.addColumn')}</button>
                                                             <button className="action-btn" style={{ fontSize: 10, padding: "3px 8px" }} onClick={() =>
                                                                 setTbls(part.id, ts => ts.map((t, i) => i === ti
                                                                     ? { ...t, rows: [...t.rows, t.headers.map(() => '')] }
                                                                     : t))
-                                                            }>+ Row</button>
+                                                            }>{t('paper.addRow')}</button>
                                                             <button className="action-btn danger" style={{ fontSize: 10, padding: "3px 8px" }} onClick={() =>
                                                                 setTbls(part.id, ts => ts.filter((_, i) => i !== ti))
                                                             }>🗑</button>
@@ -181,7 +183,7 @@ export default function PaperTab({ activePaperId, setActivePaperId, expandedQ, s
                                                         <label style={{ fontSize: 11, color: "#8ab4d4", display: "flex", alignItems: "center", gap: 4 }}>
                                                             <input type="checkbox" checked={g.showBestFit}
                                                                 onChange={e => setGphs(part.id, gs => gs.map((gg, i) => i === gi ? { ...gg, showBestFit: e.target.checked } : gg))}
-                                                            /> Best-fit
+                                                            /> {t('paper.bestFit')}
                                                         </label>
                                                         <button className="action-btn danger" style={{ fontSize: 10, padding: "3px 8px", marginLeft: "auto" }}
                                                             onClick={() => setGphs(part.id, gs => gs.filter((_, i) => i !== gi))}>🗑</button>
@@ -190,7 +192,7 @@ export default function PaperTab({ activePaperId, setActivePaperId, expandedQ, s
                                                     <GraphPlot graph={g} />
 
                                                     <div style={{ display: "flex", gap: 8, marginTop: 10, alignItems: "center", flexWrap: "wrap" }}>
-                                                        <span style={{ fontSize: 11, color: "#6a9abf" }}>Add point:</span>
+                                                        <span style={{ fontSize: 11, color: "#6a9abf" }}>{t('paper.addPoint')}</span>
                                                         <input type="number" placeholder="x" value={g.newX}
                                                             onChange={e => setGphs(part.id, gs => gs.map((gg, i) => i === gi ? { ...gg, newX: e.target.value } : gg))}
                                                             style={{ width: 70, fontSize: 11 }} step="any"
@@ -252,7 +254,7 @@ export default function PaperTab({ activePaperId, setActivePaperId, expandedQ, s
                                                         rows: [['', '', ''], ['', '', '']],
                                                         colWidths: [140, 140, 140],
                                                     }])
-                                                }>📋 + Table</button>
+                                                }>{t('paper.addTable')}</button>
                                                 <button className="action-btn" style={{ fontSize: 11 }} onClick={() =>
                                                     setGphs(part.id, gs => [...gs, {
                                                         id: Date.now(),
@@ -265,7 +267,7 @@ export default function PaperTab({ activePaperId, setActivePaperId, expandedQ, s
                                                         newY: '',
                                                         newPointLabel: '',
                                                     }])
-                                                }>📉 + Graph</button>
+                                                }>{t('paper.addGraph')}</button>
                                             </div>
                                         </div>
                                     </div>

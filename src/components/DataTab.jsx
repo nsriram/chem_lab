@@ -1,6 +1,7 @@
 import { useRef, useState, useCallback } from "react";
 import GraphPlot from "./GraphPlot";
 import { TO_SUB, TO_SUP } from "./ChemTextInput";
+import { useLang } from "../contexts/LangContext";
 
 function autoHeight(el) {
     if (!el) return;
@@ -235,11 +236,12 @@ export function ResizableTable({ tbl, ti, setTables }) {
 }
 
 export default function DataTab({ tables, setTables, graphs, setGraphs, activeDataTab, setActiveDataTab }) {
+    const { t } = useLang();
     return (
         <div style={{ padding: 24, maxWidth: 1100, margin: "0 auto" }}>
             {/* Sub-tab bar */}
             <div style={{ display: "flex", gap: 8, marginBottom: 24 }}>
-                {[["tables", "📋 Tables"], ["graphs", "📉 Graphs"]].map(([id, label]) => (
+                {[["tables", t('data.tables')], ["graphs", t('data.graphs')]].map(([id, label]) => (
                     <button key={id} className={`tab-btn ${activeDataTab === id ? "active" : ""}`}
                             onClick={() => setActiveDataTab(id)}>{label}</button>
                 ))}
@@ -249,7 +251,7 @@ export default function DataTab({ tables, setTables, graphs, setGraphs, activeDa
             {activeDataTab === "tables" && (
                 <div>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-                        <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 17, color: "#c8e8ff" }}>Results Tables</div>
+                        <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 17, color: "#c8e8ff" }}>{t('data.resultsTables')}</div>
                         <button className="action-btn success" onClick={() =>
                             setTables(ts => [...ts, {
                                 id: Date.now(),
@@ -258,13 +260,13 @@ export default function DataTab({ tables, setTables, graphs, setGraphs, activeDa
                                 rows: [["", "", ""], ["", "", ""]],
                                 colWidths: [160, 160, 160],
                             }])
-                        }>+ New Table</button>
+                        }>{t('data.newTable')}</button>
                     </div>
 
                     {tables.length === 0 && (
                         <div style={{ textAlign: "center", padding: 60, color: "#3a6a9a", border: "2px dashed #1a3a5a", borderRadius: 12 }}>
                             <div style={{ fontSize: 32, marginBottom: 8 }}>📋</div>
-                            <div style={{ fontFamily: "'Playfair Display', serif" }}>No tables yet — click "+ New Table" to start recording</div>
+                            <div style={{ fontFamily: "'Playfair Display', serif" }}>{t('data.noTables')}</div>
                         </div>
                     )}
 
@@ -286,15 +288,15 @@ export default function DataTab({ tables, setTables, graphs, setGraphs, activeDa
                                                 colWidths: [...(t.colWidths ?? t.headers.map(() => 150)), 150],
                                               }
                                             : t))
-                                    }>+ Column</button>
+                                    }>{t('data.addColumn')}</button>
                                     <button className="action-btn" style={{ fontSize: 11 }} onClick={() =>
-                                        setTables(ts => ts.map((t, i) => i === ti
-                                            ? { ...t, rows: [...t.rows, t.headers.map(() => "")] }
-                                            : t))
-                                    }>+ Row</button>
+                                        setTables(ts => ts.map((tbl2, i) => i === ti
+                                            ? { ...tbl2, rows: [...tbl2.rows, tbl2.headers.map(() => "")] }
+                                            : tbl2))
+                                    }>{t('data.addRow')}</button>
                                     <button className="action-btn danger" style={{ fontSize: 11 }} onClick={() =>
                                         setTables(ts => ts.filter((_, i) => i !== ti))
-                                    }>🗑 Delete</button>
+                                    }>{t('data.delete')}</button>
                                 </div>
                             </div>
 
@@ -310,7 +312,7 @@ export default function DataTab({ tables, setTables, graphs, setGraphs, activeDa
             {activeDataTab === "graphs" && (
                 <div>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-                        <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 17, color: "#c8e8ff" }}>Graphs</div>
+                        <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 17, color: "#c8e8ff" }}>{t('data.resultsGraphs')}</div>
                         <button className="action-btn success" onClick={() =>
                             setGraphs(gs => [...gs, {
                                 id: Date.now(),
@@ -323,13 +325,13 @@ export default function DataTab({ tables, setTables, graphs, setGraphs, activeDa
                                 newY: "",
                                 newPointLabel: "",
                             }])
-                        }>+ New Graph</button>
+                        }>{t('data.newGraph')}</button>
                     </div>
 
                     {graphs.length === 0 && (
                         <div style={{ textAlign: "center", padding: 60, color: "#3a6a9a", border: "2px dashed #1a3a5a", borderRadius: 12 }}>
                             <div style={{ fontSize: 32, marginBottom: 8 }}>📉</div>
-                            <div style={{ fontFamily: "'Playfair Display', serif" }}>No graphs yet — click "+ New Graph" to start plotting</div>
+                            <div style={{ fontFamily: "'Playfair Display', serif" }}>{t('data.noGraphs')}</div>
                         </div>
                     )}
 
@@ -352,16 +354,16 @@ export default function DataTab({ tables, setTables, graphs, setGraphs, activeDa
                                 <label style={{ fontSize: 12, color: "#8ab4d4", display: "flex", alignItems: "center", gap: 4 }}>
                                     <input type="checkbox" checked={g.showBestFit}
                                         onChange={e => setGraphs(gs => gs.map((gg, i) => i === gi ? { ...gg, showBestFit: e.target.checked } : gg))}
-                                    /> Best-fit line
+                                    /> {t('data.bestFit')}
                                 </label>
                                 <button className="action-btn danger" style={{ fontSize: 11, marginLeft: "auto" }}
-                                    onClick={() => setGraphs(gs => gs.filter((_, i) => i !== gi))}>🗑 Delete</button>
+                                    onClick={() => setGraphs(gs => gs.filter((_, i) => i !== gi))}>{t('data.delete')}</button>
                             </div>
 
                             <GraphPlot graph={g} />
 
                             <div style={{ display: "flex", gap: 8, marginTop: 14, alignItems: "center", flexWrap: "wrap" }}>
-                                <span style={{ fontSize: 12, color: "#6a9abf" }}>Add point:</span>
+                                <span style={{ fontSize: 12, color: "#6a9abf" }}>{t('data.addPoint')}</span>
                                 <input type="number" placeholder="x" value={g.newX}
                                     onChange={e => setGraphs(gs => gs.map((gg, i) => i === gi ? { ...gg, newX: e.target.value } : gg))}
                                     style={{ width: 80, fontSize: 12 }} step="any"

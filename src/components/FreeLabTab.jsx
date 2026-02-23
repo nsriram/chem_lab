@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { generateGuidanceReport, CATEGORY_LABELS } from "../engine/freeLabReport";
 import { CHEMICALS } from "../data/chemicals";
+import { useLang } from "../contexts/LangContext";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -75,12 +76,12 @@ const CATEGORY_HINTS = {
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
-function CategoryHints({ category }) {
+function CategoryHints({ category, guidanceFor }) {
     const hints = CATEGORY_HINTS[category] || CATEGORY_HINTS.general;
     return (
         <div style={{ background: 'rgba(42,74,42,0.15)', border: '1px solid rgba(74,154,74,0.3)', borderRadius: 10, padding: '14px 18px' }}>
             <div style={{ fontSize: 12, color: '#4adf7a', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 10 }}>
-                💡 Guidance for {CATEGORY_LABELS[category] || 'This Experiment'}
+                💡 {guidanceFor} {CATEGORY_LABELS[category] || 'This Experiment'}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {hints.map((h, i) => (
@@ -94,7 +95,7 @@ function CategoryHints({ category }) {
     );
 }
 
-function ReportView({ report, onNew, onUpdateReport }) {
+function ReportView({ report, onNew, onUpdateReport, t }) {
     // Group improvements by severity
     const bySeverity = { essential: [], recommended: [], suggested: [] };
     (report.improvements || []).forEach(imp => {
@@ -112,28 +113,28 @@ function ReportView({ report, onNew, onUpdateReport }) {
             <div style={{ background: 'linear-gradient(135deg, rgba(26,58,100,0.7), rgba(26,74,100,0.7))', border: '1px solid #2a6a9a', borderRadius: 12, padding: '20px 24px', marginBottom: 24 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <div>
-                        <div style={{ fontSize: 11, color: '#4a9adf', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 4 }}>📋 Lab Guidance Report</div>
+                        <div style={{ fontSize: 11, color: '#4a9adf', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 4 }}>{t('free.report.labReport')}</div>
                         <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, color: '#c8e8ff', marginBottom: 4 }}>{report.title}</div>
                         <div style={{ fontSize: 12, color: '#6a9abf', marginBottom: 4 }}>{report.categoryLabel}</div>
-                        {report.goal && <div style={{ fontSize: 13, color: '#8ab4d4', fontStyle: 'italic' }}>Goal: {report.goal}</div>}
+                        {report.goal && <div style={{ fontSize: 13, color: '#8ab4d4', fontStyle: 'italic' }}>{t('free.report.goal')} {report.goal}</div>}
                     </div>
                     <div style={{ textAlign: 'right', fontSize: 11, color: '#4a7a9a' }}>
                         <div>{report.generatedAt}</div>
-                        <div style={{ marginTop: 4 }}>{report.actionsCount} actions · {report.chemicalsUsed.length} chemicals</div>
+                        <div style={{ marginTop: 4 }}>{report.actionsCount} {t('free.report.actionsCount')} · {report.chemicalsUsed.length} {t('free.report.chemicalsCount')}</div>
                     </div>
                 </div>
             </div>
 
             {/* Summary */}
             <div style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid #1a3a5a', borderRadius: 10, padding: '16px 20px', marginBottom: 20 }}>
-                <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 14, color: '#8ab4d4', marginBottom: 8 }}>📝 Experiment Summary</div>
+                <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 14, color: '#8ab4d4', marginBottom: 8 }}>{t('free.report.summary')}</div>
                 <div style={{ fontSize: 14, color: '#a8c8e0', lineHeight: 1.7 }}>{report.summary}</div>
             </div>
 
             {/* Strengths */}
             {report.strengths.length > 0 && (
                 <div style={{ background: 'rgba(42,100,42,0.15)', border: '1px solid rgba(74,154,74,0.4)', borderRadius: 10, padding: '16px 20px', marginBottom: 20 }}>
-                    <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 14, color: '#4adf7a', marginBottom: 10 }}>✅ What You Did Well</div>
+                    <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 14, color: '#4adf7a', marginBottom: 10 }}>{t('free.report.didWell')}</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                         {report.strengths.map((s, i) => (
                             <div key={i} style={{ display: 'flex', gap: 10, fontSize: 13, color: '#a0d4a0', lineHeight: 1.6 }}>
@@ -147,13 +148,13 @@ function ReportView({ report, onNew, onUpdateReport }) {
 
             {report.strengths.length === 0 && (
                 <div style={{ background: 'rgba(42,42,42,0.2)', border: '1px solid #2a3a4a', borderRadius: 10, padding: '14px 20px', marginBottom: 20, fontSize: 13, color: '#6a8aaa', fontStyle: 'italic' }}>
-                    No strengths were identified from the action log — make sure you perform your experiment in the Laboratory tab first.
+                    {t('free.report.noStrengths')}
                 </div>
             )}
 
             {/* Improvements */}
             <div style={{ marginBottom: 20 }}>
-                <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 14, color: '#c8e8ff', marginBottom: 12 }}>⚠️ Areas to Improve</div>
+                <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 14, color: '#c8e8ff', marginBottom: 12 }}>{t('free.report.areasToImprove')}</div>
                 {['essential', 'recommended', 'suggested'].map(sev => {
                     const items = bySeverity[sev];
                     if (items.length === 0) return null;
@@ -179,7 +180,7 @@ function ReportView({ report, onNew, onUpdateReport }) {
             {/* Recommended Protocol */}
             <div style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid #1a3a5a', borderRadius: 10, padding: '16px 20px', marginBottom: 20 }}>
                 <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 14, color: '#c8e8ff', marginBottom: 12 }}>
-                    📋 Recommended Protocol — {report.categoryLabel}
+                    {t('free.report.protocol')} — {report.categoryLabel}
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {report.protocol.map((step, i) => (
@@ -195,7 +196,7 @@ function ReportView({ report, onNew, onUpdateReport }) {
 
             {/* Key Tips */}
             <div style={{ background: 'rgba(42,42,80,0.2)', border: '1px solid rgba(100,100,160,0.3)', borderRadius: 10, padding: '16px 20px', marginBottom: 28 }}>
-                <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 14, color: '#a8a8d4', marginBottom: 10 }}>💡 Key Tips</div>
+                <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 14, color: '#a8a8d4', marginBottom: 10 }}>{t('free.report.keyTips')}</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
                     {report.tips.map((tip, i) => (
                         <div key={i} style={{ display: 'flex', gap: 8, fontSize: 13, color: '#9898c4', lineHeight: 1.6 }}>
@@ -209,13 +210,13 @@ function ReportView({ report, onNew, onUpdateReport }) {
             {/* Action buttons */}
             <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
                 <button className="action-btn" style={{ padding: '10px 28px', fontSize: 14 }} onClick={onNew}>
-                    🔄 New Experiment
+                    {t('free.newExperiment')}
                 </button>
                 <button className="action-btn" style={{ padding: '10px 28px', fontSize: 14 }} onClick={onUpdateReport}>
-                    🔁 Regenerate Report
+                    {t('free.regenerate')}
                 </button>
                 <button className="action-btn" style={{ padding: '10px 28px', fontSize: 14 }} onClick={handlePrint}>
-                    🖨️ Print
+                    {t('free.print')}
                 </button>
             </div>
         </div>
@@ -231,6 +232,7 @@ export default function FreeLabTab({
     actionLog, clearLog,
     setActiveTab,
 }) {
+    const { t } = useLang();
     const [form, setForm] = useState(freeExperiment ?? { title: '', category: 'qualitative', goal: '' });
     const [clearOnStart, setClearOnStart] = useState(true);
 
@@ -264,6 +266,7 @@ export default function FreeLabTab({
                 report={freeLabReport}
                 onNew={handleNew}
                 onUpdateReport={handleGenerate}
+                t={t}
             />
         );
     }
@@ -278,7 +281,7 @@ export default function FreeLabTab({
                 <div style={{ background: 'linear-gradient(135deg, rgba(30,80,50,0.5), rgba(30,70,60,0.5))', border: '1px solid #2a8a4a', borderRadius: 12, padding: '18px 24px', marginBottom: 20 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <div>
-                            <div style={{ fontSize: 11, color: '#4adf7a', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 4 }}>🔬 Experiment in Progress</div>
+                            <div style={{ fontSize: 11, color: '#4adf7a', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 4 }}>{t('free.inProgress')}</div>
                             <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 19, color: '#c8e8ff', marginBottom: 3 }}>{freeExperiment.title}</div>
                             <div style={{ fontSize: 12, color: '#6ab4a4' }}>{cat?.label}</div>
                             {freeExperiment.goal && (
@@ -289,28 +292,28 @@ export default function FreeLabTab({
                             className="action-btn"
                             style={{ fontSize: 11, flexShrink: 0 }}
                             onClick={() => { setFreeExperiment(null); setFreeLabReport(null); }}
-                        >✏️ Change</button>
+                        >{t('free.change')}</button>
                     </div>
                 </div>
 
                 {/* Navigation */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 20 }}>
                     <button className="action-btn success" style={{ padding: '13px 0', fontSize: 14 }} onClick={() => setActiveTab('lab')}>
-                        🧪 Go to Laboratory →
+                        {t('free.goToLab')}
                     </button>
                     <button className="action-btn" style={{ padding: '13px 0', fontSize: 14 }} onClick={() => setActiveTab('data')}>
-                        📈 Go to Data &amp; Graphs →
+                        {t('free.goToData')}
                     </button>
                 </div>
 
                 {/* Stats */}
                 <div style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid #2a4a6a', borderRadius: 10, padding: '16px 20px', marginBottom: 20 }}>
-                    <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 13, color: '#8ab4d4', marginBottom: 12 }}>Progress So Far</div>
+                    <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 13, color: '#8ab4d4', marginBottom: 12 }}>{t('free.progressSoFar')}</div>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 14 }}>
                         {[
-                            ['Actions logged', actionLog.length, '#4a9adf'],
-                            ['Chemicals used', chemicalsUsed.length, '#4adf9a'],
-                            ['Observations', actionLog.filter(a => a.observation).length, '#df9a4a'],
+                            [t('free.actionsLogged'), actionLog.length, '#4a9adf'],
+                            [t('free.chemicalsUsed'), chemicalsUsed.length, '#4adf9a'],
+                            [t('free.observations'), actionLog.filter(a => a.observation).length, '#df9a4a'],
                         ].map(([label, val, col]) => (
                             <div key={label} style={{ background: 'rgba(42,90,138,0.15)', borderRadius: 8, padding: '10px 14px', textAlign: 'center' }}>
                                 <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 26, color: col }}>{val}</div>
@@ -320,20 +323,20 @@ export default function FreeLabTab({
                     </div>
                     {chemicalsUsed.length > 0 && (
                         <div style={{ fontSize: 12, color: '#7a9abf', lineHeight: 1.5 }}>
-                            <span style={{ color: '#5a7a9a' }}>Chemicals: </span>
+                            <span style={{ color: '#5a7a9a' }}>{t('free.chemicals')} </span>
                             {chemicalsUsed.map(id => CHEMICALS[id]?.label ?? id).join(' · ')}
                         </div>
                     )}
                     {actionLog.length === 0 && (
                         <div style={{ textAlign: 'center', color: '#4a7a6a', fontSize: 13, padding: 8 }}>
-                            No lab actions yet — go to the Laboratory tab to start your experiment.
+                            {t('free.noLabActions')}
                         </div>
                     )}
                 </div>
 
                 {/* Category guidance */}
                 <div style={{ marginBottom: 20 }}>
-                    <CategoryHints category={freeExperiment.category} />
+                    <CategoryHints category={freeExperiment.category} guidanceFor={t('free.guidanceFor')} />
                 </div>
 
                 {/* Generate button */}
@@ -344,11 +347,11 @@ export default function FreeLabTab({
                         onClick={handleGenerate}
                         disabled={actionLog.length === 0}
                     >
-                        📋 Generate Guidance Report
+                        {t('free.generateReport')}
                     </button>
                     {actionLog.length === 0 && (
                         <div style={{ fontSize: 12, color: '#5a7a8a', marginTop: 6 }}>
-                            Complete some lab work first, then come back to generate your report.
+                            {t('free.completeFirst')}
                         </div>
                     )}
                 </div>
@@ -363,10 +366,10 @@ export default function FreeLabTab({
             <div style={{ textAlign: 'center', marginBottom: 28 }}>
                 <div style={{ fontSize: 44, marginBottom: 8 }}>🔬</div>
                 <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 22, color: '#c8e8ff', marginBottom: 6 }}>
-                    Open Experiment — Free Lab
+                    {t('free.pageTitle')}
                 </div>
                 <div style={{ color: '#7aa4c4', fontSize: 14, maxWidth: 560, margin: '0 auto' }}>
-                    Set up and perform any single experiment. Receive personalised guidance on technique — not a grade.
+                    {t('free.pageDesc')}
                 </div>
             </div>
 
@@ -374,13 +377,13 @@ export default function FreeLabTab({
                 {/* Form */}
                 <div style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid #2a4a6a', borderRadius: 12, padding: 24 }}>
                     <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 16, color: '#c8e8ff', marginBottom: 20 }}>
-                        Describe Your Experiment
+                        {t('free.describeTitle')}
                     </div>
 
                     {/* Title */}
                     <div style={{ marginBottom: 16 }}>
                         <label style={{ display: 'block', fontSize: 11, color: '#5a8aaa', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 5 }}>
-                            Experiment Title *
+                            {t('free.expTitleLabel')}
                         </label>
                         <input
                             value={form.title}
@@ -393,7 +396,7 @@ export default function FreeLabTab({
                     {/* Category */}
                     <div style={{ marginBottom: 16 }}>
                         <label style={{ display: 'block', fontSize: 11, color: '#5a8aaa', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 5 }}>
-                            Experiment Category
+                            {t('free.categoryLabel')}
                         </label>
                         <select
                             value={form.category}
@@ -412,7 +415,7 @@ export default function FreeLabTab({
                     {/* Goal */}
                     <div style={{ marginBottom: 20 }}>
                         <label style={{ display: 'block', fontSize: 11, color: '#5a8aaa', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 5 }}>
-                            What do you want to find out?
+                            {t('free.goalLabel')}
                         </label>
                         <textarea
                             value={form.goal}
@@ -432,8 +435,8 @@ export default function FreeLabTab({
                             style={{ marginTop: 2, flexShrink: 0 }}
                         />
                         <span>
-                            Clear the action log when I start{' '}
-                            <span style={{ color: '#5a8a9a' }}>(recommended — removes previous experiment data so your report is accurate)</span>
+                            {t('free.clearLog')}{' '}
+                            <span style={{ color: '#5a8a9a' }}>{t('free.clearLogNote')}</span>
                         </span>
                     </label>
 
@@ -443,17 +446,17 @@ export default function FreeLabTab({
                         onClick={handleStart}
                         disabled={!form.title.trim()}
                     >
-                        🧪 Start Experiment →
+                        {t('free.startBtn')}
                     </button>
                     {!form.title.trim() && (
-                        <div style={{ fontSize: 11, color: '#4a6a7a', marginTop: 5, textAlign: 'center' }}>Enter an experiment title to continue</div>
+                        <div style={{ fontSize: 11, color: '#4a6a7a', marginTop: 5, textAlign: 'center' }}>{t('free.enterTitle')}</div>
                     )}
                 </div>
 
                 {/* Example experiments sidebar */}
                 <div>
                     <div style={{ fontSize: 12, color: '#5a8aaa', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 10 }}>
-                        Try one of these
+                        {t('free.tryOneOf')}
                     </div>
                     {EXAMPLE_EXPERIMENTS.map((ex, i) => (
                         <div

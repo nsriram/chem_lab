@@ -1,19 +1,22 @@
 import { exportReportPDF } from "../utils/export";
+import { useLang } from "../contexts/LangContext";
 
 export default function EvaluateTab({ evaluation, actionLog, partAnswers, paper, tables, graphs, runEvaluation, onBack, onStartFresh }) {
+    const { t } = useLang();
+
     return (
         <div style={{ padding: 24, maxWidth: 900, margin: "0 auto" }}>
             {!evaluation ? (
                 <div style={{ textAlign: "center", padding: 60 }}>
                     <div style={{ fontSize: 48, marginBottom: 16 }}>📊</div>
                     <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, color: "#c8e8ff", marginBottom: 12 }}>
-                        Ready to Evaluate
+                        {t('eval.readyTitle')}
                     </div>
                     <div style={{ color: "#8ab4d4", marginBottom: 24 }}>
-                        Click "Submit &amp; Evaluate" to receive your assessment
+                        {t('eval.readyDesc')}
                     </div>
                     <button className="action-btn success" style={{ fontSize: 16, padding: "12px 32px" }} onClick={runEvaluation}>
-                        🎓 Submit &amp; Evaluate Now
+                        {t('eval.submitNow')}
                     </button>
                 </div>
             ) : (
@@ -21,7 +24,7 @@ export default function EvaluateTab({ evaluation, actionLog, partAnswers, paper,
                     {/* Score Summary */}
                     <div style={{ background: "linear-gradient(135deg, rgba(26,58,90,0.8), rgba(26,74,90,0.8))", borderRadius: 12, padding: 24, marginBottom: 24, border: "1px solid #2a6a9a", textAlign: "center" }}>
                         <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 28, color: "#c8e8ff", marginBottom: 8 }}>
-                            Your Result: {evaluation.grade}
+                            {t('eval.yourResult')} {evaluation.grade}
                         </div>
                         <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 42, color: "#4adf7a", marginBottom: 12 }}>
                             {evaluation.total} / {evaluation.maxMarks}
@@ -32,8 +35,8 @@ export default function EvaluateTab({ evaluation, actionLog, partAnswers, paper,
                         <div style={{ marginTop: 8, fontSize: 13, color: "#8ab4d4" }}>
                             {Math.round((evaluation.total / evaluation.maxMarks) * 100)}%
                             · {evaluation.total >= evaluation.maxMarks * 0.7
-                                ? "Distinction" : evaluation.total >= evaluation.maxMarks * 0.5
-                                ? "Merit" : "Needs improvement"}
+                                ? t('eval.distinction') : evaluation.total >= evaluation.maxMarks * 0.5
+                                ? t('eval.merit') : t('eval.needsImprovement')}
                         </div>
                     </div>
 
@@ -70,7 +73,7 @@ export default function EvaluateTab({ evaluation, actionLog, partAnswers, paper,
                             <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 15, color: "#c8e8ff", marginBottom: 12, display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                                 <span>{sec.label}</span>
                                 <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 13, color: "#6a9abf" }}>
-                                    {sec.score}/{sec.max} marks
+                                    {sec.score}/{sec.max} {t('eval.marks')}
                                 </span>
                             </div>
                             {sec.criteria.map((c, i) => (
@@ -98,12 +101,12 @@ export default function EvaluateTab({ evaluation, actionLog, partAnswers, paper,
                     {/* Action Log */}
                     <div style={{ background: "rgba(0,0,0,0.2)", borderRadius: 10, padding: 20, border: "1px solid #2a4a6a", marginBottom: 16 }}>
                         <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 16, color: "#c8e8ff", marginBottom: 14 }}>
-                            🗒 Complete Action Log ({actionLog.length} actions)
+                            {t('eval.actionLog')} ({actionLog.length} {t('eval.actions')})
                         </div>
                         <div style={{ maxHeight: 260, overflow: "auto" }}>
                             {actionLog.length === 0 ? (
                                 <div style={{ color: "#3a6a9a", fontSize: 13 }}>
-                                    No actions recorded yet. Go to the Laboratory tab to start experimenting.
+                                    {t('eval.noActions')}
                                 </div>
                             ) : actionLog.map((entry, i) => (
                                 <div key={i} className="log-entry">
@@ -122,7 +125,7 @@ export default function EvaluateTab({ evaluation, actionLog, partAnswers, paper,
                     {paper?.questions?.length > 0 && (
                         <div style={{ background: "rgba(0,0,0,0.2)", borderRadius: 10, padding: 20, border: "1px solid #2a4a6a", marginBottom: 16 }}>
                             <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 16, color: "#c8e8ff", marginBottom: 16 }}>
-                                📝 Written Answers
+                                {t('eval.writtenAnswers')}
                             </div>
                             {paper.questions.map(q => (
                                 <div key={q.id} style={{ marginBottom: 20 }}>
@@ -139,7 +142,7 @@ export default function EvaluateTab({ evaluation, actionLog, partAnswers, paper,
                                                 {/* Question side */}
                                                 <div style={{ borderRight: "1px solid #1a3a5a", paddingRight: 12 }}>
                                                     <div style={{ fontSize: 11, color: "#4a9adf", textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 4, fontFamily: "'JetBrains Mono', monospace" }}>
-                                                        {part.label} · {part.marks} mk
+                                                        {part.label} · {part.marks} {t('eval.marks')}
                                                     </div>
                                                     <div style={{ fontSize: 12, color: "#8ab4d4", lineHeight: 1.6 }}>
                                                         {part.instruction}
@@ -148,16 +151,16 @@ export default function EvaluateTab({ evaluation, actionLog, partAnswers, paper,
                                                 {/* Answer side */}
                                                 <div>
                                                     <div style={{ fontSize: 11, color: "#5a9a6a", textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 4, fontFamily: "'JetBrains Mono', monospace" }}>
-                                                        ✏️ Student Answer
+                                                        {t('eval.studentAnswer')}
                                                     </div>
                                                     <div style={{ fontSize: 13, color: answerText ? "#c8e8ff" : "#3a5a7a", fontStyle: answerText ? "normal" : "italic", lineHeight: 1.6, whiteSpace: "pre-wrap", fontFamily: "'JetBrains Mono', monospace" }}>
-                                                        {answerText || "No answer provided"}
+                                                        {answerText || t('eval.noAnswer')}
                                                     </div>
                                                     {(hasTables || hasGraphs) && (
                                                         <div style={{ marginTop: 6, fontSize: 11, color: "#6a9abf", fontFamily: "'JetBrains Mono', monospace" }}>
-                                                            {hasTables && `📋 ${raw.tables.length} inline table${raw.tables.length > 1 ? "s" : ""}`}
+                                                            {hasTables && `📋 ${raw.tables.length} ${raw.tables.length > 1 ? t('eval.inlineTables') : t('eval.inlineTable')}`}
                                                             {hasTables && hasGraphs && "  "}
-                                                            {hasGraphs && `📉 ${raw.graphs.length} inline graph${raw.graphs.length > 1 ? "s" : ""}`}
+                                                            {hasGraphs && `📉 ${raw.graphs.length} ${raw.graphs.length > 1 ? t('eval.inlineGraphs') : t('eval.inlineGraph')}`}
                                                         </div>
                                                     )}
                                                 </div>
@@ -173,10 +176,10 @@ export default function EvaluateTab({ evaluation, actionLog, partAnswers, paper,
                         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                             <button className="action-btn success" style={{ fontSize: 13 }}
                                 onClick={() => exportReportPDF({ paper, actionLog, partAnswers, evaluation })}>
-                                📥 Download Report (PDF)
+                                {t('eval.downloadPDF')}
                             </button>
-                            <button className="action-btn" onClick={onBack}>← Back to Question Paper</button>
-                            <button className="action-btn" onClick={onStartFresh}>🔄 Start Fresh</button>
+                            <button className="action-btn" onClick={onBack}>{t('eval.backToPaper')}</button>
+                            <button className="action-btn" onClick={onStartFresh}>{t('eval.startFresh')}</button>
                         </div>
                     </div>
                 </div>

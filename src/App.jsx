@@ -4,9 +4,12 @@ import LabTab from "./components/LabTab";
 import DataTab from "./components/DataTab";
 import EvaluateTab from "./components/EvaluateTab";
 import FreeLabTab from "./components/FreeLabTab";
+import { useLang } from "./contexts/LangContext";
+import { LANG_OPTIONS } from "./data/i18n";
 
 export default function ChemLabApp() {
     const lab = useChemLab();
+    const { lang, setLang, t } = useLang();
 
     return (
         <div style={{
@@ -26,13 +29,32 @@ export default function ChemLabApp() {
             }}>
                 <div>
                     <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 22, fontWeight: 900, color: "#c8e8ff", letterSpacing: "1px" }}>
-                        ⚗️ Cambridge Chemistry Lab Simulator
+                        ⚗️ {t('app.title')}
                     </div>
                     <div style={{ fontSize: 12, color: "#6a9abf", letterSpacing: "2px", textTransform: "uppercase" }}>
-                        AS &amp; A Level · 9701/33 · Advanced Practical Skills
+                        {t('app.subtitle')}
                     </div>
                 </div>
                 <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                    {/* Language selector */}
+                    <select
+                        value={lang}
+                        onChange={e => setLang(e.target.value)}
+                        title="Select language"
+                        style={{
+                            background: "rgba(0,0,0,0.4)",
+                            border: "1px solid #2a5a8a",
+                            color: "#8ab4d4",
+                            borderRadius: 6,
+                            padding: "5px 8px",
+                            fontSize: 13,
+                            cursor: "pointer",
+                        }}
+                    >
+                        {LANG_OPTIONS.map(o => (
+                            <option key={o.code} value={o.code}>{o.flag} {o.label}</option>
+                        ))}
+                    </select>
                     <div style={{
                         fontFamily: "'JetBrains Mono', monospace",
                         fontSize: 18,
@@ -45,31 +67,22 @@ export default function ChemLabApp() {
                         ⏱ {String(Math.floor(lab.clockTime / 60)).padStart(2, '0')}:{String(lab.clockTime % 60).padStart(2, '0')}
                     </div>
                     <button className="action-btn" style={{ fontSize: 11 }} onClick={lab.undo} disabled={lab.historyIndex === 0}>
-                        ↩ Undo
+                        {t('btn.undo')}
                     </button>
                     <button className="action-btn" style={{ fontSize: 11 }} onClick={lab.redo} disabled={lab.historyIndex >= lab.logHistory.length - 1}>
-                        ↪ Redo
+                        {t('btn.redo')}
                     </button>
                     <button
                         className="action-btn danger"
                         style={{ fontSize: 11 }}
                         title="Clear all session data: bench, answers, log, graphs, tables"
                         onClick={() => {
-                            if (window.confirm(
-                                "Start a new session?\n\n" +
-                                "This will clear:\n" +
-                                "• All vessels on the bench\n" +
-                                "• All written answers\n" +
-                                "• The full action log\n" +
-                                "• All data tables and graphs\n\n" +
-                                "Your saved question paper selection is kept.\n\n" +
-                                "This cannot be undone."
-                            )) {
+                            if (window.confirm(t('newSession.title') + '\n\n' + t('newSession.body'))) {
                                 lab.startFresh();
                             }
                         }}
                     >
-                        🔄 New Session
+                        {t('btn.newSession')}
                     </button>
                 </div>
             </div>
@@ -77,18 +90,18 @@ export default function ChemLabApp() {
             {/* Tab Bar */}
             <div style={{ display: "flex", gap: 2, padding: "12px 24px 0", borderBottom: "1px solid #1a3a5a" }}>
                 {[
-                    ["paper", "📋 Question Paper"],
-                    ["lab", "🧪 Laboratory"],
-                    ["data", "📈 Data & Graphs"],
-                    ["evaluate", "📊 Evaluate"],
-                    ["freelab", "🔬 Free Lab"],
+                    ["paper",    t('tab.paper')],
+                    ["lab",      t('tab.lab')],
+                    ["data",     t('tab.data')],
+                    ["evaluate", t('tab.evaluate')],
+                    ["freelab",  t('tab.freelab')],
                 ].map(([id, label]) => (
                     <button key={id} className={`tab-btn ${lab.activeTab === id ? "active" : ""}`}
                         onClick={() => lab.setActiveTab(id)}>{label}</button>
                 ))}
                 <div style={{ flex: 1 }} />
                 <button className="action-btn success" style={{ marginBottom: 4 }} onClick={lab.runEvaluation}>
-                    🎓 Submit &amp; Evaluate
+                    {t('btn.submitEvaluate')}
                 </button>
             </div>
 
