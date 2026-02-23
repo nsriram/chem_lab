@@ -15,7 +15,7 @@
 // indicator rules can determine the colour at each 1 cm³ addition step.
 // Note: mmol = C(mol/dm³) × V(cm³)  because 1 dm³ = 1000 cm³.
 const _ACID_CONC  = { HCl: 2.00, H2SO4: 1.00, oxalic_acid: 0.05 };
-const _BASE_CONC  = { NaOH: 1.00, Na2CO3: 1.00, NH3_aq: 1.00 };
+const _BASE_CONC  = { NaOH: 1.00, Na2CO3: 1.00, NH3_aq: 1.00, NaHCO3: 0.20, NaHCO3_aq: 0.20 };
 const _ACID_EQUIV = { H2SO4: 2 };   // diprotic: 2 H⁺ per molecule
 const _BASE_EQUIV = { Na2CO3: 2 };  // dibasic:  2 OH⁻ equivalents per molecule
 
@@ -43,6 +43,7 @@ const _IODO_OXID = {
     CuSO4:        { conc: 1.000,  i2PerMol: 0.5 },  // 2Cu²⁺ + 4I⁻ → 2CuI + I₂
     FeCl3:        { conc: 0.500,  i2PerMol: 0.5 },  // 2Fe³⁺ + 2I⁻ → 2Fe²⁺ + I₂
     fe3_aq:       { conc: 0.500,  i2PerMol: 0.5 },  // same Fe³⁺ stoichiometry (ammonium iron(III) sulfate)
+    I2_solution:  { conc: 0.100,  i2PerMol: 1.0 },  // I₂ itself — direct oxidant; 1 mol I₂ per mol
 };
 const _S2O3_CONC = 22.00 / 248.2;  // 0.0886 mol/dm³ for Na₂S₂O₃·5H₂O (Mr = 248.2)
 
@@ -53,6 +54,7 @@ function _iodometricBalance(vessel) {
         const ox = _IODO_OXID[c.chemical];
         if (ox) i2Mmol += vol * ox.conc * ox.i2PerMol;
         if (c.chemical === 'Na2S2O3_titrant') thioMmol += vol * _S2O3_CONC;
+        if (c.chemical === 'Na2S2O3_std')     thioMmol += vol * 0.100;  // 0.100 mol/dm³ standard
     }
     // I₂ + 2Na₂S₂O₃ → 2NaI + Na₂S₄O₆  (1 mol I₂ consumed per 2 mol Na₂S₂O₃)
     const i2Consumed  = thioMmol / 2;
@@ -173,11 +175,16 @@ export const REACTION_RULES = [
     {
         id: "titration/iodometric",
         matches: (chemicals) =>
-            chemicals.includes("Na2S2O3_titrant") &&
-            chemicals.includes("KI") &&
-            (chemicals.includes("KMnO4_acid") || chemicals.includes("FA3_oxidiser") ||
-             chemicals.includes("H2O2") || chemicals.includes("CuSO4") ||
-             chemicals.includes("FeCl3") || chemicals.includes("fe3_aq")),
+            (chemicals.includes("Na2S2O3_titrant") || chemicals.includes("Na2S2O3_std")) &&
+            (
+                // classic: KI + oxidant → I₂, then titrate with Na₂S₂O₃
+                (chemicals.includes("KI") &&
+                 (chemicals.includes("KMnO4_acid") || chemicals.includes("FA3_oxidiser") ||
+                  chemicals.includes("H2O2") || chemicals.includes("CuSO4") ||
+                  chemicals.includes("FeCl3") || chemicals.includes("fe3_aq"))) ||
+                // direct: I₂ solution titrated with Na₂S₂O₃ (2022-paper style)
+                chemicals.includes("I2_solution")
+            ),
         produce(vessel) {
             const { i2Remaining, i2Fraction } = _iodometricBalance(vessel);
             const chems = (vessel.contents || []).map(c => c.chemical);
@@ -315,7 +322,10 @@ export const REACTION_RULES = [
     },
     {
         id: "redox/kmno4-ki",
-        requires: ["KMnO4_acid", "KI"],
+        // NH4I also contains I⁻ — same oxidation by KMnO₄
+        matches: (chemicals) =>
+            chemicals.includes("KMnO4_acid") &&
+            (chemicals.includes("KI") || chemicals.includes("NH4I")),
         produce() {
             return {
                 observation: "I⁻ oxidised to I₂ by MnO₄⁻. Solution turns deep yellow-brown (I₂). Add starch to confirm — turns blue-black. KMnO₄ purple consumed.",
@@ -662,7 +672,10 @@ export const REACTION_RULES = [
     },
     {
         id: "qualitative/agno3-iodide",
-        requires: ["AgNO3", "KI"],
+        // NH4I also gives AgI pale yellow ppt insoluble in NH₃
+        matches: (chemicals) =>
+            chemicals.includes("AgNO3") &&
+            (chemicals.includes("KI") || chemicals.includes("NH4I")),
         produce() {
             return {
                 observation: "Pale yellow precipitate of silver iodide (AgI) forms immediately. Insoluble in both dilute and concentrated NH₃(aq). Halide confirmed as I⁻.",
@@ -901,11 +914,12 @@ export const REACTION_RULES = [
     },
     {
         id: "qualitative/bacl2-sulfate",
-        // SO4²⁻ sources: H2SO4, CuSO4, FeSO4, fe3_aq (iron(III) ammonium sulfate)
+        // SO4²⁻ sources: H2SO4, CuSO4, FeSO4, fe3_aq, AlNH4SO4_aq (alum)
         matches: (chemicals) =>
             chemicals.includes("BaCl2") &&
             (chemicals.includes("H2SO4") || chemicals.includes("CuSO4") ||
-             chemicals.includes("FeSO4") || chemicals.includes("fe3_aq")),
+             chemicals.includes("FeSO4") || chemicals.includes("fe3_aq") ||
+             chemicals.includes("AlNH4SO4_aq")),
         produce() {
             return {
                 observation: "White precipitate of barium sulfate (BaSO₄) forms immediately. Insoluble in excess dilute HCl. Sulfate ion confirmed.",
@@ -1430,11 +1444,13 @@ export const REACTION_RULES = [
         id: "titration/starch-iodine",
         // Fires whenever starch is present AND I₂ has been (or can be) generated:
         // – FA3_oxidiser (iodate/IO₃⁻ source)
-        // – KI + any oxidant that liberates I₂: KMnO4_acid, H2O2, CuSO4, FeCl3
+        // – KI or NH4I + any oxidant that liberates I₂
+        // – I2_solution directly
         matches: (chemicals) =>
             chemicals.includes("starch") && (
                 chemicals.includes("FA3_oxidiser") ||
-                (chemicals.includes("KI") && (
+                chemicals.includes("I2_solution") ||
+                ((chemicals.includes("KI") || chemicals.includes("NH4I")) && (
                     chemicals.includes("KMnO4_acid") ||
                     chemicals.includes("H2O2") ||
                     chemicals.includes("CuSO4") ||
@@ -1501,6 +1517,528 @@ export const REACTION_RULES = [
                 observation: `White crystalline solid loses water on heating. Sizzling and bubbling as water escapes. After strong heating: white powdery anhydrous residue (~${residueMass}g). Mass loss = ${(mass - parseFloat(residueMass)).toFixed(2)}g (= water of crystallisation).`,
                 colorChange: "white crystals → white powder (anhydrous)",
             };
+        },
+    },
+
+    // ── NH4Cl solid — sublimation on heating ──────────────────────────────────
+    {
+        id: "qualitative/nh4cl-solid-heat",
+        requires: ["NH4Cl_solid"],
+        actionFilter: "heat",
+        produce() {
+            return {
+                observation: "NH₄Cl sublimes completely — no liquid residue. White smoke (mixture of NH₃ + HCl vapours) fills the tube. White crystalline rings form near the cooler upper part of the tube. Damp red litmus near tube mouth turns blue (NH₃); damp blue litmus further up turns red (HCl). NH₄Cl(s) ⇌ NH₃(g) + HCl(g). Confirms ammonium salt by sublimation. Dissolve the white ring back in water → re-forms NH₄Cl. NH₄⁺ confirmed: no fixed residue, sublimation is diagnostic.",
+                gas: "NH₃ + HCl (white smoke; sublimation)",
+                colorChange: "white solid → white smoke + white ring of crystals near top of tube; no residue",
+            };
+        },
+        blind() {
+            return {
+                observation: "Solid sublimes on heating — white smoke fills tube. White crystalline ring forms in cooler part. Pungent smell. Damp litmus at tube mouth turns blue (NH₃); damp litmus further up turns red (HCl). No liquid or coloured residue. Sublimation is diagnostic for NH₄Cl.",
+                gas: "White smoke (two pungent gases); sublimation",
+                colorChange: "white solid → white smoke + white ring of crystals; no residue",
+            };
+        },
+    },
+
+    // ── NH4I cation/anion tests ────────────────────────────────────────────────
+    {
+        id: "qualitative/nh4i-naoh-heat",
+        requires: ["NH4I", "NaOH"],
+        actionFilter: "heat",
+        produce() {
+            return {
+                observation: "On warming with NaOH: pungent ammonia gas (NH₃) evolved — damp red litmus paper held in vapour turns blue. No precipitate. NH₄⁺ + OH⁻ → NH₃(g) + H₂O. Confirms NH₄⁺. Cold NaOH gives no precipitate (I⁻ not precipitated by NaOH).",
+                gas: "NH₃ – pungent; turns damp red litmus blue (on warming)",
+                colorChange: "no visible change in solution (NH₃ gas evolved on warming)",
+            };
+        },
+        blind() {
+            return {
+                observation: "On warming: pungent smell. Damp red litmus paper turns blue. No visible change to solution.",
+                gas: "Pungent gas; turns damp red litmus blue",
+                colorChange: "no visible change (pungent gas on warming)",
+            };
+        },
+    },
+    {
+        id: "qualitative/nh4i-naoh",
+        requires: ["NH4I", "NaOH"],
+        produce() {
+            return {
+                observation: "No precipitate at room temperature — I⁻ is NOT precipitated by NaOH. On warming: pungent ammonia evolved — turns damp red litmus blue (NH₄⁺ confirmed). No colour change in solution. Contrast: Fe³⁺ gives rust-brown ppt; Cu²⁺ gives pale blue ppt.",
+                colorChange: "no visible change (no ppt; NH₃ gas on warming)",
+            };
+        },
+        blind() {
+            return {
+                observation: "No precipitate at room temperature. On warming, pungent gas evolved — turns damp red litmus blue. No colour change to solution.",
+                colorChange: "no visible change (pungent gas on warming)",
+            };
+        },
+    },
+    {
+        id: "qualitative/nh4i-acid",
+        matches: (chemicals) =>
+            chemicals.includes("NH4I") &&
+            (chemicals.includes("HCl") || chemicals.includes("H2SO4")),
+        produce() {
+            return {
+                observation: "No visible reaction — no precipitate, no gas, no colour change. NH₄I is stable in dilute acid. I⁻ is not oxidised by dilute H₂SO₄ or HCl (concentrated H₂SO₄ would oxidise I⁻ → I₂). NH₄⁺ is not displaced as NH₃ by acid.",
+                colorChange: "no visible change (NH₄I stable in dilute acid)",
+            };
+        },
+        blind() {
+            return {
+                observation: "No visible change. No precipitate, no gas evolved. Confirms no easily reducible/oxidisable groups reactive under these conditions.",
+                colorChange: "no visible change",
+            };
+        },
+    },
+
+    // ── CuCO₃ reactions ────────────────────────────────────────────────────────
+    // MUST precede qualitative/acid-carbonate (which requires Na2CO3 specifically).
+    {
+        id: "qualitative/cuco3-acid",
+        matches: (chemicals) =>
+            chemicals.includes("CuCO3") &&
+            (chemicals.includes("HCl") || chemicals.includes("H2SO4")),
+        produce() {
+            return {
+                observation: "Green CuCO₃ solid dissolves in acid with vigorous effervescence. CO₂ evolved — turns limewater milky. Blue/turquoise CuCl₂ (with HCl) or pale blue CuSO₄ (with H₂SO₄) solution forms. CuCO₃(s) + 2HCl(aq) → CuCl₂(aq) + H₂O(l) + CO₂(g). Test solution with NaOH → pale blue Cu(OH)₂ ppt (confirms Cu²⁺); with NH₃ (excess) → deep blue [Cu(NH₃)₄]²⁺.",
+                newColor: "#2a88c0",
+                gas: "CO₂ – turns limewater milky",
+                colorChange: "green solid dissolves → blue/turquoise solution + CO₂ effervescence",
+            };
+        },
+        blind() {
+            return {
+                observation: "Coloured solid dissolves in acid with vigorous effervescence. Colourless gas evolved — turns limewater milky. Coloured (blue/turquoise) solution forms.",
+                gas: "Colourless gas; turns limewater milky",
+                colorChange: "coloured solid → blue/turquoise solution + effervescence",
+            };
+        },
+    },
+    {
+        id: "thermal/cuco3-heat",
+        requires: ["CuCO3"],
+        actionFilter: "heat",
+        produce() {
+            return {
+                observation: "Green CuCO₃ powder turns black on heating. Black CuO residue remains. Water vapour condenses on cooler parts of tube. CO₂ evolved — turns limewater milky. CuCO₃(s) → CuO(s) + CO₂(g). Confirms CO₃²⁻ (limewater test) and Cu²⁺ (green → black CuO). Black CuO dissolves in dilute HCl → blue solution (Cu²⁺).",
+                gas: "CO₂ – turns limewater milky",
+                colorChange: "green solid → black solid (CuO) + CO₂ + water condensation",
+            };
+        },
+        blind() {
+            return {
+                observation: "Solid changes colour on heating. Water condensation visible on cooler part of tube. Colourless gas evolved — turns limewater milky. Coloured solid residue remains.",
+                gas: "Colourless gas; turns limewater milky",
+                colorChange: "coloured solid changes colour on heating; water condensation",
+            };
+        },
+    },
+
+    // ── Na₂S₂O₃ + FeCl₃ → decolourisation ────────────────────────────────────
+    // MUST precede qualitative/fecl3-naoh and qualitative/fecl3-nh3.
+    {
+        id: "qualitative/na2s2o3-fecl3",
+        matches: (chemicals) =>
+            chemicals.includes("Na2S2O3") &&
+            (chemicals.includes("FeCl3") || chemicals.includes("fe3_aq")),
+        produce() {
+            return {
+                observation: "Orange-brown FeCl₃ solution decolourises immediately to colourless/very pale. S₂O₃²⁻ reduces Fe³⁺ to Fe²⁺: 2Fe³⁺ + S₂O₃²⁻ → 2Fe²⁺ + S₄O₆²⁻ (tetrathionate). Distinctive: thiosulfate decolourises FeCl₃; sulfate (SO₄²⁻) does NOT — key test to distinguish S₂O₃²⁻ from SO₄²⁻.",
+                newColor: "#f0f0f0",
+                colorChange: "orange-brown (FeCl₃) → colourless (Fe³⁺ reduced to Fe²⁺ by S₂O₃²⁻)",
+            };
+        },
+        blind() {
+            return {
+                observation: "Orange-brown solution decolourises/turns colourless on adding the reagent. Confirms a reducing anion (S₂O₃²⁻). Contrast: SO₄²⁻ gives no change with FeCl₃.",
+                colorChange: "orange-brown → colourless (decolourisation confirms reducing anion)",
+            };
+        },
+    },
+
+    // ── AlNH4SO4_aq (alum) cation tests ──────────────────────────────────────
+    {
+        id: "qualitative/alnh4so4-naoh",
+        requires: ["AlNH4SO4_aq", "NaOH"],
+        produce() {
+            return {
+                observation: "White gelatinous precipitate of Al(OH)₃ forms immediately. Al³⁺ + 3OH⁻ → Al(OH)₃(s). Dissolves in excess NaOH → colourless [Al(OH)₄]⁻ (aluminate; amphoteric). On warming: pungent NH₃ evolved — turns damp red litmus blue. NH₄⁺ + OH⁻ → NH₃ + H₂O. Confirms Al³⁺ (white ppt soluble in excess NaOH) and NH₄⁺ (NH₃ on warming).",
+                newColor: "#f0f0f5",
+                precipitate: "Al(OH)₃(s) – white gelatinous ppt, soluble in excess NaOH",
+                hasPrecipitate: true,
+                gas: "NH₃ – pungent (on warming); turns damp red litmus blue",
+                colorChange: "colourless → white gelatinous ppt → colourless [Al(OH)₄]⁻ in excess",
+            };
+        },
+        blind() {
+            return {
+                observation: "White gelatinous precipitate forms. Dissolves in excess NaOH. On warming: pungent gas evolved — turns damp red litmus blue. Confirms amphoteric cation (Al³⁺) and NH₄⁺.",
+                precipitate: "White gelatinous precipitate; soluble in excess NaOH",
+                gas: "Pungent gas on warming; turns damp red litmus blue",
+                colorChange: "colourless → white ppt → colourless (excess NaOH); NH₃ on warming",
+            };
+        },
+    },
+    {
+        id: "qualitative/alnh4so4-nh3",
+        requires: ["AlNH4SO4_aq", "NH3_aq"],
+        produce() {
+            return {
+                observation: "White gelatinous precipitate of Al(OH)₃ forms. Al³⁺ + 3NH₃ + 3H₂O → Al(OH)₃(s) + 3NH₄⁺. Insoluble in excess NH₃(aq) — key distinction from Cu²⁺ (which gives deep blue [Cu(NH₃)₄]²⁺ complex in excess NH₃). Confirms Al³⁺.",
+                newColor: "#f0f0f5",
+                precipitate: "Al(OH)₃(s) – white gelatinous ppt, insoluble in excess NH₃",
+                hasPrecipitate: true,
+                colorChange: "colourless → white gelatinous precipitate (insoluble in excess NH₃)",
+            };
+        },
+        blind() {
+            return {
+                observation: "White gelatinous precipitate forms. Insoluble in excess NH₃. Distinct from Cu²⁺ (which gives deep blue in excess NH₃).",
+                precipitate: "White gelatinous precipitate; insoluble in excess NH₃",
+                colorChange: "colourless → white gelatinous precipitate",
+            };
+        },
+    },
+    {
+        id: "qualitative/fecl3-alum-no-reaction",
+        requires: ["AlNH4SO4_aq", "FeCl3"],
+        produce() {
+            return {
+                observation: "No significant reaction — orange-brown FeCl₃ colour unchanged. Alum (SO₄²⁻, Al³⁺, NH₄⁺) contains no reducing agent; none of these ions reduce Fe³⁺. Contrast: Na₂S₂O₃ immediately decolourises FeCl₃. This negative result helps identify SO₄²⁻ vs S₂O₃²⁻.",
+                newColor: "#c46008",
+                colorChange: "orange-brown — no change (SO₄²⁻ does not react with Fe³⁺)",
+            };
+        },
+        blind() {
+            return {
+                observation: "No significant change in colour. Confirms absence of reducing anion (S₂O₃²⁻ would decolourise FeCl₃; SO₄²⁻ does not).",
+                colorChange: "no significant change",
+            };
+        },
+    },
+    {
+        id: "qualitative/kmno4-alum-no-reaction",
+        matches: (chemicals) =>
+            chemicals.includes("KMnO4_acid") && chemicals.includes("AlNH4SO4_aq") &&
+            !chemicals.includes("KI") && !chemicals.includes("Na2S2O3") &&
+            !chemicals.includes("Na2SO3") && !chemicals.includes("FeSO4") &&
+            !chemicals.includes("H2O2") && !chemicals.includes("oxalic_acid"),
+        produce() {
+            return {
+                observation: "No reaction — KMnO₄ remains purple. SO₄²⁻ cannot reduce MnO₄⁻. Expected negative result: alum contains only SO₄²⁻, Al³⁺, NH₄⁺ — none are reducing agents. Contrast: S₂O₃²⁻, SO₃²⁻, Fe²⁺, and H₂O₂ all decolourise KMnO₄. This confirms anion is SO₄²⁻ (not SO₃²⁻ or S₂O₃²⁻).",
+                newColor: "#9b10c8",
+                colorChange: "purple (no change — SO₄²⁻ is not a reducing agent)",
+            };
+        },
+        blind() {
+            return {
+                observation: "Purple colour remains — no decolourisation. Confirms absence of reducing agent (S₂O₃²⁻ or SO₃²⁻ would decolourise KMnO₄).",
+                colorChange: "purple (no change)",
+            };
+        },
+    },
+
+    // ── Cr³⁺ cation tests (Cr_aq) ─────────────────────────────────────────────
+    {
+        id: "qualitative/cr3-naoh",
+        requires: ["Cr_aq", "NaOH"],
+        produce() {
+            return {
+                observation: "Grey-green precipitate of Cr(OH)₃ forms immediately. Cr³⁺ + 3OH⁻ → Cr(OH)₃(s). Dissolves in excess NaOH → dark green [Cr(OH)₄]⁻ or [Cr(OH)₆]³⁻ solution (amphoteric). No NH₃ on warming. Distinguishes Cr³⁺ from Fe³⁺ (rust-brown ppt insoluble in excess NaOH) and Al³⁺ (white ppt soluble in excess NaOH → colourless).",
+                newColor: "#3a6a3a",
+                precipitate: "Cr(OH)₃(s) – grey-green ppt, soluble in excess NaOH → dark green",
+                hasPrecipitate: true,
+                colorChange: "green → grey-green ppt → dark green solution in excess NaOH",
+            };
+        },
+        blind() {
+            return {
+                observation: "Grey-green precipitate forms. Dissolves in excess NaOH giving dark green solution. No NH₃ on warming. Amphoteric behaviour.",
+                precipitate: "Grey-green precipitate; soluble in excess NaOH (dark green solution)",
+                colorChange: "grey-green ppt → dark green (excess NaOH)",
+            };
+        },
+    },
+    {
+        id: "qualitative/cr3-nh3",
+        requires: ["Cr_aq", "NH3_aq"],
+        produce() {
+            return {
+                observation: "Grey-green precipitate of Cr(OH)₃ forms. Insoluble in excess NH₃(aq) — distinguishes Cr³⁺ from Cu²⁺ (deep blue complex with excess NH₃). Confirms Cr³⁺. Cr(OH)₃ is a gelatinous grey-green solid.",
+                newColor: "#4a7a4a",
+                precipitate: "Cr(OH)₃(s) – grey-green ppt, insoluble in excess NH₃",
+                hasPrecipitate: true,
+                colorChange: "green solution → grey-green precipitate (insoluble in excess NH₃)",
+            };
+        },
+        blind() {
+            return {
+                observation: "Grey-green precipitate forms. Insoluble in excess NH₃(aq).",
+                precipitate: "Grey-green precipitate; insoluble in excess NH₃",
+                colorChange: "grey-green precipitate forms",
+            };
+        },
+    },
+
+    // ── Mn²⁺ cation tests (MnSO4) ─────────────────────────────────────────────
+    {
+        id: "qualitative/mn2-naoh",
+        requires: ["MnSO4", "NaOH"],
+        produce() {
+            return {
+                observation: "Off-white/flesh-coloured precipitate of Mn(OH)₂ forms immediately. Insoluble in excess NaOH. Mn²⁺ + 2OH⁻ → Mn(OH)₂(s). Turns pale brown then dark brown on standing in air — Mn(OH)₂ oxidised to MnO₂·xH₂O by atmospheric O₂. Colour change is diagnostic: off-white → brown on air exposure.",
+                newColor: "#c8a878",
+                precipitate: "Mn(OH)₂(s) – off-white/cream ppt → brown MnO₂ on standing in air",
+                hasPrecipitate: true,
+                colorChange: "pale pink → off-white ppt → brown (air oxidation of Mn(OH)₂ → MnO₂)",
+            };
+        },
+        blind() {
+            return {
+                observation: "Off-white/cream precipitate forms immediately. Insoluble in excess NaOH. Rapidly turns brown on standing in air (oxidation by atmospheric O₂).",
+                precipitate: "Off-white precipitate → brown on standing; insoluble in excess NaOH",
+                colorChange: "off-white ppt → brown (air oxidation)",
+            };
+        },
+    },
+    {
+        id: "qualitative/mn2-nh3",
+        requires: ["MnSO4", "NH3_aq"],
+        produce() {
+            return {
+                observation: "Off-white/cream precipitate of Mn(OH)₂ forms. Insoluble in excess NH₃(aq). Turns brown on standing in air. Similar to NaOH test — both give off-white ppt insoluble in excess. Confirms Mn²⁺.",
+                newColor: "#c8a878",
+                precipitate: "Mn(OH)₂(s) – off-white ppt → brown on standing; insoluble in excess NH₃",
+                hasPrecipitate: true,
+                colorChange: "pale pink → off-white ppt → brown (air oxidation)",
+            };
+        },
+        blind() {
+            return {
+                observation: "Off-white/cream precipitate forms. Insoluble in excess NH₃. Turns brown on standing in air.",
+                precipitate: "Off-white precipitate → brown on standing; insoluble in excess NH₃",
+                colorChange: "off-white ppt → brown",
+            };
+        },
+    },
+
+    // ── Ba²⁺ + NaOH → Ba(OH)₂ precipitate ────────────────────────────────────
+    {
+        id: "qualitative/bacl2-naoh",
+        requires: ["BaCl2", "NaOH"],
+        produce() {
+            return {
+                observation: "White precipitate of barium hydroxide Ba(OH)₂ forms. Slightly soluble but precipitates at moderate concentrations. Insoluble in excess NaOH. Ba²⁺ + 2OH⁻ → Ba(OH)₂(s). On warming: no ammonia evolved (confirms absence of NH₄⁺). Distinguishes Ba²⁺: NaOH gives white ppt; contrast Cu²⁺ (pale blue ppt), Fe³⁺ (rust-brown ppt), Al³⁺ (white ppt soluble in excess).",
+                newColor: "#f0f0ee",
+                precipitate: "Ba(OH)₂(s) – white ppt, slightly soluble; insoluble in excess NaOH",
+                hasPrecipitate: true,
+                colorChange: "colourless → white precipitate (Ba(OH)₂; insoluble in excess NaOH)",
+            };
+        },
+        blind() {
+            return {
+                observation: "White precipitate forms. Insoluble in excess NaOH. No ammonia on warming. Slightly soluble so precipitate may be faint at low concentrations.",
+                precipitate: "White precipitate; insoluble in excess NaOH",
+                colorChange: "colourless → white precipitate",
+            };
+        },
+    },
+
+    // ── NaHCO₃ reactions ───────────────────────────────────────────────────────
+    {
+        id: "qualitative/nahco3-acid",
+        matches: (chemicals) =>
+            (chemicals.includes("NaHCO3") || chemicals.includes("NaHCO3_aq")) &&
+            (chemicals.includes("HCl") || chemicals.includes("H2SO4")),
+        produce() {
+            return {
+                observation: "Vigorous effervescence — CO₂ gas evolved immediately. Turns limewater milky. 2MHCO₃(aq) + H₂SO₄(aq) → M₂SO₄(aq) + 2H₂O(l) + 2CO₂(g). Colourless solution remains. Bromophenol blue indicator turns yellow at endpoint (acid in excess).",
+                gas: "CO₂ – turns limewater milky",
+                colorChange: "effervescence (CO₂) on adding acid to bicarbonate",
+            };
+        },
+        blind() {
+            return {
+                observation: "Vigorous effervescence. Colourless gas evolved — turns limewater milky.",
+                gas: "Colourless, odourless gas; turns limewater milky",
+                colorChange: "effervescence",
+            };
+        },
+    },
+    {
+        id: "thermal/nahco3-heat",
+        matches: (chemicals) =>
+            chemicals.includes("NaHCO3") || chemicals.includes("NaHCO3_aq"),
+        actionFilter: "heat",
+        produce() {
+            return {
+                observation: "On strong heating: white Na₂CO₃ residue remains. CO₂ evolved — turns limewater milky. Water vapour condenses on cooler parts. 2NaHCO₃(s) → Na₂CO₃(s) + H₂O(g) + CO₂(g). Mass loss calculated to find Mr of MHCO₃. Residue (Na₂CO₃) tested with dilute HCl → effervescence (CO₂) confirms carbonate. Heating to constant mass gives complete decomposition.",
+                gas: "CO₂ – turns limewater milky (+ water vapour condensation)",
+                colorChange: "white solid → white Na₂CO₃ residue + CO₂ + water condensation",
+            };
+        },
+        blind() {
+            return {
+                observation: "White solid decomposes on heating. White residue remains. CO₂ evolved — turns limewater milky. Water condensation. Residue reacts with dilute acid with effervescence.",
+                gas: "Colourless gas; turns limewater milky",
+                colorChange: "white solid → white residue (thermal decomposition)",
+            };
+        },
+    },
+
+    // ── Basic zinc carbonate reactions ─────────────────────────────────────────
+    {
+        id: "thermal/basic-zinc-carbonate-heat",
+        requires: ["basic_zinc_carbonate"],
+        actionFilter: "heat",
+        produce(vessel) {
+            const contents = vessel.contents || [];
+            const mass = contents.find(c => c.chemical === "basic_zinc_carbonate")?.mass || 3.0;
+            // ZnCO₃·2Zn(OH)₂·xH₂O → 3ZnO + CO₂ + (x+2)H₂O; Mr ≈ 360 for x=1
+            const residueMass = (mass * 244.2 / 360).toFixed(2);
+            return {
+                observation: `White/cream solid heated strongly. White ZnO residue (~${residueMass}g). Yellow when hot, white on cooling. CO₂ evolved — turns limewater milky. Water vapour condenses. ZnCO₃·2Zn(OH)₂·xH₂O(s) → 3ZnO(s) + CO₂(g) + (x+2)H₂O(g). Use: n(ZnO) = residue/81.4; n(compound) = n(ZnO)/3; Mr = mass/n(compound). Calculate x from Mr − 324.2)/18.`,
+                gas: "CO₂ – turns limewater milky (+ water vapour)",
+                colorChange: "white/cream solid → white ZnO residue (yellow hot, white cold) + CO₂ + water condensation",
+            };
+        },
+        blind() {
+            return {
+                observation: "White/cream solid heated strongly. White residue remains (yellow when hot, white on cooling). Colourless gas evolved — turns limewater milky. Water condensation on cooler parts.",
+                gas: "Colourless gas; turns limewater milky",
+                colorChange: "white solid → white residue (thermal decomposition)",
+            };
+        },
+    },
+    {
+        id: "qualitative/basic-zinc-carbonate-acid",
+        matches: (chemicals) =>
+            chemicals.includes("basic_zinc_carbonate") &&
+            (chemicals.includes("HCl") || chemicals.includes("H2SO4")),
+        produce() {
+            return {
+                observation: "Basic zinc carbonate dissolves in acid with effervescence. CO₂ evolved — turns limewater milky. Colourless Zn²⁺ solution forms. ZnCO₃·2Zn(OH)₂·xH₂O + 6HCl → 3ZnCl₂ + CO₂ + (x+5)H₂O. Test solution with NaOH → white Zn(OH)₂ ppt soluble in excess NaOH (amphoteric Zn²⁺).",
+                gas: "CO₂ – turns limewater milky",
+                colorChange: "white solid dissolves → colourless solution + CO₂ effervescence",
+            };
+        },
+        blind() {
+            return {
+                observation: "Solid dissolves in acid with effervescence. Colourless gas evolved — turns limewater milky. Colourless solution forms.",
+                gas: "Colourless gas; turns limewater milky",
+                colorChange: "white solid dissolves → colourless solution + effervescence",
+            };
+        },
+    },
+
+    // ── I₂ solution (direct I₂) reactions ─────────────────────────────────────
+    {
+        id: "qualitative/i2-starch",
+        requires: ["I2_solution", "starch"],
+        produce() {
+            return {
+                observation: "Deep blue-black colour immediately — starch-iodine complex formed. Confirms I₂ present in solution. Decolourises on heating (complex breaks down); returns blue-black on cooling.",
+                newColor: "#0a0a2a",
+                colorChange: "brown (I₂) → deep blue-black (starch-iodine complex)",
+            };
+        },
+        blind() {
+            return {
+                observation: "Deep blue-black colour forms immediately on adding starch to the brown solution. Confirms I₂ present.",
+                colorChange: "brown → deep blue-black (starch-iodine)",
+            };
+        },
+    },
+    {
+        id: "qualitative/i2-sulfite",
+        requires: ["I2_solution", "Na2SO3"],
+        produce() {
+            return {
+                observation: "Brown I₂ solution decolourises as Na₂SO₃ reduces I₂. Na₂SO₃ + I₂ + H₂O → Na₂SO₄ + 2HI. If Na₂SO₃ in excess: solution colourless (all I₂ consumed). If I₂ in excess: yellow-brown from remaining I₂ — add starch → blue-black. This reaction is the basis for iodometric determination of Na₂SO₃·xH₂O water of crystallisation.",
+                newColor: "#f5f5f5",
+                colorChange: "brown (I₂) → colourless (SO₃²⁻ reduces I₂) [yellow-brown if I₂ excess]",
+            };
+        },
+        blind() {
+            return {
+                observation: "Brown solution decolourises on adding the reagent. Confirms a reducing anion. Add starch to check for remaining I₂.",
+                colorChange: "brown → colourless/pale (reducing anion present)",
+            };
+        },
+    },
+
+    // ── Bromophenol blue indicator ─────────────────────────────────────────────
+    // For MHCO₃ + H₂SO₄ titrations (2021-style). Yellow < pH 3; green at pH 3–4.5;
+    // blue > pH 4.5. Starts blue in alkaline MHCO₃ flask; add acid → green endpoint.
+    // MUST precede qualitative/naoh-neutralise and qualitative/nahco3-acid.
+    {
+        id: "titration/bromophenol-blue",
+        matches: (chemicals) =>
+            chemicals.includes("bromophenol_blue") &&
+            (chemicals.includes("HCl") || chemicals.includes("H2SO4") ||
+             chemicals.includes("NaOH") || chemicals.includes("Na2CO3") ||
+             chemicals.includes("NaHCO3") || chemicals.includes("NaHCO3_aq")),
+        produce(vessel) {
+            const { acidMmol, baseMmol, excess } = _titrationBalance(vessel);
+            if (baseMmol === 0 && acidMmol > 0) {
+                return {
+                    observation: "Bromophenol blue in acid — YELLOW (pH < 3). Add alkali from burette. Endpoint: yellow → green/blue-green.",
+                    newColor: "#ddaa00",
+                    colorChange: "yellow (acidic, pH < 3)",
+                };
+            }
+            if (acidMmol === 0 && baseMmol > 0) {
+                return {
+                    observation: "Bromophenol blue in alkaline solution — BLUE (pH > 4.5). Add acid from burette. Endpoint colour: yellow-green or green.",
+                    newColor: "#4040c0",
+                    colorChange: "blue (alkaline, pH > 4.5)",
+                };
+            }
+            if (excess < -2.0) {
+                return {
+                    observation: `Acid in large excess (acid: ${acidMmol.toFixed(1)} mmol, base: ${baseMmol.toFixed(1)} mmol). Bromophenol blue YELLOW. Continue adding base.`,
+                    newColor: "#ddaa00",
+                    colorChange: "yellow (acid in large excess)",
+                };
+            }
+            if (excess < 0) {
+                return {
+                    observation: `⚠️ NEAR ENDPOINT — YELLOW-GREEN, fading. Base excess: ${Math.abs(excess).toFixed(1)} mmol. Add alkali DROPWISE.`,
+                    newColor: "#88aa20",
+                    colorChange: "yellow → yellow-green (near endpoint — add dropwise!)",
+                };
+            }
+            if (excess <= 1.0) {
+                return {
+                    observation: `✓ ENDPOINT REACHED — GREEN/BLUE-GREEN (pH ≈ 4.5). Base excess only ${excess.toFixed(1)} mmol. Record burette reading.`,
+                    newColor: "#3a8a40",
+                    colorChange: "yellow → green ✓ ENDPOINT (pH ≈ 4.5)",
+                };
+            }
+            return {
+                observation: `Over-titrated — ${excess.toFixed(1)} mmol excess base. Bromophenol blue BLUE. Endpoint was green. Repeat titration.`,
+                newColor: "#4040c0",
+                colorChange: "green → blue (over-titrated)",
+            };
+        },
+        blind(vessel) {
+            const { acidMmol, baseMmol, excess } = _titrationBalance(vessel);
+            if (baseMmol === 0 && acidMmol > 0)
+                return { observation: "Yellow (acidic). Add alkali from burette. Endpoint: yellow → green." };
+            if (acidMmol === 0 && baseMmol > 0)
+                return { observation: "Blue (alkaline). Add acid from burette. Endpoint: blue → green." };
+            if (excess < -2.0)
+                return { observation: "Yellow. Acid in excess. Continue adding alkali." };
+            if (excess < 0)
+                return { observation: "⚠️ Yellow-green. NEAR ENDPOINT — add alkali dropwise." };
+            if (excess <= 1.0)
+                return { observation: "✓ GREEN — ENDPOINT. Record burette reading." };
+            return { observation: "Blue — over-titrated (too much alkali). Repeat titration." };
         },
     },
 

@@ -1261,6 +1261,357 @@ Carry out tests using NaOH, NH₃(aq) and acidified KMnO₄.`,
     ],
 })),
 
+// ─── Paper p_m21 ── February / March 2021 (real) ─────────────────────────────
+{
+    id: "p_m21",
+    title: "9701/33 February/March 2021",
+    subtitle: "Paper 3 Advanced Practical Skills 1",
+    time: "2 hours",
+    marks: 40,
+    faMap: {
+        "FA 1": "H2SO4",
+        "FA 2": "NaHCO3",
+        "FA 3": "NaHCO3_aq",
+        "FA 4": "NaHCO3",
+        "FA 5": "Na2CO3",
+        "FA 6": "NH4Cl_solid",
+        "FA 7": "NH4I",
+        "FA 8": "BaCl2",
+    },
+    unknownFAs: ["FA 2", "FA 4", "FA 6", "FA 7", "FA 8"],
+    questions: [
+        {
+            id: "Q1", type: "quantitative",
+            title: "Question 1 – Titration to Identify a Group 1 Metal",
+            marks: 16,
+            context: `A Group 1 metal M forms a hydrogencarbonate salt MHCO₃. You will determine the relative formula mass, Mr, of MHCO₃ and hence identify M.
+
+FA 1 = 0.0550 mol dm⁻³ sulfuric acid, H₂SO₄
+FA 2 = solid MHCO₃ (Group 1 metal hydrogencarbonate; unknown)
+FA 3 = solution prepared by dissolving FA 2 in distilled water and making up to 250 cm³
+Indicator: bromophenol blue
+
+Reaction: 2MHCO₃(aq) + H₂SO₄(aq) → M₂SO₄(aq) + 2H₂O(l) + 2CO₂(g)`,
+            parts: [
+                { id: "Q1a", label: "(a)(i) Method & Results Table", marks: 7,
+                  instruction: "Weigh ~2.0 g FA 2. Dissolve completely in distilled water, transfer to a 250 cm³ volumetric flask, make up to the mark with distilled water → FA 3. Fill burette with FA 1 (H₂SO₄). Pipette 25.0 cm³ FA 3 into a conical flask; add 2–3 drops bromophenol blue. Perform rough titration then at least two accurate titrations. Record all burette readings to 0.05 cm³ in a suitable table.",
+                  hint: "Endpoint: blue/green (alkaline MHCO₃) → yellow (acid in excess). Rinse and fill burette carefully." },
+                { id: "Q1b", label: "(a)(ii) Mean titre", marks: 1,
+                  instruction: "Calculate a suitable mean titre from your accurate consistent results. Show working.",
+                  calculationGuide: "Select titres within ±0.10 cm³. Mean to 0.01 cm³." },
+                { id: "Q1c", label: "(b)(i) n(H₂SO₄)", marks: 1,
+                  instruction: "Calculate the amount, in mol, of H₂SO₄ in the mean titre volume of FA 1.",
+                  calculationGuide: "n(H₂SO₄) = 0.0550 × (mean titre / 1000)" },
+                { id: "Q1d", label: "(b)(ii) n(MHCO₃) in 25.0 cm³", marks: 1,
+                  instruction: "Use the equation to find the amount, in mol, of MHCO₃ that reacted with the H₂SO₄ in (b)(i). (2MHCO₃ : 1H₂SO₄)",
+                  calculationGuide: "n(MHCO₃) = 2 × n(H₂SO₄)" },
+                { id: "Q1e", label: "(b)(iii) n(MHCO₃) in 250 cm³", marks: 1,
+                  instruction: "Calculate the amount, in mol, of MHCO₃ in the full 250 cm³ solution.",
+                  calculationGuide: "n(MHCO₃) in 250 cm³ = n(MHCO₃) in 25 cm³ × 10" },
+                { id: "Q1f", label: "(b)(iv) Mr of MHCO₃", marks: 1,
+                  instruction: "Calculate the relative formula mass, Mr, of MHCO₃. (Use your recorded mass of FA 2.)",
+                  calculationGuide: "Mr = mass of FA 2 / n(MHCO₃) in 250 cm³" },
+                { id: "Q1g", label: "(b)(v) Identify M and MHCO₃", marks: 1,
+                  instruction: "Use your Mr to identify M (the Group 1 metal) and state the formula of MHCO₃. Show reasoning. Relative atomic masses: Li=6.9, Na=23.0, K=39.1, Rb=85.5, Cs=132.9. (Mr MHCO₃ = Ar(M) + 1 + 12 + 48 = Ar(M) + 61)",
+                  answerKey: "MHCO₃ has Mr = Ar(M) + 61. If M = Na: Mr = 23+61 = 84. If M = K: Mr = 39.1+61 = 100.1. Identify M from calculated Mr." },
+                { id: "Q1h", label: "(c)(i) Percentage error in mass", marks: 1,
+                  instruction: "The uncertainty in a single balance reading is ±0.01 g. Calculate the maximum percentage error in the mass of FA 2 used.",
+                  calculationGuide: "% error = (2 × 0.01) / mass of FA 2 × 100" },
+                { id: "Q1i", label: "(c)(ii) Burette vs pipette accuracy", marks: 2,
+                  instruction: "A student suggests that a more accurate value of Mr would be obtained if both FA 1 (H₂SO₄) and FA 3 (MHCO₃ solution) were measured using a pipette. State whether this would improve accuracy and explain why.",
+                  answerKey: "Partially correct. Measuring FA 3 with a pipette would be accurate (pipette more precise than burette for fixed volumes). However FA 1 (H₂SO₄) must be from a burette because variable volumes are added to find the endpoint. A burette is appropriate for the titrant (FA 1); a pipette is appropriate for the aliquot (FA 3)." },
+            ],
+        },
+        {
+            id: "Q2", type: "energetics",
+            title: "Question 2 – Thermal Decomposition of MHCO₃",
+            marks: 12,
+            context: `The hydrogencarbonate FA 4 (same compound as FA 2) undergoes thermal decomposition:
+2MHCO₃(s) → M₂CO₃(s) + CO₂(g) + H₂O(g)
+
+The residue after heating is FA 5 (the carbonate M₂CO₃).
+
+FA 4 = solid MHCO₃ (same as FA 2)
+FA 5 = residue (metal carbonate M₂CO₃) after heating FA 4`,
+            parts: [
+                { id: "Q2a", label: "(a) Method & Results Table", marks: 4,
+                  instruction: "Weigh a clean, dry crucible with lid. Add approximately 2.0 g FA 4. Reweigh crucible + lid + FA 4. Heat strongly for 5 minutes (lid on). Cool completely (at least 5 min). Reweigh. Heat again for 3 minutes. Cool. Reweigh. Record masses: (I) crucible+lid, (II) crucible+lid+FA 4, (III) after 1st heating, (IV) after 2nd heating.",
+                  hint: "Two heating cycles ensure constant mass. Mass(IV)−Mass(I) = residue. Mass(II)−Mass(IV) = mass loss." },
+                { id: "Q2b", label: "(b)(i) Mass of FA 4 and mass loss", marks: 1,
+                  instruction: "Calculate the mass of FA 4 used and the total mass loss on heating.",
+                  calculationGuide: "mass FA 4 = (II) − (I); mass loss = (II) − (IV)" },
+                { id: "Q2c", label: "(b)(ii) n(CO₂) and n(H₂O) evolved", marks: 1,
+                  instruction: "From the stoichiometry 2MHCO₃ → M₂CO₃ + CO₂ + H₂O, the mass loss = mass of CO₂ + mass of H₂O per 2 mol MHCO₃. Use your mass loss to calculate n(MHCO₃). (Mr of CO₂ = 44.0; Mr of H₂O = 18.0; combined = 62.0 per 2 mol MHCO₃).",
+                  calculationGuide: "n(MHCO₃) = (2 × mass loss) / 62.0" },
+                { id: "Q2d", label: "(b)(iii) Mr of MHCO₃ from thermal method", marks: 1,
+                  instruction: "Calculate Mr of MHCO₃ using the thermal decomposition data.",
+                  calculationGuide: "Mr = mass of FA 4 / n(MHCO₃)" },
+                { id: "Q2e", label: "(c) Test on FA 5 with dilute HCl", marks: 2,
+                  instruction: "Add a small amount of FA 5 (residue M₂CO₃) to a test-tube. Add dilute HCl (1 cm depth). Record your observations.",
+                  answerKey: "Vigorous effervescence. Colourless, odourless gas evolved. Turns limewater milky — confirms CO₂. M₂CO₃(s) + 2HCl(aq) → 2MCl(aq) + H₂O(l) + CO₂(g). Confirms carbonate anion CO₃²⁻ in residue." },
+                { id: "Q2f", label: "(d) Identify M from both methods", marks: 1,
+                  instruction: "Compare your Mr values from Q1 (titration method) and Q2 (thermal method). Identify M and state whether the two values are consistent.",
+                  answerKey: "Both Mr values should identify the same Group 1 metal (e.g. Mr ≈ 84 → M = Na; Mr ≈ 100 → M = K). Comment on agreement/disagreement and sources of error in each method." },
+                { id: "Q2g", label: "(e) Evaluation of methods", marks: 2,
+                  instruction: "Suggest which method (titration in Q1 or thermal decomposition in Q2) gives a more accurate value of Mr. Give reasons based on sources of error in each method.",
+                  answerKey: "Titration method: main error is balance (% error in mass). Thermal method: main error is incomplete decomposition or hygroscopic residue absorbing moisture. Titration may be more accurate if burette readings are precise. Accept any well-reasoned comparison." },
+            ],
+        },
+        {
+            id: "Q3", type: "qualitative",
+            title: "Question 3 – Qualitative Analysis (Ammonium Salts and BaCl₂)",
+            marks: 12,
+            context: `FA 6 is a solid. FA 7 and FA 8 are aqueous solutions.
+
+Reagents available: acidified KMnO₄, starch solution, AgNO₃, NH₃(aq), NaOH(aq), Al foil, dilute H₂SO₄, distilled water, bromophenol blue indicator, limewater.
+
+Use 1 cm depth of solutions for each test unless stated otherwise.`,
+            parts: [
+                { id: "Q3a", label: "(a) Test on FA 6 (solid, heating)", marks: 3,
+                  instruction: "Place a small spatula of FA 6 in a dry test-tube. Heat gently, then strongly. Hold damp red litmus paper in the vapour above. Record all observations (colour, physical change, gas tests).",
+                  answerKey: "White solid sublimes completely on heating — no coloured residue. White solid rings/smoke visible near top of tube. White smoke has pungent smell. Damp red litmus paper turns blue (NH₃ vapour near top), then blue litmus turns red (HCl vapour above). Confirms NH₄Cl: sublimation with NH₃+HCl. FA 6 = NH₄Cl." },
+                { id: "Q3b", label: "(b) Tests on FA 7 and FA 8", marks: 7,
+                  instruction: "Carry out the following tests. Record ALL observations in a results table with columns for Test, FA 7, FA 8.\n\nTest 1: Add 2–3 drops acidified KMnO₄, then add 2–3 drops starch solution.\nTest 2: Add 2–3 drops AgNO₃, then add NH₃(aq) dropwise; note if precipitate dissolves.\nTest 3: Add NaOH(aq) dropwise at room temperature (cold); record precipitate.\nTest 4: Add NaOH(aq), warm gently; hold damp red litmus paper in vapour.\nTest 5: Add 2–3 drops dilute H₂SO₄; record observation.",
+                  hint: "For Test 1, the combination of KMnO₄ (oxidant) + starch is used together to detect I⁻. For Test 2, a pale yellow precipitate insoluble in NH₃ confirms I⁻ (AgI)." },
+                { id: "Q3c", label: "(c) Identify anions in FA 7 and FA 8", marks: 2,
+                  instruction: "Use your observations from (b) to identify the anions in FA 7 and FA 8. Give the formula of each anion and justify from your observations.",
+                  answerKey: "FA 7 = NH₄I:\n• Test 1: KMnO₄ decolourised (I⁻ reduces MnO₄⁻ → I₂ formed), starch turns blue-black (I₂). Anion = I⁻.\n• Test 2: Pale yellow ppt (AgI) insoluble in NH₃. Confirms I⁻.\n• Test 4: NH₃ evolved on warming (NH₄⁺). Cation = NH₄⁺.\n• Test 5: No visible change (I⁻ not oxidised by dilute H₂SO₄).\n\nFA 8 = BaCl₂:\n• Test 2: White/curdy ppt (AgCl) partially soluble in dilute NH₃. Anion = Cl⁻.\n• Test 3: White ppt (Ba(OH)₂) insoluble in excess NaOH. Cation = Ba²⁺.\n• Test 5: White ppt (BaSO₄) insoluble in acid. SO₄²⁻ from H₂SO₄ precipitates Ba²⁺." },
+            ],
+        },
+    ],
+},
+
+// ─── Paper p_m22 ── February / March 2022 (real) ─────────────────────────────
+{
+    id: "p_m22",
+    title: "9701/33 February/March 2022",
+    subtitle: "Paper 3 Advanced Practical Skills 1",
+    time: "2 hours",
+    marks: 40,
+    faMap: {
+        "FA 1": "NaOH",
+        "FA 2": "H2SO4",
+        "FA 3": "Na2SO3",
+        "FA 4": "I2_solution",
+        "FA 5": "Na2S2O3_std",
+        "FA 6": "starch",
+        "FA 7": "Na2S2O3",
+        "FA 8": "AlNH4SO4_aq",
+    },
+    unknownFAs: ["FA 7", "FA 8"],
+    questions: [
+        {
+            id: "Q1", type: "energetics",
+            title: "Question 1 – Thermometric Titration (NaOH + H₂SO₄)",
+            marks: 12,
+            context: `A thermometric titration measures temperature change as acid is added to alkali. The temperature vs volume graph gives the equivalence point by intersection of two best-fit lines.
+
+FA 1 = 1.90 mol dm⁻³ sodium hydroxide, NaOH (measure 25.0 cm³ into polystyrene cup)
+FA 2 = dilute sulfuric acid, H₂SO₄ (concentration unknown; in burette)
+
+Reaction: 2NaOH(aq) + H₂SO₄(aq) → Na₂SO₄(aq) + 2H₂O(l)   ΔH = −57.6 kJ mol⁻¹ (theoretical)`,
+            parts: [
+                { id: "Q1a", label: "(a) Method & Results Table", marks: 5,
+                  instruction: "Measure exactly 25.0 cm³ FA 1 into a polystyrene cup in a 250 cm³ beaker. Record initial temperature (T₀) to 0.1°C. Fill burette with FA 2. Add 5.0 cm³ FA 2, stir gently, record temperature. Repeat, adding 5.0 cm³ portions up to 45.0 cm³ total. Record results in a table: Vol FA 2 added (cm³) | Temperature (°C).",
+                  hint: "Stir gently and consistently between readings. Record temperature ~30 s after each addition. Keep polystyrene cup still to minimise heat loss." },
+                { id: "Q1b", label: "(b) Graph and equivalence point", marks: 3,
+                  instruction: "Plot temperature (y-axis) against volume of FA 2 added (x-axis). Draw two straight lines of best fit — one for the rising portion (before equivalence) and one for the falling/level portion (after equivalence). Extrapolate both lines and read off the volume of FA 2 at the intersection — this is the equivalence volume, V_eq.",
+                  calculationGuide: "V_eq from graph: volume FA 2 that exactly neutralises 25.0 cm³ FA 1." },
+                { id: "Q1c", label: "(c)(i) Concentration of FA 2", marks: 2,
+                  instruction: "Calculate the concentration of FA 2 (H₂SO₄). Use: n(NaOH) = 1.90 × 25.0/1000; n(H₂SO₄) = ½ × n(NaOH); c(H₂SO₄) = n(H₂SO₄) / (V_eq/1000).",
+                  calculationGuide: "c(H₂SO₄) = (1.90 × 25.0 × 10⁻³ × 0.5) / (V_eq × 10⁻³)" },
+                { id: "Q1d", label: "(c)(ii) ΔH of neutralisation", marks: 1,
+                  instruction: "Use the maximum temperature rise ΔT from your graph to calculate ΔH (kJ mol⁻¹). Assume total mass = total volume × 1.00 g/cm³; specific heat = 4.18 J g⁻¹ K⁻¹.",
+                  calculationGuide: "q = m × 4.18 × ΔT (J); n(H₂O) = n(NaOH) = 0.0475 mol; ΔH = −q / (1000 × n(H₂O)) kJ mol⁻¹" },
+                { id: "Q1e", label: "(d) % error and explanation", marks: 1,
+                  instruction: "Calculate the percentage difference between your ΔH and the theoretical value (−57.6 kJ mol⁻¹). Suggest one reason why the experimental value is less negative than the theoretical.",
+                  answerKey: "% difference = |ΔH_exp − (−57.6)| / 57.6 × 100. Reasons for less negative: heat loss to surroundings/polystyrene cup; heat absorbed by thermometer; not accounting for heat capacity of cup/thermometer; incorrect extrapolation." },
+            ],
+        },
+        {
+            id: "Q2", type: "quantitative",
+            title: "Question 2 – Water of Crystallisation (Na₂SO₃·xH₂O via Iodometry)",
+            marks: 15,
+            context: `Sodium sulfite can be crystallised as Na₂SO₃·xH₂O. The reaction with iodine is:
+Na₂SO₃(aq) + I₂(aq) + H₂O(l) → Na₂SO₄(aq) + 2HI(aq)
+
+Excess I₂ is back-titrated with Na₂S₂O₃:
+I₂(aq) + 2Na₂S₂O₃(aq) → 2NaI(aq) + Na₂S₄O₆(aq)
+
+FA 3 = solution of Na₂SO₃·xH₂O (31.50 g dm⁻³; made from hydrated salt)
+FA 4 = 0.100 mol dm⁻³ iodine solution, I₂(aq)
+FA 5 = 0.100 mol dm⁻³ sodium thiosulfate, Na₂S₂O₃
+FA 6 = starch solution (indicator)`,
+            parts: [
+                { id: "Q2a", label: "(a) Titration method & results", marks: 6,
+                  instruction: "Fill burette with FA 5 (Na₂S₂O₃). Pipette 25.0 cm³ FA 3 into a conical flask. Add 25.0 cm³ FA 4 (I₂ solution) from a measuring cylinder — excess I₂. Titrate immediately with FA 5. When the solution turns pale yellow, add ~10 drops FA 6 (starch) — blue-black appears. Continue dropwise until blue-black JUST disappears permanently (endpoint). Record all burette readings. Carry out at least 2 accurate titrations.",
+                  hint: "The I₂ oxidises SO₃²⁻ immediately. Titrate excess I₂ with Na₂S₂O₃. Add starch near endpoint only (when pale yellow) for a sharp colour change." },
+                { id: "Q2b", label: "(b) Mean titre", marks: 1,
+                  instruction: "Calculate a suitable mean titre from consistent accurate results. Show working.",
+                  calculationGuide: "Select titres within ±0.10 cm³. Mean to 0.01 cm³." },
+                { id: "Q2c", label: "(c)(i) n(Na₂S₂O₃) in mean titre", marks: 1,
+                  instruction: "Calculate the amount, in mol, of Na₂S₂O₃ in the mean titre volume.",
+                  calculationGuide: "n(Na₂S₂O₃) = 0.100 × (mean titre / 1000)" },
+                { id: "Q2d", label: "(c)(ii) n(I₂) consumed by Na₂S₂O₃", marks: 1,
+                  instruction: "Calculate the amount of excess I₂ that reacted with Na₂S₂O₃ in (c)(i). (1 mol I₂ reacts with 2 mol Na₂S₂O₃)",
+                  calculationGuide: "n(I₂) excess = ½ × n(Na₂S₂O₃)" },
+                { id: "Q2e", label: "(c)(iii) n(I₂) that reacted with Na₂SO₃", marks: 1,
+                  instruction: "Calculate n(I₂) that reacted with the Na₂SO₃ in the 25.0 cm³ aliquot. Total I₂ added = 25.0 × 0.100/1000 mol.",
+                  calculationGuide: "n(I₂) reacted = (0.100 × 25.0/1000) − n(I₂) excess" },
+                { id: "Q2f", label: "(c)(iv) n(Na₂SO₃) and molar mass", marks: 2,
+                  instruction: "Calculate n(Na₂SO₃) in 25.0 cm³ FA 3. (1 mol Na₂SO₃ reacts with 1 mol I₂). Then calculate the molar mass of Na₂SO₃·xH₂O from the concentration (31.50 g dm⁻³) and n(Na₂SO₃) per dm³.",
+                  calculationGuide: "n(Na₂SO₃) = n(I₂ reacted); n per dm³ = n per 25cm³ × 40; Mr = 31.50 / n per dm³" },
+                { id: "Q2g", label: "(c)(v) Value of x", marks: 2,
+                  instruction: "Calculate x in Na₂SO₃·xH₂O. (Mr of Na₂SO₃ = 126.0; Mr of H₂O = 18.0)",
+                  calculationGuide: "x = (Mr calculated − 126.0) / 18.0; round x to nearest integer" },
+                { id: "Q2h", label: "(d) Role of Na₂CO₃", marks: 1,
+                  instruction: "A student suggests that adding Na₂CO₃ to the flask before adding I₂ would make the titration more accurate. Explain why Na₂CO₃ is added.",
+                  answerKey: "Na₂CO₃ (alkali) neutralises HI produced during the reaction. HI in acid conditions can reverse-react with the product Na₂SO₄ or catalyse side reactions. Buffering the solution at pH ~8 ensures complete, forward reaction and prevents oxidation of SO₃²⁻ by dissolved O₂." },
+            ],
+        },
+        {
+            id: "Q3", type: "qualitative",
+            title: "Question 3 – Qualitative Analysis (Na₂S₂O₃ and Alum)",
+            marks: 13,
+            context: `FA 7 and FA 8 are aqueous solutions. Each contains a different set of ions.
+
+Reagents available: dilute HCl, BaCl₂(aq), KMnO₄(aq) (acidified), FeCl₃(aq), NaOH(aq), NH₃(aq), AgNO₃(aq), starch.
+
+Use 1 cm depth of each solution for each test.`,
+            parts: [
+                { id: "Q3a", label: "(a) Anion tests — FA 7 and FA 8", marks: 5,
+                  instruction: "Carry out the following tests on both FA 7 and FA 8. Record ALL observations in a results table.\n\nTest 1 (anion): Add dilute HCl, then BaCl₂ solution. Record precipitate colour and note if it dissolves in HCl.\nTest 2 (reducing anion): Add a few drops acidified KMnO₄.\nTest 3 (thiosulfate vs other): Add a few drops FeCl₃ solution. Note colour change.",
+                  hint: "Test 1: BaSO₄ (white, insoluble in HCl) confirms SO₄²⁻; pale yellow ppt (BaS₂O₃) with S₂O₃²⁻ does not dissolve in HCl. Test 2: KMnO₄ decolourised by S₂O₃²⁻ or SO₃²⁻; stays purple for SO₄²⁻. Test 3: FeCl₃ decolourised by S₂O₃²⁻; no change with SO₄²⁻." },
+                { id: "Q3b", label: "(b)(i) Identify anions", marks: 2,
+                  instruction: "Use your observations to identify the anion in FA 7 and in FA 8. Give ion formula and justify each.",
+                  answerKey: "FA 7 = Na₂S₂O₃: Test 1 → pale yellow ppt with BaCl₂/HCl (BaS₂O₃); Test 2 → decolourises KMnO₄ (S₂O₃²⁻ is reducing); Test 3 → decolourises FeCl₃ (confirms S₂O₃²⁻). Anion = S₂O₃²⁻.\n\nFA 8 = AlNH₄(SO₄)₂ (alum): Test 1 → white ppt BaSO₄ insoluble in HCl; Test 2 → KMnO₄ stays purple (SO₄²⁻ not reducing); Test 3 → FeCl₃ no change. Anion = SO₄²⁻." },
+                { id: "Q3c", label: "(b)(ii) Cation tests on FA 8", marks: 4,
+                  instruction: "Carry out the following cation tests on FA 8 only. Record observations.\n\nTest 4: Add NaOH dropwise to 1 cm FA 8; note precipitate. Continue adding excess NaOH — note if ppt dissolves. Warm the tube and hold damp red litmus in vapour.\nTest 5: Add NH₃(aq) dropwise to fresh 1 cm FA 8; note precipitate. Continue adding excess NH₃ — note if ppt dissolves.",
+                  answerKey: "Test 4 (NaOH): White gelatinous ppt forms (Al(OH)₃). Dissolves in excess NaOH → colourless [Al(OH)₄]⁻ (amphoteric). On warming: pungent NH₃ evolved, damp red litmus turns blue (confirms NH₄⁺). Cations: Al³⁺ + NH₄⁺.\nTest 5 (NH₃): White gelatinous ppt (Al(OH)₃) forms. Insoluble in excess NH₃. Confirms Al³⁺ (contrast Cu²⁺ which gives deep blue with excess NH₃)." },
+                { id: "Q3d", label: "(c) Ionic equations", marks: 2,
+                  instruction: "Write ionic equations with state symbols for:\n(i) Al³⁺ dissolving in excess NaOH.\n(ii) NH₄⁺ reacting with NaOH on warming.",
+                  answerKey: "(i) Al(OH)₃(s) + OH⁻(aq) → [Al(OH)₄]⁻(aq)\n(ii) NH₄⁺(aq) + OH⁻(aq) → NH₃(g) + H₂O(l)" },
+            ],
+        },
+    ],
+},
+
+// ─── Paper p_m23 ── February / March 2023 (real) ─────────────────────────────
+{
+    id: "p_m23",
+    title: "9701/33 February/March 2023",
+    subtitle: "Paper 3 Advanced Practical Skills 1",
+    time: "2 hours",
+    marks: 40,
+    faMap: {
+        "FA 1": "basic_zinc_carbonate",
+        "FA 2": "HCl",
+        "FA 3": "NaOH",
+        "FA 4": "bromophenol_blue",
+        "FA 5": "CuCO3",
+        "FA 6": "HCl",
+    },
+    unknownFAs: ["FA 1", "FA 5"],
+    questions: [
+        {
+            id: "Q1", type: "quantitative",
+            title: "Question 1 – Thermal Decomposition of Basic Zinc Carbonate",
+            marks: 10,
+            context: `Basic zinc carbonate has formula ZnCO₃·2Zn(OH)₂·xH₂O, where x is to be determined.
+
+Thermal decomposition: ZnCO₃·2Zn(OH)₂·xH₂O(s) → 3ZnO(s) + CO₂(g) + (x+2)H₂O(g)
+
+FA 1 = basic zinc carbonate (solid; unknown x)
+Mr(ZnO) = 81.4; Mr(ZnCO₃·2Zn(OH)₂) = 324.2`,
+            parts: [
+                { id: "Q1a", label: "(a) Method & Results Table", marks: 5,
+                  instruction: "Weigh a clean, dry crucible. Add approximately 3.0 g FA 1. Reweigh. Heat strongly for 5 minutes (lid on for first 2 min, then off). Cool completely (at least 5 min). Reweigh. Heat again 3 minutes, cool, reweigh. Record: (I) mass of crucible, (II) crucible + FA 1, (III) after 1st heating, (IV) after 2nd heating.",
+                  hint: "Heat to constant mass ensures complete decomposition. ZnO is white when cool but yellow when hot — this is normal." },
+                { id: "Q1b", label: "(b)(i) n(ZnO) in residue", marks: 1,
+                  instruction: "Calculate the amount, in mol, of ZnO in the residue after heating to constant mass.",
+                  calculationGuide: "mass of residue = (IV) − (I); n(ZnO) = mass of residue / 81.4" },
+                { id: "Q1c", label: "(b)(ii) n(ZnCO₃·2Zn(OH)₂·xH₂O)", marks: 1,
+                  instruction: "Use the stoichiometry (1 mol compound → 3 mol ZnO) to find n(compound).",
+                  calculationGuide: "n(compound) = n(ZnO) / 3" },
+                { id: "Q1d", label: "(b)(iii) Mr of compound", marks: 1,
+                  instruction: "Calculate the relative formula mass, Mr, of ZnCO₃·2Zn(OH)₂·xH₂O.",
+                  calculationGuide: "Mr = mass of FA 1 / n(compound)" },
+                { id: "Q1e", label: "(b)(iv) Value of x", marks: 2,
+                  instruction: "Calculate x. (Mr(ZnCO₃·2Zn(OH)₂) = 324.2; Mr(H₂O) = 18.0)",
+                  calculationGuide: "x = (Mr − 324.2) / 18.0; round to nearest integer" },
+            ],
+        },
+        {
+            id: "Q2", type: "quantitative",
+            title: "Question 2 – Back-Titration to Determine Mr of Basic Zinc Carbonate",
+            marks: 17,
+            context: `3.52 g FA 1 was dissolved in 100 cm³ of 2.00 mol dm⁻³ HCl (excess). This was diluted to exactly 1.00 dm³ → FA 2 solution.
+
+Reaction: ZnCO₃·2Zn(OH)₂·xH₂O + 6HCl → 3ZnCl₂ + CO₂ + (x+5)H₂O
+
+FA 2 = solution of excess HCl (diluted to 1.00 dm³) — in conical flask (25.0 cm³ aliquots)
+FA 3 = 0.150 mol dm⁻³ NaOH — in burette
+FA 4 = bromophenol blue indicator`,
+            parts: [
+                { id: "Q2a", label: "(a) Titration method & results", marks: 7,
+                  instruction: "Fill burette with FA 3 (NaOH). Pipette 25.0 cm³ FA 2 into conical flask; add 2–3 drops FA 4 (bromophenol blue). Perform rough titration (acid in flask → yellow; add alkali until green). Then carry out at least two accurate titrations. Record all burette readings to 0.05 cm³ in a suitable table.",
+                  hint: "FA 2 is acidic (excess HCl). Indicator starts yellow; endpoint = green (pH ≈ 4.5). Don't overshoot to blue (over-titrated). Rinse conical flask (not pipette) with distilled water between titrations." },
+                { id: "Q2b", label: "(b) Mean titre", marks: 1,
+                  instruction: "Calculate a suitable mean titre. Show working.",
+                  calculationGuide: "Select consistent titres within ±0.10 cm³. Mean to 0.01 cm³." },
+                { id: "Q2c", label: "(c)(i) n(NaOH) in mean titre", marks: 1,
+                  instruction: "Calculate the amount, in mol, of NaOH in the mean titre.",
+                  calculationGuide: "n(NaOH) = 0.150 × (mean titre / 1000)" },
+                { id: "Q2d", label: "(c)(ii) n(HCl) in 25.0 cm³ FA 2", marks: 1,
+                  instruction: "Calculate the amount of HCl in 25.0 cm³ FA 2. (NaOH + HCl → NaCl + H₂O, 1:1)",
+                  calculationGuide: "n(HCl) in 25 cm³ = n(NaOH)" },
+                { id: "Q2e", label: "(c)(iii) n(HCl) in 1.00 dm³ FA 2", marks: 1,
+                  instruction: "Calculate the amount of HCl in the full 1.00 dm³ FA 2 solution.",
+                  calculationGuide: "n(HCl) in 1 dm³ = n(HCl) in 25 cm³ × 40" },
+                { id: "Q2f", label: "(c)(iv) n(HCl) that reacted with FA 1", marks: 1,
+                  instruction: "Calculate the amount of HCl that reacted with FA 1. Total HCl = 2.00 × 0.100 = 0.200 mol.",
+                  calculationGuide: "n(HCl) reacted = 0.200 − n(HCl) in 1 dm³ FA 2" },
+                { id: "Q2g", label: "(c)(v) n(FA 1 compound) and Mr", marks: 2,
+                  instruction: "Use the ratio (1 mol compound reacts with 6 mol HCl) to find n(FA 1). Then calculate Mr.",
+                  calculationGuide: "n(compound) = n(HCl reacted) / 6; Mr = 3.52 / n(compound)" },
+                { id: "Q2h", label: "(d) Effect of higher NaOH concentration", marks: 2,
+                  instruction: "A student repeats the back-titration using FA 3 of higher concentration. State and explain the effect on the calculated Mr.",
+                  answerKey: "Higher [NaOH]: more NaOH needed per cm³ → smaller titre to neutralise same amount of HCl. n(NaOH) per titre = c × V (larger c gives more n for same V) → apparent n(HCl) in FA 2 is larger → apparent n(HCl) reacted is smaller → apparent n(compound) is smaller → calculated Mr = 3.52/n(compound) is larger. Effect: Mr would be calculated as larger (overestimate)." },
+                { id: "Q2i", label: "(e) Percentage error in titre", marks: 1,
+                  instruction: "The uncertainty in reading a burette is ±0.05 cm³. A titre is the difference of two readings. Calculate the maximum percentage error in the mean titre if the mean titre is 18.50 cm³.",
+                  calculationGuide: "% error = (2 × 0.05) / 18.50 × 100 = 0.54%" },
+            ],
+        },
+        {
+            id: "Q3", type: "qualitative",
+            title: "Question 3 – Qualitative Analysis (CuCO₃ and HCl)",
+            marks: 13,
+            context: `FA 5 is a solid. FA 6 is an aqueous solution.
+
+Reagents available: limewater, Mg ribbon, NaOH(aq), NH₃(aq), AgNO₃(aq), Al foil, distilled water.
+
+Use 1 cm depth of solutions for each test.`,
+            parts: [
+                { id: "Q3a", label: "(a) Test on FA 5 (heating)", marks: 3,
+                  instruction: "Place a small spatula of FA 5 in a dry boiling tube. Connect delivery tube dipping into limewater. Heat strongly. Record all observations — note changes to the solid, limewater, and any water condensation.",
+                  answerKey: "Green solid turns black on heating. Water condensation on cooler parts of tube. Limewater turns milky (CO₂ evolved). Confirms: green CuCO₃ → black CuO + CO₂ + (if water of crystallisation: water). Equation: CuCO₃(s) → CuO(s) + CO₂(g). Colour change: green → black; limewater milky." },
+                { id: "Q3b", label: "(b)(i) FA 6 + Mg ribbon", marks: 2,
+                  instruction: "Add 2 cm depth FA 6 to a test-tube. Add a small piece of Mg ribbon. Record observations including any gas test.",
+                  answerKey: "Vigorous effervescence. Mg ribbon dissolves. Colourless gas evolved — pops with lighted splint (H₂). Confirms FA 6 contains H⁺ (acid). FA 6 is HCl. Mg(s) + 2HCl(aq) → MgCl₂(aq) + H₂(g)." },
+                { id: "Q3c", label: "(b)(ii) FA 5 + FA 6, then cation tests", marks: 5,
+                  instruction: "Add 2 cm depth FA 6 to a test-tube. Add a small spatula of FA 5. Record observations (call this solution FA 7). Then carry out tests on FA 7:\n(A) Add NaOH dropwise. Note precipitate. Add excess NaOH.\n(B) Add NH₃(aq) dropwise. Note precipitate. Add excess NH₃.",
+                  answerKey: "FA 5 + FA 6: Green solid dissolves with effervescence (CO₂ — limewater milky). Blue/turquoise solution forms (CuCl₂). CuCO₃ + 2HCl → CuCl₂ + H₂O + CO₂.\n\nTest A (NaOH): Pale blue precipitate Cu(OH)₂ forms. Insoluble in excess NaOH. Confirms Cu²⁺.\nTest B (NH₃): Pale blue precipitate forms. Dissolves in excess NH₃ → deep blue [Cu(NH₃)₄]²⁺ complex. Confirms Cu²⁺." },
+                { id: "Q3d", label: "(c)(i) Anion in FA 6 (AgNO₃ test)", marks: 2,
+                  instruction: "Add a few drops of AgNO₃ to 1 cm FA 6. Note precipitate. Then add NH₃(aq). Note whether precipitate dissolves.",
+                  answerKey: "Curdy white precipitate forms (AgCl). Dissolves readily in dilute NH₃(aq) to give colourless [Ag(NH₃)₂]⁺. Confirms Cl⁻ anion in FA 6. FA 6 is HCl." },
+                { id: "Q3e", label: "(c)(ii) Ionic equation for Cu²⁺ + NH₃", marks: 1,
+                  instruction: "Write the ionic equation (with state symbols) for the reaction of Cu²⁺ with excess NH₃(aq) to form the tetraamine complex.",
+                  answerKey: "Cu²⁺(aq) + 4NH₃(aq) → [Cu(NH₃)₄]²⁺(aq)" },
+            ],
+        },
+    ],
+},
+
 ];
 
 // Backward compatibility: keep QUESTION_PAPER pointing to the 2024 paper

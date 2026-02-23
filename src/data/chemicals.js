@@ -36,4 +36,18 @@ export const CHEMICALS = {
     "CaCl2":                { label: "Calcium Chloride (1.0 mol/dm³)",            type: "solution", color: "#f0f5f8", category: "solution" },
     "KNO3":                 { label: "Potassium Nitrate (1.0 mol/dm³)",           type: "solution", color: "#f5f8f0", category: "solution" },
     "NaNO2":                { label: "Sodium Nitrite (0.5 mol/dm³)",              type: "solution", color: "#f0fff5", category: "solution" },
+
+    // ── Added for 2021–2023 real Cambridge papers ──────────────────────────────
+    "NH4Cl_solid":          { label: "Ammonium Chloride (solid)",                           type: "solid",    color: "#f5f5f0", category: "solid" },
+    "NaHCO3":               { label: "Sodium Hydrogencarbonate (solid, MHCO₃ unknown)",    type: "solid",    color: "#f0f0f0", category: "solid" },
+    "NaHCO3_aq":            { label: "Sodium Hydrogencarbonate Solution (0.20 mol/dm³)",   type: "solution", color: "#f0f8f0", category: "solution" },
+    "bromophenol_blue":     { label: "Bromophenol Blue indicator",                         type: "solution", color: "#ffe090", category: "indicator" },
+    "NH4I":                 { label: "Ammonium Iodide (0.50 mol/dm³)",                     type: "solution", color: "#fafaf0", category: "reagent" },
+    "I2_solution":          { label: "Iodine Solution (0.100 mol/dm³)",                    type: "solution", color: "#6a4a08", category: "reagent" },
+    "Na2S2O3_std":          { label: "Sodium Thiosulfate Standard (0.100 mol/dm³)",        type: "solution", color: "#e8f8f8", category: "titrant" },
+    "CuCO3":                { label: "Copper(II) Carbonate (green solid)",                 type: "solid",    color: "#4a8a3a", category: "solid" },
+    "basic_zinc_carbonate": { label: "Basic Zinc Carbonate (ZnCO₃·2Zn(OH)₂·xH₂O solid)", type: "solid",    color: "#f0f0e8", category: "solid" },
+    "AlNH4SO4_aq":          { label: "Aluminium Ammonium Sulfate (0.50 mol/dm³)",          type: "solution", color: "#f5f5f0", category: "solution" },
+    "Cr_aq":                { label: "Chromium(III) Sulfate (0.50 mol/dm³)",               type: "solution", color: "#4a7a4a", category: "solution" },
+    "MnSO4":                { label: "Manganese(II) Sulfate (0.50 mol/dm³)",               type: "solution", color: "#ffe8e8", category: "solution" },
 };

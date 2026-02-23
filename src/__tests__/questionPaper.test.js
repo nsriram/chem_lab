@@ -8,14 +8,14 @@ describe("QUESTION_PAPERS array", () => {
         expect(Array.isArray(QUESTION_PAPERS)).toBe(true);
     });
 
-    it("contains exactly 20 papers", () => {
-        expect(QUESTION_PAPERS).toHaveLength(20);
+    it("contains exactly 23 papers", () => {
+        expect(QUESTION_PAPERS).toHaveLength(23);
     });
 
     it("every paper has a unique id", () => {
         const ids = QUESTION_PAPERS.map(p => p.id);
         const unique = new Set(ids);
-        expect(unique.size).toBe(20);
+        expect(unique.size).toBe(23);
     });
 });
 
