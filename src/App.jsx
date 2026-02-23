@@ -1,7 +1,6 @@
 import { useChemLab } from "./hooks/useChemLab";
 import PaperTab from "./components/PaperTab";
 import LabTab from "./components/LabTab";
-import DataTab from "./components/DataTab";
 import EvaluateTab from "./components/EvaluateTab";
 import FreeLabTab from "./components/FreeLabTab";
 import { useLang } from "./contexts/LangContext";
@@ -92,7 +91,6 @@ export default function ChemLabApp() {
                 {[
                     ["paper",    t('tab.paper')],
                     ["lab",      t('tab.lab')],
-                    ["data",     t('tab.data')],
                     ["evaluate", t('tab.evaluate')],
                     ["freelab",  t('tab.freelab')],
                 ].map(([id, label]) => (
@@ -148,25 +146,12 @@ export default function ChemLabApp() {
                 />
             )}
 
-            {lab.activeTab === "data" && (
-                <DataTab
-                    tables={lab.tables}
-                    setTables={lab.setTables}
-                    graphs={lab.graphs}
-                    setGraphs={lab.setGraphs}
-                    activeDataTab={lab.activeDataTab}
-                    setActiveDataTab={lab.setActiveDataTab}
-                />
-            )}
-
             {lab.activeTab === "evaluate" && (
                 <EvaluateTab
                     evaluation={lab.evaluation}
                     actionLog={lab.actionLog}
                     partAnswers={lab.partAnswers}
                     paper={lab.activePaper}
-                    tables={lab.tables}
-                    graphs={lab.graphs}
                     runEvaluation={lab.runEvaluation}
                     onBack={() => { lab.setEvaluation(null); lab.setActiveTab("paper"); }}
                     onStartFresh={lab.startFresh}

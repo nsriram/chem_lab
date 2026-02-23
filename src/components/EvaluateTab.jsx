@@ -1,7 +1,7 @@
 import { exportReportPDF } from "../utils/export";
 import { useLang } from "../contexts/LangContext";
 
-export default function EvaluateTab({ evaluation, actionLog, partAnswers, paper, tables, graphs, runEvaluation, onBack, onStartFresh }) {
+export default function EvaluateTab({ evaluation, actionLog, partAnswers, paper, runEvaluation, onBack, onStartFresh }) {
     const { t } = useLang();
 
     return (

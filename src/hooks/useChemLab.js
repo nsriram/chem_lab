@@ -39,9 +39,6 @@ export function useChemLab() {
     const [activePaperId, setActivePaperId] = useState(() => s.activePaperId ?? 0);
     const [transferDestId, setTransferDestId] = useState(null);
     const [transferAmount, setTransferAmount] = useState(10);
-    const [tables, setTables] = useState(() => s.tables ?? []);
-    const [graphs, setGraphs] = useState(() => s.graphs ?? []);
-    const [activeDataTab, setActiveDataTab] = useState(() => s.activeDataTab ?? "tables");
     const [freeExperiment, setFreeExperiment] = useState(() => s.freeExperiment ?? null);
     const [freeLabReport, setFreeLabReport] = useState(() => s.freeLabReport ?? null);
     const clockRef = useRef(null);
@@ -53,14 +50,13 @@ export function useChemLab() {
                 activeTab, activePaperId, expandedQ,
                 vessels, actionLog, logHistory, historyIndex,
                 partAnswers, evaluation, clockTime,
-                tables, graphs, activeDataTab,
                 freeExperiment, freeLabReport,
             }));
         } catch {
             // Storage quota exceeded — ignore
         }
     }, [activeTab, activePaperId, expandedQ, vessels, actionLog, logHistory,
-        historyIndex, partAnswers, evaluation, clockTime, tables, graphs, activeDataTab,
+        historyIndex, partAnswers, evaluation, clockTime,
         freeExperiment, freeLabReport]);
 
     useEffect(() => {
@@ -392,8 +388,6 @@ export function useChemLab() {
         setPartAnswers({});
         setEvaluation(null);
         setClockTime(0);
-        setTables([]);
-        setGraphs([]);
         setActiveTab("paper");
     };
 
@@ -416,9 +410,6 @@ export function useChemLab() {
         expandedQ, setExpandedQ,
         activePaperId, setActivePaperId,
         partAnswers, setPartAnswers,
-        tables, setTables,
-        graphs, setGraphs,
-        activeDataTab, setActiveDataTab,
         evaluation, setEvaluation,
         actionLog,
         historyIndex,
