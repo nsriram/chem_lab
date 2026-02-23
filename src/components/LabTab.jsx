@@ -409,7 +409,7 @@ export default function LabTab({
                                             </span>
                                         </div>
                                     ))}
-                                    <div style={{ marginTop: 8, height: 16, borderRadius: 4, background: vessel.color, border: "1px solid rgba(255,255,255,0.1)", transition: "background 0.8s ease" }} />
+                                    <div style={{ marginTop: 8, height: 32, borderRadius: 6, background: vessel.color, border: "1px solid rgba(255,255,255,0.18)", transition: "background 0.8s ease", boxShadow: `0 0 8px ${vessel.color}80, inset 0 1px 0 rgba(255,255,255,0.2)` }} />
                                 </div>
                             )}
                             <button
@@ -470,7 +470,7 @@ export default function LabTab({
                     <div style={{ fontSize: 12, color: "#c8e8ff", minHeight: 20, display: "flex", alignItems: "center", gap: 6 }}>
                         {selectedChemical ? (
                             <>
-                                <span style={{ width: 8, height: 8, borderRadius: 2, background: CHEMICALS[selectedChemical]?.color, border: "1px solid rgba(255,255,255,0.3)", flexShrink: 0, display: "inline-block" }} />
+                                <span style={{ width: 14, height: 14, borderRadius: 3, background: CHEMICALS[selectedChemical]?.color, border: "1px solid rgba(255,255,255,0.3)", flexShrink: 0, display: "inline-block", boxShadow: `0 0 6px ${CHEMICALS[selectedChemical]?.color}90` }} />
                                 {splitLabel(CHEMICALS[selectedChemical]?.label ?? "").name}
                             </>
                         ) : "—"}
