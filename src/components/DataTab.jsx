@@ -12,7 +12,7 @@ function autoHeight(el) {
 // ── ChemCell ──────────────────────────────────────────────────────────────────
 // Compact table-cell textarea with Ctrl+, / Ctrl+. keyboard shortcuts.
 // No visible toolbar — a small badge appears in the corner when mode is active.
-export function ChemCell({ value, onChange }) {
+export function ChemCell({ value, onChange, style: styleOverride }) {
     const [mode, setMode] = useState(null);
     const ref = useRef(null);
 
@@ -68,6 +68,7 @@ export function ChemCell({ value, onChange }) {
                     lineHeight: 1.5, minHeight: 28,
                     outline: mode ? `1px solid ${mode === 'sub' ? '#2a5adf' : '#df7a2a'}` : 'none',
                     outlineOffset: -1,
+                    ...styleOverride,
                 }}
             />
             {mode && (
@@ -184,12 +185,12 @@ export function ResizableTable({ tbl, ti, setTables }) {
                 <tr>
                     {tbl.headers.map((h, hi) => (
                         <th key={hi} style={{ border: "1px solid #2a5a8a", padding: 0, position: "relative", overflow: "hidden" }}>
-                            <ChemInput
+                            <ChemCell
                                 value={h}
                                 onChange={v => setTables(ts => ts.map((t, i) => i === ti
                                     ? { ...t, headers: t.headers.map((hh, j) => j === hi ? v : hh) }
                                     : t))}
-                                style={{ width: "100%", background: "rgba(26,74,122,0.4)", color: "#c8e8ff", border: "none", padding: "6px 26px 6px 8px", fontWeight: "bold", fontFamily: "'JetBrains Mono', monospace", fontSize: 12, boxSizing: "border-box" }}
+                                style={{ background: "rgba(26,74,122,0.4)", color: "#c8e8ff", padding: "6px 26px 6px 8px", fontWeight: "bold" }}
                             />
                             {/* Column remove button */}
                             {tbl.headers.length > 1 && (

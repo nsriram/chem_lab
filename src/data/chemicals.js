@@ -31,6 +31,7 @@ export const CHEMICALS = {
     "oxalic_acid":          { label: "Oxalic Acid (0.05 mol/dm³)",                type: "solution", color: "#fffaf0", category: "reagent" },
     "Cu2O":                 { label: "Copper(I) Oxide",                           type: "solid",    color: "#c8502a", category: "solid" },
     "FeCl3":                { label: "Iron(III) Chloride (0.5 mol/dm³)",          type: "solution", color: "#c46008", category: "solution" },
+    "fe3_aq":               { label: "Iron(III) Ammonium Sulfate Solution (0.5 mol/dm³)", type: "solution", color: "#c46008", category: "solution" },
     "NH4Cl":                { label: "Ammonium Chloride (1.0 mol/dm³)",           type: "solution", color: "#f5f5f0", category: "solution" },
     "CaCl2":                { label: "Calcium Chloride (1.0 mol/dm³)",            type: "solution", color: "#f0f5f8", category: "solution" },
     "KNO3":                 { label: "Potassium Nitrate (1.0 mol/dm³)",           type: "solution", color: "#f5f8f0", category: "solution" },

@@ -42,6 +42,7 @@ const _IODO_OXID = {
     H2O2:         { conc: 0.100,  i2PerMol: 1.0 },  // H₂O₂ + 2I⁻ + 2H⁺ → I₂
     CuSO4:        { conc: 1.000,  i2PerMol: 0.5 },  // 2Cu²⁺ + 4I⁻ → 2CuI + I₂
     FeCl3:        { conc: 0.500,  i2PerMol: 0.5 },  // 2Fe³⁺ + 2I⁻ → 2Fe²⁺ + I₂
+    fe3_aq:       { conc: 0.500,  i2PerMol: 0.5 },  // same Fe³⁺ stoichiometry (ammonium iron(III) sulfate)
 };
 const _S2O3_CONC = 22.00 / 248.2;  // 0.0886 mol/dm³ for Na₂S₂O₃·5H₂O (Mr = 248.2)
 
@@ -176,7 +177,7 @@ export const REACTION_RULES = [
             chemicals.includes("KI") &&
             (chemicals.includes("KMnO4_acid") || chemicals.includes("FA3_oxidiser") ||
              chemicals.includes("H2O2") || chemicals.includes("CuSO4") ||
-             chemicals.includes("FeCl3")),
+             chemicals.includes("FeCl3") || chemicals.includes("fe3_aq")),
         produce(vessel) {
             const { i2Remaining, i2Fraction } = _iodometricBalance(vessel);
             const chems = (vessel.contents || []).map(c => c.chemical);
@@ -389,7 +390,7 @@ export const REACTION_RULES = [
     // MUST precede fecl3-naoh so the I⁻ test fires before a plain NaOH test.
     {
         id: "redox/fecl3-ki",
-        requires: ["FeCl3", "KI"],
+        matches: (chemicals) => chemicals.includes("KI") && (chemicals.includes("FeCl3") || chemicals.includes("fe3_aq")),
         produce() {
             return {
                 observation: "Fe³⁺ oxidises I⁻ to I₂. Solution turns deep yellow-brown (I₂ formed). Fe³⁺ reduced to Fe²⁺ (pale green). Add starch → blue-black confirms I₂. Key test: Fe³⁺ oxidises I⁻ but Fe²⁺ does NOT — use to distinguish FeSO₄ from FeCl₃.",
@@ -409,19 +410,24 @@ export const REACTION_RULES = [
     // Must precede naoh-cuso4 and nh3-cuso4 rules.
     {
         id: "qualitative/fecl3-naoh",
-        requires: ["FeCl3", "NaOH"],
-        produce() {
+        matches: (chemicals) =>
+            chemicals.includes("NaOH") && (chemicals.includes("FeCl3") || chemicals.includes("fe3_aq")),
+        produce(vessel) {
+            const isAmmoniumIron = (vessel.contents || []).some(c => c.chemical === "fe3_aq");
             return {
-                observation: "Rust-brown/red-brown precipitate of iron(III) hydroxide Fe(OH)₃ forms immediately. Insoluble in excess NaOH. Confirms Fe³⁺. Does NOT dissolve in excess (distinction from Al³⁺).",
+                observation: isAmmoniumIron
+                    ? "Rust-brown/red-brown precipitate of iron(III) hydroxide Fe(OH)₃ forms immediately. Insoluble in excess NaOH. On warming, pungent ammonia gas (NH₃) evolves — turns damp red litmus paper blue. Confirms both Fe³⁺ (rust-brown ppt) and NH₄⁺ (NH₃ on warming). Does NOT dissolve in excess."
+                    : "Rust-brown/red-brown precipitate of iron(III) hydroxide Fe(OH)₃ forms immediately. Insoluble in excess NaOH. Confirms Fe³⁺. Does NOT dissolve in excess (distinction from Al³⁺).",
                 newColor: "#b05a10",
                 precipitate: "Fe(OH)₃(s) – rust-brown ppt, insoluble in excess NaOH",
                 hasPrecipitate: true,
                 colorChange: "orange-brown → rust-brown precipitate (Fe(OH)₃)",
+                ...(isAmmoniumIron && { gas: "NH₃ – pungent; turns damp red litmus blue (on warming)" }),
             };
         },
         blind() {
             return {
-                observation: "Rust-brown/red-brown precipitate forms immediately. Insoluble in excess NaOH. Does NOT dissolve in excess.",
+                observation: "Rust-brown/red-brown precipitate forms immediately. Insoluble in excess NaOH. Does NOT dissolve in excess. On warming, pungent gas evolved — turns damp red litmus blue.",
                 precipitate: "Rust-brown precipitate, insoluble in excess NaOH",
                 colorChange: "→ rust-brown precipitate",
             };
@@ -429,7 +435,8 @@ export const REACTION_RULES = [
     },
     {
         id: "qualitative/fecl3-nh3",
-        requires: ["FeCl3", "NH3_aq"],
+        matches: (chemicals) =>
+            chemicals.includes("NH3_aq") && (chemicals.includes("FeCl3") || chemicals.includes("fe3_aq")),
         produce() {
             return {
                 observation: "Rust-brown precipitate of Fe(OH)₃ forms. Insoluble in excess NH₃(aq) — key distinction from Cu²⁺ (which dissolves in excess NH₃ to form deep blue complex).",
@@ -615,6 +622,25 @@ export const REACTION_RULES = [
         },
     },
     {
+        id: "qualitative/agno3-fe3aq",
+        // fe3_aq contains SO₄²⁻ but no Cl⁻/Br⁻/I⁻ — no AgX halide precipitate
+        matches: (chemicals) =>
+            chemicals.includes("AgNO3") && chemicals.includes("fe3_aq"),
+        produce() {
+            return {
+                observation: "No curdy white precipitate of AgCl forms. Confirms absence of Cl⁻, Br⁻ and I⁻. Any slight turbidity (Ag₂SO₄, partially soluble) dissolves on addition of NH₃(aq). The AgNO₃ test is negative for halides.",
+                newColor: "#c46008",
+                colorChange: "orange-brown → no significant change (no halide precipitate)",
+            };
+        },
+        blind() {
+            return {
+                observation: "No curdy precipitate forms with AgNO₃. Any slight turbidity dissolves on adding NH₃(aq). Confirms no Cl⁻, Br⁻ or I⁻ present.",
+                colorChange: "no significant change (no halide precipitate)",
+            };
+        },
+    },
+    {
         id: "qualitative/agno3-bromide",
         requires: ["AgNO3", "KBr"],
         produce() {
@@ -773,7 +799,8 @@ export const REACTION_RULES = [
     // MUST be placed before acid-carbonate and bacl2-carbonate rules.
     {
         id: "qualitative/na2co3-fecl3",
-        requires: ["Na2CO3", "FeCl3"],
+        matches: (chemicals) =>
+            chemicals.includes("Na2CO3") && (chemicals.includes("FeCl3") || chemicals.includes("fe3_aq")),
         produce() {
             return {
                 observation: "Rust-brown/red-brown precipitate forms immediately. CO₂ effervescence. Fe³⁺ is hydrolysed by CO₃²⁻ to give Fe(OH)₃(s) — not FeCO₃. 2FeCl₃ + 3Na₂CO₃ + 3H₂O → 2Fe(OH)₃↓ + 3CO₂↑ + 6NaCl. The brown ppt distinguishes Fe³⁺ from Ca²⁺ (white ppt) and Cu²⁺ (blue-green ppt).",
@@ -874,10 +901,11 @@ export const REACTION_RULES = [
     },
     {
         id: "qualitative/bacl2-sulfate",
-        // SO4²⁻ sources: H2SO4, CuSO4, FeSO4
+        // SO4²⁻ sources: H2SO4, CuSO4, FeSO4, fe3_aq (iron(III) ammonium sulfate)
         matches: (chemicals) =>
             chemicals.includes("BaCl2") &&
-            (chemicals.includes("H2SO4") || chemicals.includes("CuSO4") || chemicals.includes("FeSO4")),
+            (chemicals.includes("H2SO4") || chemicals.includes("CuSO4") ||
+             chemicals.includes("FeSO4") || chemicals.includes("fe3_aq")),
         produce() {
             return {
                 observation: "White precipitate of barium sulfate (BaSO₄) forms immediately. Insoluble in excess dilute HCl. Sulfate ion confirmed.",
@@ -1242,6 +1270,32 @@ export const REACTION_RULES = [
         },
     },
 
+    // ── Mg + Fe³⁺ acidic solution (fe3_aq) ────────────────────────────────────
+    // fe3_aq is acidic (H⁺ from Fe³⁺ hydrolysis) and Fe³⁺ itself is an oxidant.
+    // Mg + 2H⁺ → Mg²⁺ + H₂(g) AND Mg + 2Fe³⁺ → Mg²⁺ + 2Fe²⁺
+    // MUST precede qualitative/mg-acid so this fires when fe3_aq is present.
+    {
+        id: "qualitative/mg-fe3",
+        matches: (chemicals) =>
+            (chemicals.includes("Mg_powder") || chemicals.includes("Mg_ribbon")) &&
+            chemicals.includes("fe3_aq"),
+        produce() {
+            return {
+                observation: "Effervescence observed — hydrogen gas (H₂) evolved; pops with lighted splint. Mg reacts with H⁺ present in the acidic iron(III) solution: Mg(s) + 2H⁺(aq) → Mg²⁺(aq) + H₂(g). Fe³⁺ also oxidises Mg: Mg + 2Fe³⁺ → Mg²⁺ + 2Fe²⁺. Solution colour changes from orange-rust to pale green/yellow (Fe³⁺ → Fe²⁺) as Mg dissolves.",
+                gas: "H₂ – pops with lighted splint",
+                newColor: "#8ab86a",
+                colorChange: "orange-rust → pale green/yellow (Fe²⁺; Mg dissolves)",
+            };
+        },
+        blind() {
+            return {
+                observation: "Effervescence observed — colourless gas evolved; pops with lighted splint. Solid dissolves. Solution colour changes to paler shade. Confirms H⁺ and/or oxidising cation present.",
+                gas: "Colourless gas; pops with lighted splint",
+                colorChange: "coloured solution → paler; solid dissolves",
+            };
+        },
+    },
+
     // ── Mg + acid (OR-logic on both sides) ────────────────────────────────────
     {
         id: "qualitative/mg-acid",
@@ -1384,7 +1438,8 @@ export const REACTION_RULES = [
                     chemicals.includes("KMnO4_acid") ||
                     chemicals.includes("H2O2") ||
                     chemicals.includes("CuSO4") ||
-                    chemicals.includes("FeCl3")
+                    chemicals.includes("FeCl3") ||
+                    chemicals.includes("fe3_aq")
                 ))
             ),
         produce() {

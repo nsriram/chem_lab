@@ -127,7 +127,7 @@ FA 8 is a solid.`,
         "FA 4": "KI",
         "FA 5": "H2SO4",
         "FA 6": "starch",
-        "FA 7": "FeCl3",
+        "FA 7": "fe3_aq",
     },
     unknownFAs: ["FA 7"],
     questions: [
