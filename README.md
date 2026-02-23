@@ -24,8 +24,7 @@ Cambridge Paper 3 (Advanced Practical Skills) tests students on titrations, enth
 - **Full virtual bench** — choose glassware, add reagents, heat, stir, filter, and weigh, with realistic colour changes and gas observations.
 - **Live reaction feedback** — the lab responds to what you do: indicators change colour at the endpoint, precipitates form, gases are identified.
 - **Measurement precision hints** — get nudged when a burette reading isn't to 0.05 cm³ or a balance reading isn't to 0.01 g.
-- **Results tables and graphs** — build data tables and plot scatter graphs directly in the app, just like the real exam booklet.
-- **Per-question answer boxes** — type written answers alongside each question part, mirroring the Cambridge answer booklet layout.
+- **Per-question answer boxes** — type written answers alongside each question part, mirroring the Cambridge answer booklet layout. Add results tables and scatter graphs directly within each answer box.
 - **Free Lab mode** — experiment without a set paper; great for exploring reactions and building intuition.
 - **Automated marking** — a built-in rubric engine scores every section against the Cambridge mark scheme and gives criterion-by-criterion feedback.
 - **PDF report export** — download a formatted report of your session including observations, answers, and scores.
@@ -39,9 +38,8 @@ Cambridge Paper 3 (Advanced Practical Skills) tests students on titrations, enth
 1. **Pick a paper** — choose any past paper from the Paper selector at the top.
 2. **Read the question** — the Paper tab shows the full question context and each part.
 3. **Do the experiment** — switch to the Lab tab, set up your bench, and carry out the practical.
-4. **Record results** — use the Data tab to fill in results tables and draw graphs.
-5. **Write your answers** — type answers into each question part box in the Paper tab.
-6. **Submit for marking** — go to the Evaluate tab and click *Submit for Evaluation* to see your score.
+4. **Write your answers** — type answers into each question part box in the Paper tab. Use the inline table and graph tools to record results alongside each question.
+5. **Submit for marking** — go to the Evaluate tab and click *Submit for Evaluation* to see your score.
 
 ---
 
