@@ -130,7 +130,10 @@ export default function EvaluateTab({ evaluation, actionLog, partAnswers, paper,
                                         {q.title}
                                     </div>
                                     {q.parts.map(part => {
-                                        const answer = partAnswers?.[part.id];
+                                        const raw = partAnswers?.[part.id];
+                                        const answerText = typeof raw === 'string' ? raw : (raw?.text ?? '');
+                                        const hasTables = Array.isArray(raw?.tables) && raw.tables.length > 0;
+                                        const hasGraphs = Array.isArray(raw?.graphs) && raw.graphs.length > 0;
                                         return (
                                             <div key={part.id} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 10, padding: "10px 12px", background: "rgba(255,255,255,0.02)", borderRadius: 6, border: "1px solid #1a3a5a" }}>
                                                 {/* Question side */}
@@ -147,9 +150,16 @@ export default function EvaluateTab({ evaluation, actionLog, partAnswers, paper,
                                                     <div style={{ fontSize: 11, color: "#5a9a6a", textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 4, fontFamily: "'JetBrains Mono', monospace" }}>
                                                         ✏️ Student Answer
                                                     </div>
-                                                    <div style={{ fontSize: 13, color: answer ? "#c8e8ff" : "#3a5a7a", fontStyle: answer ? "normal" : "italic", lineHeight: 1.6, whiteSpace: "pre-wrap", fontFamily: "'JetBrains Mono', monospace" }}>
-                                                        {answer || "No answer provided"}
+                                                    <div style={{ fontSize: 13, color: answerText ? "#c8e8ff" : "#3a5a7a", fontStyle: answerText ? "normal" : "italic", lineHeight: 1.6, whiteSpace: "pre-wrap", fontFamily: "'JetBrains Mono', monospace" }}>
+                                                        {answerText || "No answer provided"}
                                                     </div>
+                                                    {(hasTables || hasGraphs) && (
+                                                        <div style={{ marginTop: 6, fontSize: 11, color: "#6a9abf", fontFamily: "'JetBrains Mono', monospace" }}>
+                                                            {hasTables && `📋 ${raw.tables.length} inline table${raw.tables.length > 1 ? "s" : ""}`}
+                                                            {hasTables && hasGraphs && "  "}
+                                                            {hasGraphs && `📉 ${raw.graphs.length} inline graph${raw.graphs.length > 1 ? "s" : ""}`}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         );

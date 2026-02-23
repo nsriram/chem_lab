@@ -279,6 +279,94 @@ describe("evaluateLog – fallback when no paper supplied", () => {
     });
 });
 
+// ─── partAnswers format compatibility ────────────────────────────────────────
+// Mirrors the joinedNotes logic in useChemLab.js runEvaluation().
+// Guards against regression: partAnswers values are now {text, tables, graphs}
+// objects (since inline tables/graphs were added). Previously they were plain
+// strings; the consumer (EvaluateTab) and notes-builder must handle both.
+
+function joinedNotesFromPartAnswers(partAnswers) {
+    return Object.entries(partAnswers)
+        .map(([id, ans]) => {
+            const text = typeof ans === "string" ? ans : (ans?.text ?? "");
+            return `${id}: ${text}`;
+        })
+        .join("\n");
+}
+
+describe("partAnswers format – joinedNotes helper", () => {
+    it("extracts text from old plain-string format", () => {
+        const pa = { Q1a: "25.00 cm³ titre", Q1b: "mean = 24.50" };
+        const notes = joinedNotesFromPartAnswers(pa);
+        expect(notes).toContain("Q1a: 25.00 cm³ titre");
+        expect(notes).toContain("Q1b: mean = 24.50");
+    });
+
+    it("extracts text from new object format {text, tables, graphs}", () => {
+        const pa = {
+            Q1a: { text: "25.00 cm³ titre", tables: [], graphs: [] },
+            Q1b: { text: "mean = 24.50",    tables: [{}], graphs: [{}] },
+        };
+        const notes = joinedNotesFromPartAnswers(pa);
+        expect(notes).toContain("Q1a: 25.00 cm³ titre");
+        expect(notes).toContain("Q1b: mean = 24.50");
+    });
+
+    it("returns empty string segment for null/undefined values", () => {
+        const pa = { Q1a: null, Q1b: undefined, Q1c: { text: null } };
+        const notes = joinedNotesFromPartAnswers(pa);
+        expect(typeof notes).toBe("string");
+        expect(notes).toContain("Q1a: ");
+        expect(notes).toContain("Q1b: ");
+        expect(notes).toContain("Q1c: ");
+    });
+
+    it("mixed old and new format in same partAnswers produces correct notes", () => {
+        const pa = {
+            Q1a: "old string answer",
+            Q1b: { text: "new object answer", tables: [], graphs: [] },
+        };
+        const notes = joinedNotesFromPartAnswers(pa);
+        expect(notes).toContain("Q1a: old string answer");
+        expect(notes).toContain("Q1b: new object answer");
+    });
+});
+
+describe("evaluateLog – does not throw with object-format partAnswers notes", () => {
+    it("does not throw when notes come from object-format answers", () => {
+        const pa = {
+            Q1a: { text: "Titre 1: 23.45 cm³\nTitre 2: 23.50 cm³\nmean titre = 23.48 cm³", tables: [], graphs: [] },
+            Q1b: { text: "moles n = 0.002 mol", tables: [], graphs: [] },
+        };
+        const notes = joinedNotesFromPartAnswers(pa);
+        expect(() => evaluateLog([], notes, titrationPaper)).not.toThrow();
+    });
+
+    it("awards titre marks when text inside object answer contains titre data", () => {
+        const pa = {
+            Q1a: { text: "Titre 1: 23.45 cm³\nTitre 2: 23.50 cm³\nmean titre = 23.48 cm³ moles = 0.002", tables: [], graphs: [] },
+        };
+        const log = Array(3).fill({ action: "add_chemical", chemical: "Na2S2O3_titrant", vessel: "v", details: "" });
+        const notes = joinedNotesFromPartAnswers(pa);
+        const result = evaluateLog(log, notes, titrationPaper);
+        const q1 = result.sections[0];
+        const titreCrit = q1.criteria.find(c =>
+            c.text.includes("Burette readings") || c.text.includes("titration data")
+        );
+        expect(titreCrit?.marks).toBeGreaterThan(0);
+    });
+
+    it("evaluateLog result has no undefined in sections when notes from objects", () => {
+        const pa = { Q1a: { text: "some answer", tables: [{}], graphs: [] } };
+        const notes = joinedNotesFromPartAnswers(pa);
+        const result = evaluateLog([], notes, titrationPaper);
+        for (const sec of result.sections) {
+            expect(sec.score).not.toBeNaN();
+            expect(sec.label).toBeDefined();
+        }
+    });
+});
+
 // ─── Section score capped at question marks ───────────────────────────────────
 
 describe("evaluateLog – section score never exceeds question max", () => {
