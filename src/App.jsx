@@ -50,6 +50,27 @@ export default function ChemLabApp() {
                     <button className="action-btn" style={{ fontSize: 11 }} onClick={lab.redo} disabled={lab.historyIndex >= lab.logHistory.length - 1}>
                         ↪ Redo
                     </button>
+                    <button
+                        className="action-btn danger"
+                        style={{ fontSize: 11 }}
+                        title="Clear all session data: bench, answers, log, graphs, tables"
+                        onClick={() => {
+                            if (window.confirm(
+                                "Start a new session?\n\n" +
+                                "This will clear:\n" +
+                                "• All vessels on the bench\n" +
+                                "• All written answers\n" +
+                                "• The full action log\n" +
+                                "• All data tables and graphs\n\n" +
+                                "Your saved question paper selection is kept.\n\n" +
+                                "This cannot be undone."
+                            )) {
+                                lab.startFresh();
+                            }
+                        }}
+                    >
+                        🔄 New Session
+                    </button>
                 </div>
             </div>
 
