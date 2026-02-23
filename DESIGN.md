@@ -14,7 +14,6 @@ Browser
     ├── LabTab          ← virtual bench (vessels, chemicals, actions)
     ├── FreeLabTab      ← open-ended lab without a set paper
     ├── PaperTab        ← question paper viewer + per-part answer boxes
-    ├── DataTab         ← results tables and scatter graphs
     └── EvaluateTab     ← mark-scheme feedback + PDF export
 ```
 
@@ -37,7 +36,7 @@ Browser
 ## Component tree
 
 ### `App.jsx`
-- Owns the active tab (`lab | paper | data | evaluate | freelab`).
+- Owns the active tab (`lab | paper | evaluate | freelab`).
 - Wraps the whole tree in `LangContext.Provider` so any component can call `useLang()` for translations.
 - Renders the header (paper selector, New Session button, language switcher) and delegates to the active tab component.
 - Passes the single `chemLab` state object and its handlers down as props.
@@ -56,14 +55,10 @@ Browser
 
 ### `PaperTab.jsx`
 - Displays the selected paper's questions in Cambridge exam style.
-- Each question part has an answer box (`ChemTextInput` / `ChemCell`).
-- Answer state is stored per `part.id` in `partAnswers` (managed by `useChemLab`).
-- Tables and graphs from the Data tab can be attached to a part's answer via an inline picker.
-
-### `DataTab.jsx`
-- Two sub-panels: **Tables** and **Graphs**.
-- Tables: resizable columns, multi-line headers (`ChemCell` — auto-growing textarea), add/remove rows and columns.
-- Graphs: `GraphPlot.jsx` renders an SVG scatter plot. Students click to place data points; axes auto-scale; a best-fit line can be toggled.
+- Each question part has an answer box (`ChemTextInput`) and "+ Add Table" / "+ Add Graph" buttons.
+- Answer state is stored per `part.id` in `partAnswers` as `{ text, tables[], graphs[] }` (managed by `useChemLab`).
+- Tables use `ResizableTable` (resizable columns, multi-line `ChemCell` headers); graphs use `GraphPlot` with typed x/y coordinate entry and a best-fit line toggle.
+- Both components are imported from `DataTab.jsx`, which serves as a pure component library.
 
 ### `EvaluateTab.jsx`
 - Shows a score summary card, per-section breakdown bars, and criterion-level pass/partial/fail chips.
@@ -94,8 +89,6 @@ All app state lives in a single custom hook. Components receive slices of state 
   selectedChemical: null,      // id of the chemical/equipment to add next
   actionLog:      [],          // { timestamp, action, vessel, details }
   partAnswers:    {},          // { [partId]: { text, tables[], graphs[] } }
-  tables:         [],          // standalone data tables
-  graphs:         [],          // standalone graphs
   evaluation:     null,        // result object from evaluation engine
   currentPaper:   PAPERS[0],   // the active question paper
   tab:            "lab",       // active UI tab
