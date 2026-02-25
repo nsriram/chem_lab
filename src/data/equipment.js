@@ -6,6 +6,7 @@ export const EQUIPMENT = {
     "measuring_cylinder_10":    { label: "Measuring Cylinder (10 cm³)",icon: "📏", apparatusMass: 34.57 },
     "measuring_cylinder_25":    { label: "Measuring Cylinder (25 cm³)",icon: "📐", apparatusMass: 54.91 },
     "measuring_cylinder_50":    { label: "Measuring Cylinder (50 cm³)",icon: "📐", apparatusMass: 65.34 },
+    "volumetric_flask_250":     { label: "Volumetric Flask (250 cm³)", icon: "⚱️", apparatusMass: 132.67 },
     "conical_flask":            { label: "Conical Flask (250 cm³)",     icon: "⚗️", apparatusMass: 89.46 },
     "beaker_100":               { label: "Beaker (100 cm³)",            icon: "🫙", apparatusMass: 63.82 },
     "beaker_250":               { label: "Beaker (250 cm³)",            icon: "🫗", apparatusMass: 94.17 },
