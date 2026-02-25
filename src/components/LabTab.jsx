@@ -31,7 +31,7 @@ const EQUIP_GROUPS = [
         id: "vessels",
         labelKey: "equip.vessels",
         color: "#60a5fa",
-        ids: ["conical_flask", "beaker_100", "beaker_250", "polystyrene_cup", "test_tube", "boiling_tube", "crucible"],
+        ids: ["conical_flask", "beaker_100", "beaker_250", "volumetric_flask_250", "polystyrene_cup", "test_tube", "boiling_tube", "crucible"],
     },
     {
         id: "measuring",
