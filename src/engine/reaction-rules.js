@@ -1158,6 +1158,76 @@ export const REACTION_RULES = [
         },
     },
 
+    // ── Bromophenol blue indicator ─────────────────────────────────────────────
+    // For MHCO₃ + H₂SO₄ titrations (2021-style). Yellow < pH 3; green at pH 3–4.5;
+    // blue > pH 4.5. Starts blue in alkaline MHCO₃ flask; add acid → green endpoint.
+    // Placed here so it fires before the generic naoh-neutralise and nahco3-acid rules.
+    {
+        id: "titration/bromophenol-blue",
+        matches: (chemicals) =>
+            chemicals.includes("bromophenol_blue") &&
+            (chemicals.includes("HCl") || chemicals.includes("H2SO4") ||
+             chemicals.includes("NaOH") || chemicals.includes("Na2CO3") ||
+             chemicals.includes("NaHCO3") || chemicals.includes("NaHCO3_aq")),
+        produce(vessel) {
+            const { acidMmol, baseMmol, excess } = _titrationBalance(vessel);
+            if (baseMmol === 0 && acidMmol > 0) {
+                return {
+                    observation: "Bromophenol blue in acid — YELLOW (pH < 3). Add alkali from burette. Endpoint: yellow → green/blue-green.",
+                    newColor: "#ddaa00",
+                    colorChange: "yellow (acidic, pH < 3)",
+                };
+            }
+            if (acidMmol === 0 && baseMmol > 0) {
+                return {
+                    observation: "Bromophenol blue in alkaline solution — BLUE (pH > 4.5). Add acid from burette. Endpoint colour: yellow-green or green.",
+                    newColor: "#4040c0",
+                    colorChange: "blue (alkaline, pH > 4.5)",
+                };
+            }
+            if (excess < -2.0) {
+                return {
+                    observation: `Acid in large excess (acid: ${acidMmol.toFixed(1)} mmol, base: ${baseMmol.toFixed(1)} mmol). Bromophenol blue YELLOW. Continue adding base.`,
+                    newColor: "#ddaa00",
+                    colorChange: "yellow (acid in large excess)",
+                };
+            }
+            if (excess < 0) {
+                return {
+                    observation: `⚠️ NEAR ENDPOINT — YELLOW-GREEN, fading. Base excess: ${Math.abs(excess).toFixed(1)} mmol. Add alkali DROPWISE.`,
+                    newColor: "#88aa20",
+                    colorChange: "yellow → yellow-green (near endpoint — add dropwise!)",
+                };
+            }
+            if (excess <= 1.0) {
+                return {
+                    observation: `✓ ENDPOINT REACHED — GREEN/BLUE-GREEN (pH ≈ 4.5). Base excess only ${excess.toFixed(1)} mmol. Record burette reading.`,
+                    newColor: "#3a8a40",
+                    colorChange: "yellow → green ✓ ENDPOINT (pH ≈ 4.5)",
+                };
+            }
+            return {
+                observation: `Over-titrated — ${excess.toFixed(1)} mmol excess base. Bromophenol blue BLUE. Endpoint was green. Repeat titration.`,
+                newColor: "#4040c0",
+                colorChange: "green → blue (over-titrated)",
+            };
+        },
+        blind(vessel) {
+            const { acidMmol, baseMmol, excess } = _titrationBalance(vessel);
+            if (baseMmol === 0 && acidMmol > 0)
+                return { observation: "Yellow (acidic). Add alkali from burette. Endpoint: yellow → green." };
+            if (acidMmol === 0 && baseMmol > 0)
+                return { observation: "Blue (alkaline). Add acid from burette. Endpoint: blue → green." };
+            if (excess < -2.0)
+                return { observation: "Yellow. Acid in excess. Continue adding alkali." };
+            if (excess < 0)
+                return { observation: "⚠️ Yellow-green. NEAR ENDPOINT — add alkali dropwise." };
+            if (excess <= 1.0)
+                return { observation: "✓ GREEN — ENDPOINT. Record burette reading." };
+            return { observation: "Blue — over-titrated (too much alkali). Repeat titration." };
+        },
+    },
+
     {
         id: "qualitative/naoh-neutralise",
         // NaOH + acid → salt + water (neutralisation, no visible change)
@@ -1969,76 +2039,6 @@ export const REACTION_RULES = [
                 observation: "Brown solution decolourises on adding the reagent. Confirms a reducing anion. Add starch to check for remaining I₂.",
                 colorChange: "brown → colourless/pale (reducing anion present)",
             };
-        },
-    },
-
-    // ── Bromophenol blue indicator ─────────────────────────────────────────────
-    // For MHCO₃ + H₂SO₄ titrations (2021-style). Yellow < pH 3; green at pH 3–4.5;
-    // blue > pH 4.5. Starts blue in alkaline MHCO₃ flask; add acid → green endpoint.
-    // MUST precede qualitative/naoh-neutralise and qualitative/nahco3-acid.
-    {
-        id: "titration/bromophenol-blue",
-        matches: (chemicals) =>
-            chemicals.includes("bromophenol_blue") &&
-            (chemicals.includes("HCl") || chemicals.includes("H2SO4") ||
-             chemicals.includes("NaOH") || chemicals.includes("Na2CO3") ||
-             chemicals.includes("NaHCO3") || chemicals.includes("NaHCO3_aq")),
-        produce(vessel) {
-            const { acidMmol, baseMmol, excess } = _titrationBalance(vessel);
-            if (baseMmol === 0 && acidMmol > 0) {
-                return {
-                    observation: "Bromophenol blue in acid — YELLOW (pH < 3). Add alkali from burette. Endpoint: yellow → green/blue-green.",
-                    newColor: "#ddaa00",
-                    colorChange: "yellow (acidic, pH < 3)",
-                };
-            }
-            if (acidMmol === 0 && baseMmol > 0) {
-                return {
-                    observation: "Bromophenol blue in alkaline solution — BLUE (pH > 4.5). Add acid from burette. Endpoint colour: yellow-green or green.",
-                    newColor: "#4040c0",
-                    colorChange: "blue (alkaline, pH > 4.5)",
-                };
-            }
-            if (excess < -2.0) {
-                return {
-                    observation: `Acid in large excess (acid: ${acidMmol.toFixed(1)} mmol, base: ${baseMmol.toFixed(1)} mmol). Bromophenol blue YELLOW. Continue adding base.`,
-                    newColor: "#ddaa00",
-                    colorChange: "yellow (acid in large excess)",
-                };
-            }
-            if (excess < 0) {
-                return {
-                    observation: `⚠️ NEAR ENDPOINT — YELLOW-GREEN, fading. Base excess: ${Math.abs(excess).toFixed(1)} mmol. Add alkali DROPWISE.`,
-                    newColor: "#88aa20",
-                    colorChange: "yellow → yellow-green (near endpoint — add dropwise!)",
-                };
-            }
-            if (excess <= 1.0) {
-                return {
-                    observation: `✓ ENDPOINT REACHED — GREEN/BLUE-GREEN (pH ≈ 4.5). Base excess only ${excess.toFixed(1)} mmol. Record burette reading.`,
-                    newColor: "#3a8a40",
-                    colorChange: "yellow → green ✓ ENDPOINT (pH ≈ 4.5)",
-                };
-            }
-            return {
-                observation: `Over-titrated — ${excess.toFixed(1)} mmol excess base. Bromophenol blue BLUE. Endpoint was green. Repeat titration.`,
-                newColor: "#4040c0",
-                colorChange: "green → blue (over-titrated)",
-            };
-        },
-        blind(vessel) {
-            const { acidMmol, baseMmol, excess } = _titrationBalance(vessel);
-            if (baseMmol === 0 && acidMmol > 0)
-                return { observation: "Yellow (acidic). Add alkali from burette. Endpoint: yellow → green." };
-            if (acidMmol === 0 && baseMmol > 0)
-                return { observation: "Blue (alkaline). Add acid from burette. Endpoint: blue → green." };
-            if (excess < -2.0)
-                return { observation: "Yellow. Acid in excess. Continue adding alkali." };
-            if (excess < 0)
-                return { observation: "⚠️ Yellow-green. NEAR ENDPOINT — add alkali dropwise." };
-            if (excess <= 1.0)
-                return { observation: "✓ GREEN — ENDPOINT. Record burette reading." };
-            return { observation: "Blue — over-titrated (too much alkali). Repeat titration." };
         },
     },
 

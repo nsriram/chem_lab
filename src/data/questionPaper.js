@@ -1278,7 +1278,7 @@ Carry out tests using NaOH, NH₃(aq) and acidified KMnO₄.`,
         "FA 7": "NH4I",
         "FA 8": "BaCl2",
     },
-    unknownFAs: ["FA 2", "FA 4", "FA 6", "FA 7", "FA 8"],
+    unknownFAs: ["FA 2", "FA 3", "FA 4", "FA 6", "FA 7", "FA 8"],
     questions: [
         {
             id: "Q1", type: "quantitative",
