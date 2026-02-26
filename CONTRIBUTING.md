@@ -11,6 +11,7 @@ Thank you for your interest in contributing to the Cambridge Chemistry Lab Simul
 | **Question papers** | Add a past paper that isn't in the bank yet |
 | **Reaction rules** | Add a missing chemical reaction or improve an observation description |
 | **New chemicals** | Add a reagent needed for a specific paper |
+| **New equipment** | Add a missing piece of glassware or apparatus |
 | **Bug fixes** | Fix an incorrect reaction observation, scoring error, or UI glitch |
 | **Translations** | Improve or add a language in `src/data/i18n.js` |
 | **Tests** | Improve coverage for the evaluation engine or reaction rules |
@@ -49,6 +50,15 @@ npm test           # must pass before opening a PR
 npm run build      # must build cleanly
 ```
 
+The test suite covers:
+
+| File | What it enforces |
+|---|---|
+| `reactions.test.js` | `simulateReaction` output for ~40 combinations; indicator rule priority |
+| `evaluation.test.js` | Rubric scoring for all question types, grade boundaries |
+| `questionPaper.test.js` | Paper structure, mark totals, `faMap` × `CHEMICALS` cross-reference, `_aq` spoiler rule |
+| `data-integrity.test.js` | Every equipment entry has a valid `group`; every chemical has a valid `type`, `category`, and hex `color` |
+
 ### 5. Open a pull request
 
 Push your branch and open a PR against `main`. Fill in the PR description explaining what changed and why.
@@ -62,8 +72,9 @@ Papers live in `src/data/questionPaper.js`. Each entry in the `QUESTION_PAPERS` 
 Checklist for a new paper:
 
 - [ ] `id` is unique (e.g. `"p_m20"` for Feb/Mar 2020).
-- [ ] `faMap` maps every `"FA N"` label to a chemical ID from `src/data/chemicals.js`.
+- [ ] `faMap` maps every `"FA N"` label to a chemical ID that exists in `src/data/chemicals.js` — the test suite enforces this automatically.
 - [ ] `unknownFAs` lists only the labels the student must identify (not known reagents like indicators).
+- [ ] If a known FA maps to `ChemId_aq` and an unknown FA maps to the bare `ChemId` (same compound, different form), add the `_aq` FA to `unknownFAs` too — otherwise its palette label reveals the unknown's identity.
 - [ ] All question `type` values are one of `"quantitative"`, `"energetics"`, or `"qualitative"`.
 - [ ] Question and part `marks` values sum correctly.
 - [ ] `answerKey` fields do not reveal the identity of unknown FAs in the question `context` text.
@@ -80,10 +91,33 @@ Append a new entry to the `REACTION_RULES` array in the appropriate group. See [
 Tips:
 
 - Check that no existing rule already covers your combination (rules are first-match-wins).
+- **Indicator rules must be placed before generic acid-base rules** — if an indicator rule (e.g. bromophenol blue, methyl orange) is positioned after a catch-all neutralisation rule, the indicator will never fire. Place indicator rules in the titration indicators section, before the qualitative section.
 - If your rule should only fire for a specific action (e.g. heating), set `actionFilter: "heat"`.
 - Always provide a `blind()` function that omits chemical names — this is used when the FA is unknown to the student.
 - Extend a `matches` function rather than adding a duplicate rule when the same chemistry applies to multiple chemical IDs (e.g. both `KI` and `NH4I` supply `I⁻`).
-- Add a test case in `src/__tests__/reactions.test.js`.
+- Add a test case in `src/__tests__/reactions.test.js` that verifies your rule fires correctly — and, for indicator rules, that it fires *instead of* the generic rule it would otherwise be shadowed by.
+
+---
+
+## Adding a new piece of equipment
+
+Equipment lives in `src/data/equipment.js`. Add a new key to the `EQUIPMENT` object with a `group` field — the palette in `LabTab.jsx` is derived from this field automatically, so **no changes are needed anywhere else**:
+
+```js
+"round_bottom_flask": {
+    label: "Round-bottom Flask (500 cm³)",
+    icon:  "⚗️",
+    group: "vessels",          // "vessels" | "measuring" | "tools"
+    apparatusMass: 145.20,     // g — omit for non-weighable items
+},
+```
+
+Groups:
+- `"vessels"` — glassware that holds liquids or solids (flasks, beakers, crucibles)
+- `"measuring"` — volumetric or measuring instruments (burettes, pipettes, thermometers)
+- `"tools"` — everything else (Bunsen, stirring rod, filter paper, droppers)
+
+The `data-integrity.test.js` suite enforces that every entry has a valid `group`, `label`, and `icon` — `npm test` will catch missing or misspelled fields.
 
 ---
 
