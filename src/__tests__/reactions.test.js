@@ -336,3 +336,30 @@ describe("simulateReaction – edge cases", () => {
         expect(typeof r.observation).toBe("string");
     });
 });
+
+// ─── Indicator rule priority ──────────────────────────────────────────────────
+// These tests guard against indicator rules being shadowed by generic acid-base
+// rules (first-match-wins — a misplaced rule silently produces wrong output).
+
+describe("bromophenol blue priority over generic acid-base rules", () => {
+    it("fires indicator rule (not nahco3-acid) when NaHCO3_aq + H2SO4 + indicator", () => {
+        const v = vessel("NaHCO3_aq", "H2SO4", "bromophenol_blue");
+        const r = simulateReaction(v, "add");
+        // Indicator rule → mentions colour; generic nahco3-acid → mentions CO₂/effervescence
+        expect(r.observation).toMatch(/yellow|blue|green|bromophenol|endpoint/i);
+        expect(r.observation).not.toMatch(/effervescen|CO₂ gas evolved/i);
+    });
+
+    it("fires indicator rule (not naoh-neutralise) when NaOH + HCl + indicator", () => {
+        const v = vessel("NaOH", "HCl", "bromophenol_blue");
+        const r = simulateReaction(v, "add");
+        expect(r.observation).toMatch(/yellow|blue|green|bromophenol|endpoint/i);
+        expect(r.observation).not.toMatch(/no visible change|colourless/i);
+    });
+
+    it("reports blue colour when only base present with indicator", () => {
+        const v = vessel("NaHCO3_aq", "bromophenol_blue");
+        const r = simulateReaction(v, "add");
+        expect(r.observation).toMatch(/blue/i);
+    });
+});

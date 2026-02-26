@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { QUESTION_PAPERS, QUESTION_PAPER } from "../data/questionPaper.js";
+import { CHEMICALS } from "../data/chemicals.js";
 
 // ─── Basic structure ──────────────────────────────────────────────────────────
 
@@ -161,6 +162,43 @@ describe("faMap on every paper", () => {
             for (const phrase of bannedPhrases) {
                 expect(q3.context).not.toContain(phrase);
             }
+        }
+    });
+});
+
+// ─── Cross-data integrity ─────────────────────────────────────────────────────
+
+describe("faMap chemical IDs exist in CHEMICALS", () => {
+    it.each(QUESTION_PAPERS.map(p => [p.id, p]))("paper %s: every faMap value is a valid chemical ID", (_, paper) => {
+        for (const [fa, chemId] of Object.entries(paper.faMap)) {
+            expect(
+                CHEMICALS[chemId],
+                `${paper.id}: ${fa} maps to "${chemId}" which is not in CHEMICALS`
+            ).toBeDefined();
+        }
+    });
+});
+
+describe("prepared FAs inherit unknown status", () => {
+    // Specific spoiler pattern: a known FA maps to "ChemId_aq" while an unknown FA
+    // maps to "ChemId" (the same compound, just as a solid). The _aq label reveals
+    // the identity of the unknown (e.g. p_m21: FA 3 = NaHCO3_aq visible in palette
+    // while FA 2 = NaHCO3 is an unknown students must identify).
+    it.each(QUESTION_PAPERS.map(p => [p.id, p]))("paper %s: no known _aq FA reveals the base compound of an unknown FA", (_, paper) => {
+        const unknownChemIds = new Set(
+            paper.unknownFAs.map(fa => paper.faMap[fa]).filter(Boolean)
+        );
+        const knownFAs = Object.entries(paper.faMap)
+            .filter(([fa]) => !paper.unknownFAs.includes(fa));
+
+        for (const [fa, chemId] of knownFAs) {
+            if (!chemId.endsWith("_aq")) continue;
+            const baseId = chemId.slice(0, -3); // strip "_aq"
+            expect(
+                unknownChemIds.has(baseId),
+                `${paper.id}: ${fa} (known, maps to "${chemId}") reveals the identity ` +
+                `of an unknown FA that maps to "${baseId}" — add ${fa} to unknownFAs`
+            ).toBe(false);
         }
     });
 });

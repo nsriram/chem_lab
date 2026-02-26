@@ -26,26 +26,21 @@ const ACTIONS = [
 ];
 
 // ── Equipment palette groups ───────────────────────────────────────────────────
-const EQUIP_GROUPS = [
-    {
-        id: "vessels",
-        labelKey: "equip.vessels",
-        color: "#60a5fa",
-        ids: ["conical_flask", "beaker_100", "beaker_250", "volumetric_flask_250", "polystyrene_cup", "test_tube", "boiling_tube", "crucible"],
-    },
-    {
-        id: "measuring",
-        labelKey: "equip.measuring",
-        color: "#34d399",
-        ids: ["burette", "pipette_25", "measuring_cylinder_10", "measuring_cylinder_25", "measuring_cylinder_50", "thermometer", "stop_clock", "balance"],
-    },
-    {
-        id: "tools",
-        labelKey: "equip.tools",
-        color: "#fb923c",
-        ids: ["bunsen", "stirring_rod", "filter_paper", "dropper", "splint", "litmus_red"],
-    },
-];
+// Derived automatically from the `group` field on each EQUIPMENT entry.
+// To add a new piece of equipment, add it to equipment.js with a `group` field —
+// no changes needed here.
+const GROUP_META = {
+    vessels:  { labelKey: "equip.vessels",  color: "#60a5fa" },
+    measuring: { labelKey: "equip.measuring", color: "#34d399" },
+    tools:    { labelKey: "equip.tools",    color: "#fb923c" },
+};
+const EQUIP_GROUPS = Object.entries(GROUP_META).map(([id, meta]) => ({
+    id,
+    ...meta,
+    ids: Object.entries(EQUIPMENT)
+        .filter(([, eq]) => eq.group === id)
+        .map(([eid]) => eid),
+}));
 
 // ── Chemical category metadata ─────────────────────────────────────────────────
 const CAT_META = {
