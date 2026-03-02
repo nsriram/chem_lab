@@ -47,6 +47,7 @@ Browser
 - Calls handlers (`onAddChemical`, `onAction`, `onSelectVessel`, …) on user interaction.
 - Unknown FAs from the current paper's `faMap` are shown with placeholder labels in the palette so students don't see the chemical names.
 - Observation panel streams the latest reaction result from the engine.
+- Equipment palette groups (`vessels`, `measuring`, `tools`) are **derived automatically** from the `group` field on each entry in `data/equipment.js` — no hardcoded ID lists in this file.
 
 ### `FreeLabTab.jsx`
 - Identical bench layout to `LabTab` but without a paper constraint.
@@ -72,7 +73,14 @@ Browser
 
 ### `ChemTextInput.jsx`
 - Thin wrapper around `<textarea>` that auto-grows with content.
-- Used for answer boxes. Accepts an optional `style` override for use in table header cells.
+- Used for written answer boxes. Exports `TO_SUB` / `TO_SUP` Unicode maps used by `ChemCell`.
+- Keyboard shortcuts: `Ctrl+,` = subscript mode, `Ctrl+.` = superscript mode, `Esc` to exit.
+
+### `DataTab.jsx` (component library — no default export)
+- Exports three reusable components consumed by `PaperTab`:
+  - **`ChemCell`** — compact auto-growing textarea for table cells; shows a sub/sup toolbar (X₂ / X²) when focused, with a one-click character palette for common chemistry symbols.
+  - **`ChemInput`** — single-line inline input used for table/graph titles and axis labels.
+  - **`ResizableTable`** — drag-to-resize column table with `ChemCell` header and data cells.
 
 ---
 
@@ -130,16 +138,18 @@ All app state lives in a single custom hook. Components receive slices of state 
 
 ### Rule file structure
 
-`reaction-rules.js` is a pure data file — no React, no imports. Rules are grouped by type:
+`reaction-rules.js` is a pure data file — no React, no imports. Rules are grouped by type and **must appear in this order**:
 
-- **Kinetics** — thiosulfate clock (time calculation from concentration)
-- **Energetics** — displacement reactions with ΔT calculation
-- **Iodometric titration** — volume-aware endpoint colour progression (deep brown → yellow-brown → pale yellow → blue-black with starch → colourless)
-- **Redox** — KMnO₄ oxidations, Fe³⁺/KI, H₂O₂
-- **Qualitative** — cation precipitates (NaOH, NH₃), anion tests (BaCl₂, AgNO₃), acid/gas reactions
-- **Thermal** — heating/decomposition reactions
-- **Titration indicators** — phenolphthalein, methyl orange, bromophenol blue (volume-aware colour states)
-- **Fallbacks** — catch-all heat/stir/filter observations
+1. **Kinetics** — thiosulfate clock (time calculation from concentration)
+2. **Energetics** — displacement reactions with ΔT calculation
+3. **Iodometric titration** — volume-aware endpoint colour progression (deep brown → yellow-brown → pale yellow → blue-black with starch → colourless)
+4. **Titration indicators** — phenolphthalein, methyl orange, bromophenol blue (volume-aware colour states)
+5. **Redox** — KMnO₄ oxidations, Fe³⁺/KI, H₂O₂
+6. **Qualitative** — cation precipitates (NaOH, NH₃), anion tests (BaCl₂, AgNO₃), acid/gas reactions
+7. **Thermal** — heating/decomposition reactions
+8. **Fallbacks** — catch-all heat/stir/filter observations
+
+> **Critical ordering rule:** Titration indicator rules (group 4) must appear **before** the qualitative acid-base rules (group 6). Because the engine is first-match-wins, a misplaced indicator rule will be silently shadowed by the more general neutralisation rule, producing no colour change.
 
 ### Adding a new reaction
 
@@ -246,6 +256,9 @@ Each paper in `data/questionPaper.js` follows this shape:
     …
   },
   unknownFAs: ["FA 5", "FA 6", "FA 7", "FA 8"],  // labels hidden from student
+  // ⚠️  If a known FA maps to "ChemId_aq" and an unknown FA maps to "ChemId",
+  //     add the _aq FA to unknownFAs too — its palette label would otherwise
+  //     reveal the identity of the unknown compound.
   questions: [
     {
       id: "Q1", type: "quantitative",
@@ -275,9 +288,10 @@ Tests live in `src/__tests__/` and cover the pure-logic modules only (no DOM ren
 
 | File | Coverage |
 |---|---|
-| `reactions.test.js` | `simulateReaction` output for ~40 chemical combinations |
+| `reactions.test.js` | `simulateReaction` output for ~43 combinations; indicator rule priority over generic acid-base rules |
 | `evaluation.test.js` | Rubric scoring for all question types, edge cases, grade boundaries |
-| `questionPaper.test.js` | Structure, field presence, mark totals, and ID uniqueness for all 23 papers |
+| `questionPaper.test.js` | Structure, mark totals, ID uniqueness for all 23 papers; `faMap` × `CHEMICALS` cross-reference; `_aq` spoiler rule |
+| `data-integrity.test.js` | Every equipment entry has a valid `group`; every chemical has a valid `type`, `category`, and hex `color` |
 
 Run with:
 
