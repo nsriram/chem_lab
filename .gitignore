@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 
 samples/
+
+# Local AI tooling memory
+.claude/
